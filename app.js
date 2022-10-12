@@ -3,6 +3,8 @@ const express = require("express");
 const http = require("http");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const route = require("./routes");
+const errorHandler = require("./middlewares/errorhandler.middleware");
 
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -12,9 +14,16 @@ const limiter = rateLimit({
 });
 
 const app = express();
+
+app.use(express.json());
 app.use(limiter);
 app.use(helmet());
 app.disable("x-powered-by");
+
+app.use("/api", route);
+
+//error handler
+app.use(errorHandler);
 
 const server = http.createServer(app);
 
