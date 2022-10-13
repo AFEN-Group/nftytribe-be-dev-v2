@@ -14,7 +14,10 @@ class Mailer {
     const response = await this.mailchimp.messages.send({
       message: {
         subject,
-        to,
+        to: to.map((email) => ({
+          type: "to",
+          email,
+        })),
         from_email: this.sender,
         from_name: this.name,
         html,
@@ -24,5 +27,4 @@ class Mailer {
     return response;
   };
 }
-
-export default Mailer;
+module.exports = Mailer;

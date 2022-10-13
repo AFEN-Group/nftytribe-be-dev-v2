@@ -2,7 +2,7 @@ const user = require("./user");
 
 const route = require("express").Router();
 
-route.use(user);
+route.use("/user", user);
 
 // route.use("/collection");
 // route.use("/nft");

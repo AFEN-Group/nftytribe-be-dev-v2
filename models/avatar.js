@@ -3,7 +3,7 @@ const avatar = (sequelize, dataTypes) => {
     url: {
       allowNull: false,
       type: dataTypes.STRING,
-      defaultValue: "/avatar/avatar.png",
+      defaultValue: process.env.default_avatar,
       validate: {
         isUrl: true,
       },

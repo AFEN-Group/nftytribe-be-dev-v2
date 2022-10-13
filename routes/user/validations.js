@@ -1,5 +1,7 @@
 const { body, param } = require("express-validator");
 const rs = require("randomstring");
+const db = require("../../models");
+const multer = require("multer");
 const createUserValidation = [
   body("username")
     .trim()
@@ -9,10 +11,12 @@ const createUserValidation = [
     .not()
     .isEmpty()
     .trim()
-    .custom(async (value) => {
-      if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    .custom(async (walletAddress) => {
+      if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
         throw "invalid wallet address";
       }
+      const user = await db.users.findOne({ where: { walletAddress } });
+      if (user) throw "user with wallet address already exists";
       return true;
     }),
 ];
@@ -32,8 +36,7 @@ const loginValidation = [
 
 const userUpdateValidation = [
   body("username")
-    .not()
-    .isEmpty()
+    .optional()
     .trim()
     .custom(async (username) => {
       const user = await db.users.findOne({
@@ -44,18 +47,34 @@ const userUpdateValidation = [
       if (user) throw "username already exists";
       return true;
     }),
-  body("twitter").isURL().optional({ checkFalsy: true }),
-  body("website").isURL().optional({ checkFalsy: true }),
-  body("bio").isString().optional({ checkFalsy: true }),
+
+  body("twitter").isURL().optional({ checkFalsy: false }),
+  body("website").isURL().optional({ checkFalsy: false }),
+  body("bio").not().isEmpty().optional({ checkFalsy: false }),
 ];
 
-const addEmailValidation = [body("email").isEmail()];
+const addEmailValidation = [
+  body("email")
+    .isEmail()
+    .custom(async (email) => {
+      const user = await db.users.findOne({ where: { email } });
+      if (user) throw "Email is already associated with a user";
+      return true;
+    }),
+];
 
 const verifyEmailValidation = [body("token").not().isEmpty().trim()];
+const avatarUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 8e6,
+  },
+});
 module.exports = {
   createUserValidation,
   loginValidation,
   addEmailValidation,
   verifyEmailValidation,
   userUpdateValidation,
+  avatarUpload,
 };
