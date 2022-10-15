@@ -60,6 +60,24 @@ const users = (sequelize, dataTypes) => {
       },
       onDelete: "cascade",
     });
+    users.hasMany(models.collectionLikes, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+    users.hasMany(models.collectionFavorites, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+    users.hasMany(models.collections, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
   };
   return users;
 };
