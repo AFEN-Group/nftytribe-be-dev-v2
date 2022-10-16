@@ -64,6 +64,7 @@ const addEmailValidation = [
 ];
 
 const verifyEmailValidation = [body("token").not().isEmpty().trim()];
+
 const avatarUpload = multer({
   storage: multer.memoryStorage(),
   limits: {

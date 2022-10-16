@@ -1,13 +1,21 @@
 const collections = (sequelize, dataTypes) => {
   const collections = sequelize.define("collections", {
     name: {
-      allowNull: true,
+      allowNull: false,
       type: dataTypes.STRING,
+    },
+    symbol: {
+      type: dataTypes.STRING,
+      allowNull: false,
     },
     contractAddress: {
       allowNull: false,
       type: dataTypes.STRING,
       unique: "contractAddress",
+    },
+    contractType: {
+      allowNull: false,
+      type: dataTypes.STRING,
     },
     coverImage: {
       allowNull: false,
@@ -16,10 +24,6 @@ const collections = (sequelize, dataTypes) => {
       validate: {
         isUrl: true,
       },
-    },
-    referWalletAddress: {
-      allowNull: true,
-      type: dataTypes.STRING,
     },
   });
   collections.associate = (models) => {

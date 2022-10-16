@@ -48,9 +48,9 @@ class Uploads {
     // );
     // return this.uploaded;
   };
-  uploadAvatar = async (images = []) => {
+  uploadAvatar = async (images = [], path = "avatar") => {
     const [avatar] = await this.compressImages(images);
-    const location = await this.upload(avatar, "avatar");
+    const location = await this.upload(avatar, path);
     return location;
   };
 }
