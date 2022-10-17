@@ -30,13 +30,13 @@ const importCollectionValidations = [
 ];
 
 const deleteCollectionValidations = [
-  param("contractAddress")
+  param("id")
     .not()
     .isEmpty()
-    .custom(async (contractAddress) => {
-      const collection = await db.collection.findOne({
+    .custom(async (id, { req }) => {
+      const collection = await db.collections.findOne({
         where: {
-          contractAddress,
+          id,
           userId: req.user.id,
         },
       });

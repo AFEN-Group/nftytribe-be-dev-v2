@@ -27,7 +27,12 @@ const collections = (sequelize, dataTypes) => {
     },
   });
   collections.associate = (models) => {
-    collections.belongsTo(models.users);
+    collections.belongsTo(models.users, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
     collections.belongsTo(models.chains, {
       onDelete: "cascade",
       foreignKey: {

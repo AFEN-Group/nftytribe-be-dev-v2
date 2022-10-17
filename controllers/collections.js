@@ -35,25 +35,41 @@ const getAllCollections = expressAsyncHandler(async (req, res) => {
 });
 const getSingleCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const { id } = req.params;
+
+  const collection = await new Collections(
+    req.user?.id || req.query.userId
+  ).getSingleCollection(id);
+
+  res.send(collection);
 });
 const likeCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const result = await new Collections(req.user.id).likeUnlikeCollection(
+    req.params.id
+  );
+  res.send(result);
 });
-const unlikeCollection = expressAsyncHandler(async (req, res) => {
-  await checkError(req, validationResult);
-});
+
 const favoriteCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const result = await new Collections(
+    req.user.id
+  ).favoriteUnfavoriteCollection(req.params.id);
+  res.send(result);
 });
 const deleteCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const result = await new Collections(req.user.id).deleteCollection(
+    req.params.id
+  );
+  res.send(result);
 });
 module.exports = {
   importCollection,
   getAllCollections,
   getSingleCollection,
   likeCollection,
-  unlikeCollection,
   favoriteCollection,
   deleteCollection,
 };

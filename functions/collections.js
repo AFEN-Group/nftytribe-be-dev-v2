@@ -43,21 +43,21 @@ class Collections {
     return metaData;
   };
 
-  deleteCollection = async (contractAddress, userId = this.userId) => {
+  deleteCollection = async (id, userId = this.userId) => {
     await db.collections.destroy({
       where: {
-        contractAddress,
+        id,
         userId,
       },
     });
     return {
       message: "success",
-      contractAddress,
+      collectionId: id,
     };
   };
   getCollections = async (params, userId = this.userId) => {
     const { limit, page, search, liked, favorites } = params;
-    console.log(liked, favorites);
+    // console.log(liked, favorites);
     const options = {
       ...(search && {
         [Op.or]: [
@@ -73,21 +73,21 @@ class Collections {
           },
         ],
       }),
+      ...(liked && {
+        "$collectionLikes.userId$": userId,
+      }),
+      ...(favorites && {
+        "$collectionFavorites.userId$": userId,
+      }),
     };
-    const includeOptions = userId && [
+    const includeOptions = [
       {
         model: db.collectionLikes,
-        where: {
-          userId,
-        },
-        required: liked ? true : false,
+        attributes: [],
       },
       {
         model: db.collectionFavorites,
-        where: {
-          userId,
-        },
-        required: favorites ? true : false,
+        attributes: [],
       },
     ];
 
@@ -98,26 +98,69 @@ class Collections {
     const offset = (page - 1) * limit;
     const totalPages = Math.ceil(count / limit);
 
-    const results = await db.collections.findAll({
+    let results = await db.collections.findAll({
       where: options,
+      subQuery: false,
+      attributes: {
+        include: [
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("collectionLikes.id")),
+            "likeCount",
+          ],
+          [
+            db.Sequelize.fn(
+              "count",
+              db.Sequelize.col("collectionFavorites.id")
+            ),
+            "favoriteCount",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("collectionLikes.userId"),
+                userId
+              ),
+              "boolean"
+            ),
+            "isLiked",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("collectionFavorites.userId"),
+                userId
+              ),
+              "boolean"
+            ),
+            "isFavorite",
+          ],
+        ].filter((data) => data && data),
+      },
       include: includeOptions,
       limit,
       offset,
+      group: ["collections.id", "collectionLikes.id", "collectionFavorites.id"],
     });
 
     return {
       limit,
       totalPages,
       page,
-      results,
+      results: results.map((data) => {
+        return this.formatCollectionData(data);
+      }),
     };
   };
   getSingleCollection = async (field, userId = this.userId) => {
     const collection = await db.collections.findOne({
+      subQuery: false,
       where: {
         [Op.or]: [
           {
             name: field,
+          },
+          {
+            id: field,
           },
           {
             contractAddress: field,
@@ -127,19 +170,51 @@ class Collections {
       include: [
         {
           model: db.collectionLikes,
-          where: {
-            userId,
-          },
+          attributes: [],
         },
         {
           model: db.collectionFavorites,
-          where: {
-            userId,
-          },
+          attributes: [],
         },
       ],
+      attributes: {
+        include: [
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("collectionLikes.id")),
+            "likeCount",
+          ],
+          [
+            db.Sequelize.fn(
+              "count",
+              db.Sequelize.col("collectionFavorites.id")
+            ),
+            "favoriteCount",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("collectionLikes.userId"),
+                userId
+              ),
+              "boolean"
+            ),
+            "isLiked",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("collectionFavorites.userId"),
+                userId
+              ),
+              "boolean"
+            ),
+            "isFavorite",
+          ],
+        ].filter((data) => data && data),
+      },
+      group: ["collections.id", "collectionLikes.id", "collectionFavorites.id"],
     });
-    return collection;
+    return this.formatCollectionData(collection);
   };
   likeUnlikeCollection = async (collectionId, userId = this.userId) => {
     const isLiked = await db.collectionLikes.findOne({
@@ -192,6 +267,15 @@ class Collections {
         collectionId,
       };
     }
+  };
+  formatCollectionData = (data) => {
+    return data
+      ? {
+          ...data.dataValues,
+          isLiked: data.dataValues.isLiked ? true : false,
+          isFavorite: data.dataValues.isFavorite ? true : false,
+        }
+      : data;
   };
 }
 
