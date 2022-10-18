@@ -28,6 +28,7 @@ jobs:
       - run: rm -rf .env
       - name: Creating env file
         run: |
+          touch .env
           echo app_port=${{ secrets.app_port}} >> .env
           echo db_username=${{ secrets.db_username }} >> .env
           echo db_password=${{ secrets.db_password }} >> .env
