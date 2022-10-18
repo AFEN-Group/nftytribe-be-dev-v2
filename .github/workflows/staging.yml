@@ -48,6 +48,6 @@ jobs:
           echo spaces_name=${{ secrets.spaces_name }} >> .env
           echo email_verification_expiry=${{ secrets.email_verification_expiry }} >> .env
           echo default_avatar=${{ secrets.default_avatar }} >> .env
-          echo afen_nft_address=${{ secrets.afen_nft_address }} >> .env
-          echo afen_market_place_address=${{ secrets.afen_market_place_address }} >> .env
+          echo nft_address=${{ secrets.afen_nft_address }} >> .env
+          echo market_place_address=${{ secrets.afen_market_place_address }} >> .env
       - run: sudo pm2 start ecosystem.config.js
