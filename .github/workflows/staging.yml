@@ -5,11 +5,10 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
@@ -18,11 +17,35 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: yarn
-    - run: rm -rf .env
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: sudo pm2 stop ecosystem.config.js
+      - run: yarn
+      - run: rm -rf .env
+      - run: |
+          echo app_port={{ secrets.app_port}} >> .env
+          db_username={{ secrets.db_username }} >> .env
+          db_password={{ secrets.db_password }} >> .env
+          db_name={{ secrets.db_name }} >> .env
+          db_host={{ secrets.db_host }} >> .env
+          db_port={{ secrets.db_port }} >> .env
+          jwt_key={{ secrets.jwt_key }} >> .env
+          ipfs_url={{ secrets.ipfs_url }} >> .env
+          mailchimp_transactional_key={{ secrets.mailchimp_transactional_key }} >> .env
+          smtp_host={{ secrets.smtp_host }} >> .env
+          pinata_api_key={{ secrets.pinata_api_key }} >> .env
+          pinata_secret_key={{ secrets.pinata_secret_key }} >> .env
+          moralis_api_key={{ secrets.moralis_api_key }} >> .env
+          spaces_access_key={{ secrets.spaces_access_key }} >> .env
+          spaces_secret_key={{ secrets.spaces_secret_key }} >> .env
+          spaces_endpoint={{ secrets.spaces_endpoint }} >> .env
+          spaces_name={{ secrets.spaces_name }} >> .env
+          email_verification_expiry={{ secrets.email_verification_expiry }} >> .env
+          default_avatar={{ secrets.default_avatar }} >> .env
+          afen_nft_address={{ secrets.afen_nft_address }} >> .env
+          afen_market_place_address={{ secrets.afen_market_place_address }} >> .env
+      - run: sudo pm2 start ecosystem.config.js
