@@ -4,6 +4,7 @@ const http = require("http");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const route = require("./routes");
+const cors=require("cors")
 const errorHandler = require("./middlewares/errorhandler.middleware");
 
 const limiter = rateLimit({
@@ -14,7 +15,7 @@ const limiter = rateLimit({
 });
 
 const app = express();
-
+app.use(cors()
 app.use(express.json());
 app.use(limiter);
 app.use(helmet());
