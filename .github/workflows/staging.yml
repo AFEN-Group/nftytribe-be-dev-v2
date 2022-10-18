@@ -35,5 +35,19 @@ jobs:
           echo db_name=${{ secrets.db_name }} >> .env
           echo db_host=${{ secrets.db_host }} >> .env
           echo db_port=${{ secrets.db_port }} >> .env
-
+          echo jwt_key=${{ secrets.jwt_key }} >> .env
+          echo ipfs_url=${{ secrets.ipfs_url }} >> .env
+          echo mailchimp_transactional_key=${{ secrets.mailchimp_transactional_key }} >> .env
+          echo smtp_host=${{ secrets.smtp_host }} >> .env
+          echo pinata_api_key=${{ secrets.pinata_api_key }} >> .env
+          echo pinata_secret_key=${{ secrets.pinata_secret_key }} >> .env
+          echo moralis_api_key=${{ secrets.moralis_api_key }} >> .env
+          echo spaces_access_key=${{ secrets.spaces_access_key }} >> .env
+          echo spaces_secret_key=${{ secrets.spaces_secret_key }} >> .env
+          echo spaces_endpoint=${{ secrets.spaces_endpoint }} >> .env
+          echo spaces_name=${{ secrets.spaces_name }} >> .env
+          echo email_verification_expiry=${{ secrets.email_verification_expiry }} >> .env
+          echo default_avatar=${{ secrets.default_avatar }} >> .env
+          echo afen_nft_address=${{ secrets.afen_nft_address }} >> .env
+          echo afen_market_place_address=${{ secrets.afen_market_place_address }} >> .env
       - run: sudo pm2 start ecosystem.config.js
