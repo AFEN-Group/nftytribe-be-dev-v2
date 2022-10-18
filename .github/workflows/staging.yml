@@ -27,13 +27,12 @@ jobs:
       - run: yarn
       - run: rm -rf .env
       - run: |
-          touch .env
           echo app_port=${{ secrets.app_port}} >> .env
           echo db_username=${{ secrets.db_username }} >> .env
           echo db_password=${{ secrets.db_password }} >> .env
           echo db_name=${{ secrets.db_name }} >> .env
           echo db_host=${{ secrets.db_host }} >> .env
-          echo db_port=${{ secrets.db_port }} >> .env
+          echo db_port="${{ secrets.db_port }}" >> .env
           echo jwt_key=${{ secrets.jwt_key }} >> .env
           echo ipfs_url=${{ secrets.ipfs_url }} >> .env
           echo mailchimp_transactional_key=${{ secrets.mailchimp_transactional_key }} >> .env
