@@ -27,6 +27,7 @@ jobs:
       - run: yarn
       - run: rm -rf .env
       - run: |
+          touch .env
           echo app_port=${{ secrets.app_port}} >> .env
           echo db_username=${{ secrets.db_username }} >> .env
           echo db_password=${{ secrets.db_password }} >> .env
