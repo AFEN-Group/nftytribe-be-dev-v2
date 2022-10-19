@@ -72,6 +72,12 @@ const users = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    users.hasMany(models.nfts, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
     users.hasMany(models.collections, {
       onDelete: "cascade",
       foreignKey: {

@@ -1,3 +1,4 @@
+const categories = require("./categories");
 const chain = require("./chain");
 const collections = require("./collections");
 const user = require("./user");
@@ -9,7 +10,6 @@ route.use("/user", user);
 route.use("/collection", collections);
 // route.use("/nft");
 route.use("/chain", chain);
-// route.use("/category");
-// route.use("/listing");
+route.use("/category", categories);
 
 module.exports = route;

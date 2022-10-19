@@ -51,6 +51,7 @@ const collections = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    collections.hasMany(models.nfts);
   };
   return collections;
 };

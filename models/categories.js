@@ -6,7 +6,10 @@ const categories = (sequelize, dataTypes) => {
       unique: "name",
     },
   });
-  categories.associate = (models) => {};
+  categories.associate = (models) => {
+    categories.hasMany(models.nfts)
+  };
+  return categories
 };
 
 module.exports = categories;

@@ -18,6 +18,12 @@ const chains = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    chains.hasMany(models.nfts, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
   };
   return chains;
 };
