@@ -1,9 +1,12 @@
 const expressAsyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 const checkError = require("../functions/checkError");
+const Nfts = require("../functions/nfts");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const nfts = await new Nfts().getNfts(req.query, req.params.field);
+  res.send(nfts);
 });
 const getSingleNft = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
