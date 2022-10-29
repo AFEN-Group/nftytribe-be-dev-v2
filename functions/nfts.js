@@ -22,9 +22,9 @@ class Nfts {
     return nft;
   };
 
-  getNftMetaData = async (data) => {
-    const { tokenId, contractAddress } = data;
-  };
+  //   getNftMetaData = async (data) => {
+  //     const { tokenId, contractAddress } = data;
+  //   };
 }
 
 module.exports = Nfts;
