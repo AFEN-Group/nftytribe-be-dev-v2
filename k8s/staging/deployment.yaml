@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nftytribe-v2-be
+spec:
+  selector:
+    matchLabels:
+      nftytribe-v2-dev: api
+  template:
+    metadata:
+      labels:
+        nftytribe-v2-dev: api
+    spec:
+      containers:
+        - name: nftytribe-v2-api
+          image: radianceobi/nftytribe-v2-be
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: staging
+            - name: "app_port"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "app_port"
+
+            - name: db_host
+              value: mysql-cluster-ip-service
+            - name: "db_username"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "db_username"
+            - name: "db_password"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "db_password"
+            - name: "db_name"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "db_name"
+            - name: "db_port"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "db_port"
+            - name: "jwt_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "jwt_key"
+            - name: "ipfs_url"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "ipfs_url"
+            - name: "mailchimp_transactional_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "mailchimp_transactional_key"
+            - name: "smtp_host"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "smtp_host"
+            - name: "pinata_api_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "pinata_api_key"
+            - name: "pinata_secret_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "pinata_secret_key"
+            - name: "moralis_api_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "moralis_api_key"
+            - name: "spaces_access_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "spaces_access_key"
+            - name: "spaces_secret_key"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "spaces_secret_key"
+            - name: "spaces_endpoint"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "spaces_endpoint"
+            - name: "spaces_name"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "spaces_name"
+            - name: "email_verification_expiry"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "email_verification_expiry"
+            - name: "default_avatar"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "default_avatar"
+            - name: "afen_nft_address"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "afen_nft_address"
+            - name: "afen_market_place_address"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "afen_market_place_address"
