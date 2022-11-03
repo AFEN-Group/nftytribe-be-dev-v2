@@ -32,4 +32,6 @@ jobs:
         run: kubectl apply -f $GITHUB_WORKSPACE/k8s/staging --namespace=development
 
       - name: Verify deployment
-        run: kubectl rollout status deployment/nftytribe-v2-be --namespace=development
+        run: |
+          kubectl rollout status deployment/nftytribe-v2-be --namespace=development
+          kubectl rollout status deployment/mysql-deployment --namespace=development
