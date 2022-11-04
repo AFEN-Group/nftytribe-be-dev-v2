@@ -23,7 +23,9 @@ jobs:
         run: docker push ${{ secrets.REGISTRY_NAME }}/nftytribe-v2-be:$(echo $GITHUB_SHA | head -c7)
 
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|${{ secrets.REGISTRY_NAME }}/nftytribe-v2-be:'${TAG}'|' $GITHUB_WORKSPACE/k8s/staging/deployment.yaml
+        run: |
+          TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|${{ secrets.REGISTRY_NAME }}/nftytribe-v2-be:'${TAG}'|' $GITHUB_WORKSPACE/k8s/staging/deployment.yaml
+          $(echo $GITHUB_WORKSPACE/k8s/staging)
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
@@ -32,6 +34,4 @@ jobs:
         run: kubectl apply -f $GITHUB_WORKSPACE/k8s/staging --namespace=development
 
       - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/nftytribe-v2-be --namespace=development
-          kubectl rollout status deployment/mysql-deployment --namespace=development
+        run: kubectl rollout status deployment/nftytribe-v2-be --namespace=development
