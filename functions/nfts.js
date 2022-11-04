@@ -3,9 +3,11 @@ const db = require("../models");
 class Nfts {
   getNfts = async (options, walletAddress) => {
     const { limit, page: cursor, chain } = options;
-    const { symbol } = await db.chains.findOne({ where: { id: chain } });
+
+    //validations will be re done on chains
+    // const { symbol } = await db.chains.findOne({ where: { id: chain } });
     const nfts = await moralis(`${walletAddress}/nft`, "get", {
-      chain: symbol,
+      chain,
       limit,
       cursor,
     });
