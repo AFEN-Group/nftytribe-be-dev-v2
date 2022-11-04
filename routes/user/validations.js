@@ -6,7 +6,9 @@ const createUserValidation = [
   body("username")
     .trim()
     .escape()
-    .default(`user-${rs.generate(5)}`),
+    .customSanitizer((value) => {
+      return "user-" + rs.generate(8);
+    }),
   body("walletAddress")
     .not()
     .isEmpty()
