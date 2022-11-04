@@ -11,10 +11,10 @@ spec:
       labels:
         component: mysql
     spec:
-      volumes:
-        - name: sql-vol
-          persistentVolumeClaim:
-            claimName: sql-pvc
+      # volumes:
+      #   - name: sql-vol
+      #     persistentVolumeClaim:
+      #       claimName: sql-pvc
       containers:
         - name: mysql
           image: mysql
@@ -31,6 +31,6 @@ spec:
                 secretKeyRef:
                   name: nftytribev2secret
                   key: db_name
-          volumeMounts:
-            - mountPath: /var/lib/mysql
-              name: sql-vol
+          # volumeMounts:
+          #   - mountPath: /var/lib/mysql
+          #     name: sql-vol
