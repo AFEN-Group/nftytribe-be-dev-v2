@@ -12,14 +12,14 @@ const addChainValidations = [
       if (chain) throw "chain with name already exists";
       return true;
     }),
-  body("symbol")
+  body("chain")
     .not()
     .isEmpty()
-    .custom(async (symbol) => {
-      const chain = await db.chains.findOne({
-        where: { symbol },
+    .custom(async (chain) => {
+      const chainExists = await db.chains.findOne({
+        where: { chain },
       });
-      if (chain) throw "chain with symbol already exists";
+      if (chainExists) throw "chain with chainId already exists";
       return true;
     }),
 ];

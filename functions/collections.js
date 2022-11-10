@@ -29,13 +29,12 @@ class Collections {
     });
 
     const metaData = result?.toJSON();
-    // console.log(metaData);
 
     const user = await db.users.findOne({
       where: { walletAddress },
       include: { model: db.avatar },
     });
-    // console.log(user);
+
     if (user && chain) {
       const collection = await db.collections.create({
         userId: user.id,
@@ -45,7 +44,6 @@ class Collections {
         chainId: chain.id,
       });
 
-      // console.log(collection);
       return collection;
     }
   };

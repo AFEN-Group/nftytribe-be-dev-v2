@@ -8,7 +8,7 @@ class Chains {
   createOrUpdateChain = async (data) => {
     const chain = await db.chains.upsert(data, {
       where: {
-        [Op.or]: [{ name: data.name }, { symbol: data.symbol }],
+        [Op.or]: [{ name: data.name }, { chain: data.chain }],
       },
     });
     return chain;

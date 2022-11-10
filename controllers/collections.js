@@ -17,9 +17,10 @@ const importCollection = expressAsyncHandler(async (req, res) => {
     coverImage = location;
   }
 
-  const collection = await new Collections(req.user.id).importCollection(
+  const collection = await new Collections().importCollection(
     contractAddress,
     chain,
+    req.user.walletAddress,
     coverImage
   );
   res.send(collection);
