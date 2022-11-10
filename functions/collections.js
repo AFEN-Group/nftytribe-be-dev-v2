@@ -36,8 +36,8 @@ class Collections {
     //   address: contractAddress,
     //   chain: chainId,
     // });
-
     // console.log(isOwner?.toJSON());
+
     const metaData = result?.toJSON();
 
     const user = await db.users.findOne({
