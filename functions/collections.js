@@ -1,6 +1,11 @@
 const { Op } = require("sequelize");
 const db = require("../models");
 const moralis = require("./moralis");
+const Moralis = require("moralis").default;
+
+Moralis.start({
+  apiKey: process.env.moralis_api_key,
+});
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -8,29 +13,41 @@ class Collections {
   importCollection = async (
     contractAddress,
     chainId,
-    coverImage,
-    userId = this.userId
+    walletAddress,
+    coverImage
   ) => {
-    const chain = await db.chains.findOne({ where: { id: chainId } });
-    const metaData = await this.getCollectionMetaData(
-      contractAddress,
-      chain.symbol
-    );
+    const chain = await db.chains.findOne({ where: { chain: chainId } });
+
+    await Moralis.EvmApi.nft.syncNFTContract({
+      address: contractAddress,
+      chain: chainId,
+    });
+
+    const result = await Moralis.EvmApi.nft.getNFTContractMetadata({
+      address: contractAddress,
+      chain: chainId,
+    });
+
+    const metaData = result?.toJSON();
+    // console.log(metaData);
+
     const user = await db.users.findOne({
-      where: { id: userId },
+      where: { walletAddress },
       include: { model: db.avatar },
     });
+    // console.log(user);
+    if (user && chain) {
+      const collection = await db.collections.create({
+        userId: user.id,
+        ...metaData,
+        contractAddress,
+        coverImage: coverImage || user.avatar.url,
+        chainId: chain.id,
+      });
 
-    const collection = await db.collections.create({
-      userId,
-      ...metaData,
-      contractAddress,
-      contractType: metaData.contract_type,
-      coverImage: coverImage || user.avatar.url,
-      chainId,
-    });
-
-    return collection;
+      // console.log(collection);
+      return collection;
+    }
   };
 
   getCollectionMetaData = async (contractAddress, chain = "bsc") => {
@@ -279,4 +296,5 @@ class Collections {
   };
 }
 
+// new Collections().importCollection("0x2f204d509852f50abb1b735c2c46231a0c9516eb")
 module.exports = Collections;

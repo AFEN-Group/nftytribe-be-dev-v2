@@ -5,10 +5,10 @@ const chains = (sequelize, dataTypes) => {
       allowNull: false,
       unique: "name",
     },
-    symbol: {
+    chain: {
       allowNull: false,
       type: dataTypes.STRING,
-      unique: "symbol",
+      unique: "chain",
     },
   });
   chains.associate = (models) => {
