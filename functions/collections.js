@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const owner = require("../abi/owner");
 const db = require("../models");
 const moralis = require("./moralis");
 const Moralis = require("moralis").default;
@@ -23,11 +24,20 @@ class Collections {
       chain: chainId,
     });
 
+    //check owner
+
     const result = await Moralis.EvmApi.nft.getNFTContractMetadata({
       address: contractAddress,
       chain: chainId,
     });
 
+    // const isOwner = await Moralis.EvmApi.utils.runContractFunction({
+    //   abi: owner[0],
+    //   address: contractAddress,
+    //   chain: chainId,
+    // });
+
+    // console.log(isOwner?.toJSON());
     const metaData = result?.toJSON();
 
     const user = await db.users.findOne({
