@@ -20,11 +20,9 @@ const importCollectionValidations = [
   body("chain")
     .not()
     .isEmpty()
-    .toInt()
-    .isInt()
-    .custom(async (id) => {
-      const chain = await db.chains.findOne({ where: { id } });
-      if (!chain) throw "chain is not supported";
+    .custom(async (chain) => {
+      const chainExist = await db.chains.findOne({ where: { chain } });
+      if (!chainExist) throw "chain is not supported";
       return true;
     }),
 ];

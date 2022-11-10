@@ -20,7 +20,6 @@ const collections = (sequelize, dataTypes) => {
     coverImage: {
       allowNull: false,
       type: dataTypes.STRING,
-      unique: "coverImage",
       validate: {
         isUrl: true,
       },

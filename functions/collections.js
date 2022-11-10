@@ -45,6 +45,11 @@ class Collections {
       });
 
       return collection;
+    } else {
+      throw {
+        message: "invalid user or chain",
+        status: 400,
+      };
     }
   };
 

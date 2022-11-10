@@ -15,7 +15,7 @@ collections.route("/").post(
 
         console.log(data);
 
-        new Collections().importCollection(
+        await new Collections().importCollection(
           data.contractAddress,
           data.chainId,
           data.walletAddress
