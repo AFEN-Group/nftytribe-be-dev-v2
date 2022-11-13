@@ -24,19 +24,10 @@ class Collections {
       chain: chainId,
     });
 
-    //check owner
-
     const result = await Moralis.EvmApi.nft.getNFTContractMetadata({
       address: contractAddress,
       chain: chainId,
     });
-
-    // const isOwner = await Moralis.EvmApi.utils.runContractFunction({
-    //   abi: owner[0],
-    //   address: contractAddress,
-    //   chain: chainId,
-    // });
-    // console.log(isOwner?.toJSON());
 
     const metaData = result?.toJSON();
 
@@ -44,6 +35,25 @@ class Collections {
       where: { walletAddress },
       include: { model: db.avatar },
     });
+
+    //checking ownership of collection
+    const ownerAddress = await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        const isOwner = await Moralis.EvmApi.utils.runContractFunction({
+          abi: owner,
+          address: contractAddress,
+          chain: chainId,
+          functionName: "owner",
+        });
+        resolve(isOwner?.toJSON());
+        // console.log(isOwner?.toJSON());
+      }, 500);
+    });
+    if (ownerAddress.toLowerCase() !== user.walletAddress.toLowerCase())
+      throw {
+        status: 401,
+        message: "Collection does not belong to you!",
+      };
 
     if (user && chain) {
       const collection = await db.collections.create({
@@ -309,5 +319,11 @@ class Collections {
   };
 }
 
-// new Collections().importCollection("0x2f204d509852f50abb1b735c2c46231a0c9516eb")
+// new Collections()
+//   .importCollection(
+//     "0x2f204d509852f50abb1b735c2c46231a0c9516eb",
+//     "0x61",
+//     "0x93dd857159351cc732be2f0a42b698f130ac7e9b"
+//   )
+//   .catch(console.log);
 module.exports = Collections;
