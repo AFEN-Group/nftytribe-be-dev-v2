@@ -24,9 +24,6 @@ const nfts = (sequelize, dataTypes) => {
     url: {
       type: dataTypes.STRING,
       allowNull: false,
-      validate: {
-        isUrl: true,
-      },
     },
     lazyMint: {
       type: dataTypes.BOOLEAN,
@@ -46,7 +43,7 @@ const nfts = (sequelize, dataTypes) => {
       type: dataTypes.DATE,
       allowNull: true,
     },
-    advancedSetting: {
+    moreInfo: {
       type: dataTypes.JSON,
       allowNull: true,
     },
@@ -54,6 +51,10 @@ const nfts = (sequelize, dataTypes) => {
       type: dataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
+    },
+    amount: {
+      type: dataTypes.INTEGER,
+      defaultValue: 1,
     },
   });
 

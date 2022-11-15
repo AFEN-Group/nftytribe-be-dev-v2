@@ -3,30 +3,40 @@ const brokerV2 = require("../../abi/brokerV2");
 const broker = require("express").Router();
 
 const abiDecoder = require("abi-decoder");
+const Nfts = require("../../functions/nfts");
 abiDecoder.addABI(brokerV2.brokerV2);
 
-broker.route("/on-sale").post(
+broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
     // console.log(req.body);
     const { txs, chainId, confirmed } = req.body;
     const [txsData] = txs;
-    if (txsData) {
+    if (txsData && !confirmed) {
       const { fromAddress, input } = txsData;
       const data = abiDecoder.decodeMethod(input);
+      const nfts = new Nfts();
       console.log(data);
-    }
 
-    res.send();
-  })
-);
-broker.route("/off-sale").post(
-  expressAsyncHandler(async (req, res) => {
-    // console.log(req.body);
-    const { txs, chainId, confirmed } = req.body;
-    const [txsData] = txs;
-    if (txsData) {
-      const { fromAddress, input } = txsData;
-      const data = abiDecoder.decodeMethod(input);
+      if (data.name.toLowerCase() === "putsaleoff") {
+        //handle putting sale off
+        const [tokenId, address] = data.params;
+
+        const putOffSale = await nfts.putOffSale(
+          address.value,
+          fromAddress,
+          tokenId.value
+        );
+      }
+
+      if (data.name.toLowerCase() === "putonsale") {
+        const newListing = await nfts.putOnSale(
+          data.params,
+          fromAddress,
+          chainId
+        );
+      }
+    } else if (txsData && confirmed) {
+      //changed confirmed to true
     }
 
     res.send();
