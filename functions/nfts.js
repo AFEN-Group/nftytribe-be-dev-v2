@@ -86,6 +86,7 @@ class Nfts {
         collectionId: collection?.id,
         chainId: chainId.id,
         userId: user.id,
+        confirmed: true,
       };
 
       // store to db
