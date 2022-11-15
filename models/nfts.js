@@ -50,6 +50,11 @@ const nfts = (sequelize, dataTypes) => {
       type: dataTypes.JSON,
       allowNull: true,
     },
+    confirmed: {
+      type: dataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   });
 
   nfts.associate = (models) => {
