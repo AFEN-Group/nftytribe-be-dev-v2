@@ -47,23 +47,23 @@ class Collections {
     });
 
     //checking ownership of collection
-    // const ownerAddress = await new Promise((resolve, reject) => {
-    //   setTimeout(async () => {
-    //     const isOwner = await Moralis.EvmApi.utils.runContractFunction({
-    //       abi: owner,
-    //       address: contractAddress,
-    //       chain: chainId,
-    //       functionName: "owner",
-    //     });
-    //     resolve(isOwner?.toJSON());
-    // console.log(isOwner?.toJSON());
-    // }, 1000);
-    // });
-    // if (ownerAddress.toLowerCase() !== user.walletAddress.toLowerCase())
-    //   throw {
-    //     status: 401,
-    //     message: "Collection does not belong to you!",
-    //   };
+    const ownerAddress = await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        const isOwner = await Moralis.EvmApi.utils.runContractFunction({
+          abi: owner,
+          address: contractAddress,
+          chain: chainId,
+          functionName: "owner",
+        });
+        resolve(isOwner?.toJSON());
+        // console.log(isOwner?.toJSON());
+      }, 800);
+    });
+    if (ownerAddress.toLowerCase() !== user.walletAddress.toLowerCase())
+      throw {
+        status: 401,
+        message: "Collection does not belong to you!",
+      };
 
     if (user && chain) {
       const collection = await db.collections.create({
