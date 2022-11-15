@@ -47,7 +47,7 @@ class Collections {
         });
         resolve(isOwner?.toJSON());
         // console.log(isOwner?.toJSON());
-      }, 500);
+      }, 1000);
     });
     if (ownerAddress.toLowerCase() !== user.walletAddress.toLowerCase())
       throw {
