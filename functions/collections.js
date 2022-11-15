@@ -19,14 +19,24 @@ class Collections {
   ) => {
     const chain = await db.chains.findOne({ where: { chain: chainId } });
 
-    await Moralis.EvmApi.nft.syncNFTContract({
-      address: contractAddress,
-      chain: chainId,
+    const syncing = await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        const sync = await Moralis.EvmApi.nft.syncNFTContract({
+          address: contractAddress,
+          chain: chainId,
+        });
+        resolve(sync?.toJSON());
+      }, 800);
     });
 
-    const result = await Moralis.EvmApi.nft.getNFTContractMetadata({
-      address: contractAddress,
-      chain: chainId,
+    const result = await new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        const data = await Moralis.EvmApi.nft.getNFTContractMetadata({
+          address: contractAddress,
+          chain: chainId,
+        });
+        resolve(data);
+      }, 800);
     });
 
     const metaData = result?.toJSON();
