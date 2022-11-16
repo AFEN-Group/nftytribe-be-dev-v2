@@ -106,7 +106,7 @@ class Collections {
     };
   };
   getCollections = async (params, userId = this.userId) => {
-    const { limit, page, search, liked, favorites } = params;
+    const { limit, page, search, liked, favorites, owner } = params;
     // console.log(liked, favorites);
     const options = {
       ...(search && {
@@ -128,6 +128,9 @@ class Collections {
       }),
       ...(favorites && {
         "$collectionFavorites.userId$": userId,
+      }),
+      ...(owner && {
+        userId: owner,
       }),
     };
     const includeOptions = [
@@ -168,6 +171,7 @@ class Collections {
             db.Sequelize.cast(
               db.Sequelize.where(
                 db.Sequelize.col("collectionLikes.userId"),
+                Op.eq,
                 userId
               ),
               "boolean"

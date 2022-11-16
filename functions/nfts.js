@@ -1,6 +1,7 @@
 const moralis = require("./moralis");
 const Moralis = require("moralis").default;
 const db = require("../models");
+const { Op } = require("sequelize");
 
 Moralis.start({
   apiKey: process.env.moralis_api_key,
@@ -63,7 +64,7 @@ class Nfts {
       const values = {
         name: nftMetadata.name,
         tokenId: data.tokenID,
-        description: nftMetadata.metadata.description,
+        description: nftMetadata.metadata?.description,
         url:
           nftMetadata.metadata?.image ||
           nftMetadata.metadata?.file ||
@@ -133,6 +134,168 @@ class Nfts {
         },
       }))
     );
+  };
+
+  getListings = async (inputs = {}) => {
+    const {
+      userId, // current user making requests
+      lazyMint,
+      owner,
+      category,
+      collection,
+      chain,
+      search, // search by name, collection address and symbol
+      priceLowest,
+      priceHighest,
+      listingType,
+      fromDate,
+      toDate,
+      limit,
+      page,
+      order, // recent, most viewed, oldest, most liked
+    } = inputs;
+
+    const offset = (page - 1) * limit;
+
+    // building out options for query
+    const options = {
+      ...(lazyMint !== undefined && {
+        lazyMint: lazyMint,
+      }),
+      ...(owner && {
+        [Op.or]: [
+          {
+            userId: owner,
+          },
+        ],
+      }),
+      ...(category && {
+        categoryId: category,
+      }),
+      ...(collection && {
+        collectionId: collection,
+      }),
+      ...(chain && {
+        chainId: chain,
+      }),
+      ...(search && {
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: `%${search}%`,
+            },
+          },
+          {
+            moreInfo: {
+              symbol: {
+                [Op.like]: `%${search}%`,
+              },
+            },
+          },
+          {
+            moreInfo: {
+              contractAddress: {
+                [Op.like]: `%${search}%`,
+              },
+            },
+          },
+        ],
+      }),
+      ...((priceHighest || priceLowest) && {
+        price: {
+          [Op.and]: {
+            ...(priceLowest && {
+              [Op.gte]: priceLowest,
+            }),
+            ...(priceHighest && {
+              [Op.lte]: priceHighest,
+            }),
+          },
+        },
+      }),
+      ...(listingType && {
+        listingType,
+      }),
+      ...((fromDate || toDate) && {
+        createdAt: {
+          [Op.and]: {
+            ...(fromDate && {
+              [Op.gte]: fromDate,
+            }),
+            ...(toDate && {
+              [Op.lte]: toDate,
+            }),
+          },
+        },
+      }),
+    };
+
+    console.log(inputs);
+    const count = await db.nfts.count({
+      where: options,
+    });
+
+    const includeOptions = [
+      {
+        model: db.nftLikes,
+        attributes: [],
+      },
+      {
+        model: db.nftFavorites,
+        attributes: [],
+      },
+    ];
+    const totalPages = Math.ceil(count / limit);
+
+    const result = await db.nfts.findAll({
+      where: options,
+      include: includeOptions,
+      subQuery: false,
+      attributes: {
+        include: [
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("nftLikes.id")),
+            "likeCount",
+          ],
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("nftFavorites.id")),
+            "favoriteCount",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("nftLikes.userId"),
+                Op.eq,
+                userId
+              ),
+              "boolean"
+            ),
+            "isLiked",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("nftFavorites.userId"),
+                Op.eq,
+                userId
+              ),
+              "boolean"
+            ),
+            "isLiked",
+          ],
+        ].filter((data) => data && data),
+      },
+      limit,
+      offset,
+      group: ["nfts.id", "nftLikes.id", "nftFavorites.id"],
+    });
+
+    return {
+      page,
+      totalPages,
+      limit,
+      results: [...result],
+    };
   };
 }
 

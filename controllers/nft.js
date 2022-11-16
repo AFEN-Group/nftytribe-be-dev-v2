@@ -16,6 +16,9 @@ const ListNft = expressAsyncHandler(async (req, res) => {
 });
 const getListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const options = req.query;
+  const result = await new Nfts().getListings(options);
+  res.send(result);
 });
 const watchListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
