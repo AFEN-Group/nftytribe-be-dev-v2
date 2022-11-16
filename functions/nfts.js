@@ -244,6 +244,14 @@ class Nfts {
         model: db.nftFavorites,
         attributes: [],
       },
+      {
+        model: db.users,
+        attributes: ["username", "walletAddress", "id"],
+        include: {
+          model: db.avatar,
+          attributes: ["url"],
+        },
+      },
     ];
     const totalPages = Math.ceil(count / limit);
 
@@ -287,16 +295,24 @@ class Nfts {
       },
       limit,
       offset,
-      group: ["nfts.id", "nftLikes.id", "nftFavorites.id"],
+      group: ["nfts.id", "user.id", "nftLikes.id", "nftFavorites.id"],
     });
 
     return {
       page,
       totalPages,
       limit,
-      results: [...result],
+      results: [...result].map((data) => {
+        const value = { ...data.dataValues };
+        value.isLiked = value.isLiked ? true : false;
+        value.isFavorite = value.isFavorite ? true : false;
+        return value;
+      }),
     };
   };
+
+  likeUnlike = async () => {};
+  favoriteUnfavorite = async () => {};
 }
 
 module.exports = Nfts;
