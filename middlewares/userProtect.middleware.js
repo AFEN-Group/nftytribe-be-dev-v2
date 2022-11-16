@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
-const db= require("../models")
+const db = require("../models");
 const userProtect = asyncHandler(async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
@@ -16,12 +16,13 @@ const userProtect = asyncHandler(async (req, res, next) => {
     };
   }
   const result = jwt.verify(authorization.split(" ")[1], process.env.jwt_key);
-  const user = await db.users.findOne({where: {id: result.id}});
+  const user = await db.users.findOne({ where: { id: result.id } });
 
-  if(!user) throw {
-    code: 401,
-    message: "user does not exist"
-  }
+  if (!user)
+    throw {
+      code: 401,
+      message: "user does not exist",
+    };
 
   req.user = user.dataValues;
 

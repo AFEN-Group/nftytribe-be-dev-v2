@@ -289,7 +289,7 @@ class Nfts {
               ),
               "boolean"
             ),
-            "isLiked",
+            "isFavorite",
           ],
         ].filter((data) => data && data),
       },
@@ -311,8 +311,66 @@ class Nfts {
     };
   };
 
-  likeUnlike = async () => {};
-  favoriteUnfavorite = async () => {};
+  likeUnlike = async (userId, nftId) => {
+    const isLiked = await db.nftLikes.findOne({
+      where: {
+        userId,
+        nftId,
+      },
+    });
+    if (isLiked) {
+      await db.nftLikes.destroy({
+        where: {
+          userId,
+          nftId,
+        },
+      });
+      return {
+        status: "unliked",
+        id: nftId,
+      };
+    } else {
+      await db.nftLikes.create({
+        userId,
+        nftId,
+      });
+
+      return {
+        status: "liked",
+        id: nftId,
+      };
+    }
+  };
+  favoriteUnfavorite = async (userId, nftId) => {
+    const isFavorite = await db.nftFavorites.findOne({
+      where: {
+        userId,
+        nftId,
+      },
+    });
+    if (isFavorite) {
+      await db.nftFavorites.destroy({
+        where: {
+          userId,
+          nftId,
+        },
+      });
+      return {
+        status: "unFavorite",
+        id: nftId,
+      };
+    } else {
+      await db.nftFavorites.create({
+        userId,
+        nftId,
+      });
+
+      return {
+        status: "favorite",
+        id: nftId,
+      };
+    }
+  };
 }
 
 module.exports = Nfts;

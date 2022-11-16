@@ -29,6 +29,18 @@ const bidListings = expressAsyncHandler(async (req, res) => {
 const getBids = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
 });
+const likeListing = expressAsyncHandler(async (req, res) => {
+  await checkError(req, validationResult);
+  const { id } = req.user;
+  const result = await new Nfts().likeUnlike(id, req.params.nftId);
+  res.send(result);
+});
+const favoriteListing = expressAsyncHandler(async (req, res) => {
+  await checkError(req, validationResult);
+  const { id } = req.user;
+  const result = await new Nfts().favoriteUnfavorite(id, req.params.nftId);
+  res.send(result);
+});
 
 module.exports = {
   getNfts,
@@ -38,4 +50,6 @@ module.exports = {
   watchListings,
   bidListings,
   getBids,
+  likeListing,
+  favoriteListing,
 };

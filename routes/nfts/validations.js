@@ -31,7 +31,21 @@ const getListingValidation = [
   query("page").toInt().default(1),
   query("order").toInt().default(1),
 ];
+
+const favorite_like_Validations = [
+  param("nftId")
+    .not()
+    .isEmpty()
+    .custom(async (id) => {
+      const nft = await db.nfts.findOne({
+        where: { id },
+      });
+      if (!nft) throw "nft not found";
+      true;
+    }),
+];
 module.exports = {
   getNftsValidations,
   getListingValidation,
+  favorite_like_Validations,
 };
