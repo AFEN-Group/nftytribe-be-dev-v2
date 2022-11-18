@@ -25,7 +25,7 @@ const getListingValidation = [
   query("search").optional({ checkFalsy: true }),
   query("priceLowest").optional({ checkFalsy: true }),
   query("priceHighest").optional({ checkFalsy: true }),
-  query("listingType").default("normal"),
+  query("listingType").optional(),
   query("fromDate").isDate().optional({ checkFalsy: false }),
   query("toDate").isDate().optional({ checkFalsy: false }),
   query("limit").toInt().default(10),
