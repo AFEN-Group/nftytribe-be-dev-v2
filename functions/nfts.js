@@ -153,6 +153,7 @@ class Nfts {
       limit,
       page,
       order, // recent, most viewed, oldest, most liked
+      physical,
     } = inputs;
 
     const offset = (page - 1) * limit;
@@ -161,6 +162,9 @@ class Nfts {
     const options = {
       ...(lazyMint !== undefined && {
         lazyMint: lazyMint,
+      }),
+      ...(physical !== undefined && {
+        physical,
       }),
       ...(owner && {
         [Op.or]: [
