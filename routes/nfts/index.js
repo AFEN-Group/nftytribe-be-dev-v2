@@ -3,6 +3,7 @@ const {
   getListings,
   likeListing,
   favoriteListing,
+  getSingleNftListing,
 } = require("../../controllers/nft");
 const userProtect = require("../../middlewares/userProtect.middleware");
 const {
@@ -15,6 +16,7 @@ const nfts = require("express").Router();
 
 nfts.route("/user/:field").get(getNftsValidations, getNfts);
 nfts.route("/listings").get(getListingValidation, getListings);
+nfts.route("/listings/:id").get(getSingleNftListing);
 nfts
   .route("/like/:nftId")
   .post(userProtect, favorite_like_Validations, likeListing);

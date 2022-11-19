@@ -241,6 +241,21 @@ class Nfts {
 
     const includeOptions = [
       {
+        model: db.users,
+        attributes: [
+          "username",
+          "email",
+          "walletAddress",
+          "verified",
+          "twitter",
+        ],
+        include: [
+          {
+            model: db.avatar,
+          },
+        ],
+      },
+      {
         model: db.nftLikes,
         attributes: [],
       },
@@ -374,6 +389,85 @@ class Nfts {
         id: nftId,
       };
     }
+  };
+  getSingleListing = async (id, userId) => {
+    const result = await db.nfts.findOne({
+      // subQuery: false,
+      where: {
+        id,
+      },
+      attributes: {
+        include: [
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("nftLikes.id")),
+            "likeCount",
+          ],
+          [
+            db.Sequelize.fn("count", db.Sequelize.col("nftFavorites.id")),
+            "favoriteCount",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("nftLikes.userId"),
+                Op.eq,
+                userId
+              ),
+              "boolean"
+            ),
+            "isLiked",
+          ],
+          userId && [
+            db.Sequelize.cast(
+              db.Sequelize.where(
+                db.Sequelize.col("nftFavorites.userId"),
+                Op.eq,
+                userId
+              ),
+              "boolean"
+            ),
+            "isFavorite",
+          ],
+        ].filter((data) => data && data),
+      },
+      include: [
+        {
+          model: db.users,
+          attributes: [
+            "username",
+            "email",
+            "walletAddress",
+            "verified",
+            "twitter",
+          ],
+          include: [
+            {
+              model: db.avatar,
+            },
+          ],
+        },
+        {
+          model: db.nftLikes,
+          attributes: [],
+        },
+        {
+          model: db.nftFavorites,
+          attributes: [],
+        },
+      ],
+      group: ["nfts.id", "nftLikes.id", "nftFavorites.id"],
+    });
+
+    if (!result)
+      throw {
+        message: "Listing not found!",
+        status: 404,
+      };
+    return {
+      ...result.dataValues,
+      isLiked: result.isLiked ? true : false,
+      isFavorite: result.isFavorite ? true : false,
+    };
   };
 }
 

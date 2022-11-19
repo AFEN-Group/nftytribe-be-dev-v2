@@ -29,5 +29,8 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon server.js",
     "staging": "NODE_ENV=staging node server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }

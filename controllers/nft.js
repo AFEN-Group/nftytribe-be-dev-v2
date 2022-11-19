@@ -8,8 +8,11 @@ const getNfts = expressAsyncHandler(async (req, res) => {
   const nfts = await new Nfts().getNfts(req.query, req.params.field);
   res.send(nfts);
 });
-const getSingleNft = expressAsyncHandler(async (req, res) => {
+const getSingleNftListing = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const { id } = req.params;
+  const { userId } = req.query;
+  res.send(await new Nfts().getSingleListing(id, userId));
 });
 const ListNft = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -44,7 +47,7 @@ const favoriteListing = expressAsyncHandler(async (req, res) => {
 
 module.exports = {
   getNfts,
-  getSingleNft,
+  getSingleNftListing,
   ListNft,
   getListings,
   watchListings,
