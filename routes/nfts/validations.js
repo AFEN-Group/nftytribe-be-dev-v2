@@ -30,7 +30,8 @@ const getListingValidation = [
   query("toDate").isDate().optional({ checkFalsy: false }),
   query("limit").toInt().default(10),
   query("page").toInt().default(1),
-  query("order").toInt().default(1),
+  query("order").default("createdAt"),
+  query("direction").default("ASC"),
 ];
 
 const favorite_like_Validations = [

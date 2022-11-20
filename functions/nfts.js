@@ -152,9 +152,32 @@ class Nfts {
       toDate,
       limit,
       page,
-      order, // recent, most viewed, oldest, most liked
+      order,
+      direction,
       physical,
     } = inputs;
+
+    const getOrder = () => {
+      const orderArr = [];
+      switch (order) {
+        case "price":
+          orderArr[0] = "price";
+          break;
+        case "date":
+          orderArr[0] = "createdAt";
+          break;
+        case "name":
+          orderArr[0] = "name";
+          break;
+        default:
+          orderArr[0] = "createdAt";
+          break;
+      }
+
+      orderArr[1] = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
+
+      return orderArr;
+    };
 
     const offset = (page - 1) * limit;
 
@@ -281,32 +304,30 @@ class Nfts {
       attributes: {
         include: [
           [
-            db.Sequelize.fn("count", db.Sequelize.col("nftLikes.id")),
+            db.Sequelize.literal(
+              "(select count(*) from nftLikes where id = nftLikes.id)"
+            ),
             "likeCount",
           ],
           [
-            db.Sequelize.fn("count", db.Sequelize.col("nftFavorites.id")),
+            db.Sequelize.literal(
+              "(select count(*) from nftFavorites where id = nftFavorites.id)"
+            ),
             "favoriteCount",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("nftLikes.userId"),
-                Op.eq,
-                userId
-              ),
-              "boolean"
+            db.Sequelize.where(
+              db.Sequelize.col("nftLikes.userId"),
+              Op.eq,
+              userId
             ),
             "isLiked",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("nftFavorites.userId"),
-                Op.eq,
-                userId
-              ),
-              "boolean"
+            db.Sequelize.where(
+              db.Sequelize.col("nftFavorites.userId"),
+              Op.eq,
+              userId
             ),
             "isFavorite",
           ],
@@ -315,6 +336,7 @@ class Nfts {
       limit,
       offset,
       group: ["nfts.id", "user.id", "nftLikes.id", "nftFavorites.id"],
+      order: [getOrder()],
     });
 
     return {
@@ -399,32 +421,31 @@ class Nfts {
       attributes: {
         include: [
           [
-            db.Sequelize.fn("count", db.Sequelize.col("nftLikes.id")),
+            db.Sequelize.literal(
+              "(select count(*) from nftLikes where id = nftLikes.id)"
+            ),
             "likeCount",
           ],
           [
-            db.Sequelize.fn("count", db.Sequelize.col("nftFavorites.id")),
+            db.Sequelize.literal(
+              "(select count(*) from nftFavorites where id = nftFavorites.id)"
+            ),
             "favoriteCount",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("nftLikes.userId"),
-                Op.eq,
-                userId
-              ),
-              "boolean"
+            db.Sequelize.where(
+              db.Sequelize.col("nftLikes.userId"),
+              Op.eq,
+              userId
             ),
+
             "isLiked",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("nftFavorites.userId"),
-                Op.eq,
-                userId
-              ),
-              "boolean"
+            db.Sequelize.where(
+              db.Sequelize.col("nftFavorites.userId"),
+              Op.eq,
+              userId
             ),
             "isFavorite",
           ],
@@ -457,7 +478,6 @@ class Nfts {
       ],
       group: ["nfts.id", "nftLikes.id", "nftFavorites.id"],
     });
-
     if (!result)
       throw {
         message: "Listing not found!",
@@ -465,8 +485,8 @@ class Nfts {
       };
     return {
       ...result.dataValues,
-      isLiked: result.isLiked ? true : false,
-      isFavorite: result.isFavorite ? true : false,
+      isLiked: result.dataValues.isLiked ? true : false,
+      isFavorite: result.dataValues.isFavorite ? true : false,
     };
   };
 }
