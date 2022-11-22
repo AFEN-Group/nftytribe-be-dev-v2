@@ -65,6 +65,7 @@ class Nfts {
         name: nftMetadata.name,
         tokenId: data.tokenID,
         description: nftMetadata.metadata?.description,
+        category: Number(data.category) || undefined,
         url:
           nftMetadata.metadata?.image ||
           nftMetadata.metadata?.file ||
@@ -382,6 +383,7 @@ class Nfts {
       };
     }
   };
+
   favoriteUnfavorite = async (userId, nftId) => {
     const isFavorite = await db.nftFavorites.findOne({
       where: {

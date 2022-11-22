@@ -1,6 +1,12 @@
 const brokerV2 = [
   {
-    inputs: [{ internalType: "uint256", name: "_brokerage", type: "uint256" }],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_brokerage",
+        type: "uint256",
+      },
+    ],
     payable: false,
     stateMutability: "nonpayable",
     type: "constructor",
@@ -230,6 +236,12 @@ const brokerV2 = [
       },
       {
         indexed: false,
+        internalType: "uint256",
+        name: "category",
+        type: "uint256",
+      },
+      {
+        indexed: false,
         internalType: "address",
         name: "ERC20Address",
         type: "address",
@@ -296,8 +308,16 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "address", name: "_erc20Token", type: "address" },
-      { internalType: "uint256", name: "_brokerage", type: "uint256" },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_brokerage",
+        type: "uint256",
+      },
     ],
     name: "addERC20TokenPayment",
     outputs: [],
@@ -308,25 +328,74 @@ const brokerV2 = [
   {
     constant: true,
     inputs: [
-      { internalType: "address", name: "", type: "address" },
-      { internalType: "uint256", name: "", type: "uint256" },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
     name: "auctions",
     outputs: [
-      { internalType: "address payable", name: "lastOwner", type: "address" },
-      { internalType: "uint256", name: "currentBid", type: "uint256" },
+      {
+        internalType: "address payable",
+        name: "lastOwner",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "currentBid",
+        type: "uint256",
+      },
       {
         internalType: "address payable",
         name: "highestBidder",
         type: "address",
       },
-      { internalType: "uint256", name: "auctionType", type: "uint256" },
-      { internalType: "uint256", name: "startingPrice", type: "uint256" },
-      { internalType: "uint256", name: "buyPrice", type: "uint256" },
-      { internalType: "bool", name: "buyer", type: "bool" },
-      { internalType: "uint256", name: "startingTime", type: "uint256" },
-      { internalType: "uint256", name: "closingTime", type: "uint256" },
-      { internalType: "address", name: "erc20Token", type: "address" },
+      {
+        internalType: "uint256",
+        name: "auctionType",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "startingPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "buyPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "buyer",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "startingTime",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "closingTime",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "category",
+        type: "uint256",
+      },
     ],
     payable: false,
     stateMutability: "view",
@@ -335,9 +404,21 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
     ],
     name: "bid",
     outputs: [],
@@ -347,9 +428,21 @@ const brokerV2 = [
   },
   {
     constant: true,
-    inputs: [{ internalType: "address", name: "", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     name: "brokerage",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -357,8 +450,16 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
     ],
     name: "buy",
     outputs: [],
@@ -369,8 +470,16 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
     ],
     name: "collect",
     outputs: [],
@@ -385,8 +494,16 @@ const brokerV2 = [
     outputs: [
       {
         components: [
-          { internalType: "address", name: "NFTAddress", type: "address" },
-          { internalType: "uint256", name: "tokenID", type: "uint256" },
+          {
+            internalType: "address",
+            name: "NFTAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
         ],
         internalType: "struct TokenDetArrayLib.TokenDet[]",
         name: "",
@@ -401,7 +518,13 @@ const brokerV2 = [
     constant: true,
     inputs: [],
     name: "getErc20Tokens",
-    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -413,8 +536,16 @@ const brokerV2 = [
     outputs: [
       {
         components: [
-          { internalType: "address", name: "NFTAddress", type: "address" },
-          { internalType: "uint256", name: "tokenID", type: "uint256" },
+          {
+            internalType: "address",
+            name: "NFTAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
         ],
         internalType: "struct TokenDetArrayLib.TokenDet[]",
         name: "",
@@ -428,11 +559,25 @@ const brokerV2 = [
   {
     constant: true,
     inputs: [
-      { internalType: "address", name: "_mintableToken", type: "address" },
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
     ],
     name: "getOnSaleStatus",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -444,8 +589,16 @@ const brokerV2 = [
     outputs: [
       {
         components: [
-          { internalType: "address", name: "NFTAddress", type: "address" },
-          { internalType: "uint256", name: "tokenID", type: "uint256" },
+          {
+            internalType: "address",
+            name: "NFTAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
         ],
         internalType: "struct TokenDetArrayLib.TokenDet[]",
         name: "",
@@ -458,13 +611,27 @@ const brokerV2 = [
   },
   {
     constant: true,
-    inputs: [{ internalType: "address", name: "_user", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
     name: "getTokensForSalePerUser",
     outputs: [
       {
         components: [
-          { internalType: "address", name: "NFTAddress", type: "address" },
-          { internalType: "uint256", name: "tokenID", type: "uint256" },
+          {
+            internalType: "address",
+            name: "NFTAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
         ],
         internalType: "struct TokenDetArrayLib.TokenDet[]",
         name: "",
@@ -479,7 +646,13 @@ const brokerV2 = [
     constant: true,
     inputs: [],
     name: "isOwner",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -487,13 +660,35 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "address", name: "", type: "address" },
-      { internalType: "address", name: "", type: "address" },
-      { internalType: "uint256", name: "", type: "uint256" },
-      { internalType: "bytes", name: "", type: "bytes" },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "",
+        type: "bytes",
+      },
     ],
     name: "onERC721Received",
-    outputs: [{ internalType: "bytes4", name: "", type: "bytes4" }],
+    outputs: [
+      {
+        internalType: "bytes4",
+        name: "",
+        type: "bytes4",
+      },
+    ],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",
@@ -502,7 +697,13 @@ const brokerV2 = [
     constant: true,
     inputs: [],
     name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -510,13 +711,46 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "_tokenID", type: "uint256" },
-      { internalType: "uint256", name: "_startingPrice", type: "uint256" },
-      { internalType: "uint256", name: "_auctionType", type: "uint256" },
-      { internalType: "uint256", name: "_buyPrice", type: "uint256" },
-      { internalType: "uint256", name: "_duration", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
-      { internalType: "address", name: "_erc20Token", type: "address" },
+      {
+        internalType: "uint256",
+        name: "_tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_startingPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_auctionType",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_buyPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_duration",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_category",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
     ],
     name: "putOnSale",
     outputs: [],
@@ -527,8 +761,16 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
     ],
     name: "putSaleOff",
     outputs: [],
@@ -538,7 +780,13 @@ const brokerV2 = [
   },
   {
     constant: false,
-    inputs: [{ internalType: "address", name: "_erc20Token", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+    ],
     name: "removeERC20TokenPayment",
     outputs: [],
     payable: false,
@@ -547,7 +795,13 @@ const brokerV2 = [
   },
   {
     constant: false,
-    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
     name: "transferOwnership",
     outputs: [],
     payable: false,
@@ -557,8 +811,16 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "address", name: "_erc20Token", type: "address" },
-      { internalType: "uint256", name: "_brokerage", type: "uint256" },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_brokerage",
+        type: "uint256",
+      },
     ],
     name: "updateBrokerage",
     outputs: [],
@@ -569,10 +831,26 @@ const brokerV2 = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
-      { internalType: "uint256", name: "_newPrice", type: "uint256" },
-      { internalType: "address", name: "_erc20Token", type: "address" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_newPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
     ],
     name: "updatePrice",
     outputs: [],
@@ -591,7 +869,13 @@ const brokerV2 = [
   },
   {
     constant: false,
-    inputs: [{ internalType: "address", name: "_erc20Token", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+    ],
     name: "withdrawERC20",
     outputs: [],
     payable: false,
@@ -604,8 +888,16 @@ const offSale = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "tokenID", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
     ],
     name: "putSaleOff",
     outputs: [],
@@ -619,13 +911,46 @@ const onSale = [
   {
     constant: false,
     inputs: [
-      { internalType: "uint256", name: "_tokenID", type: "uint256" },
-      { internalType: "uint256", name: "_startingPrice", type: "uint256" },
-      { internalType: "uint256", name: "_auctionType", type: "uint256" },
-      { internalType: "uint256", name: "_buyPrice", type: "uint256" },
-      { internalType: "uint256", name: "_duration", type: "uint256" },
-      { internalType: "address", name: "_mintableToken", type: "address" },
-      { internalType: "address", name: "_erc20Token", type: "address" },
+      {
+        internalType: "uint256",
+        name: "_tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_startingPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_auctionType",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_buyPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_duration",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_category",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
     ],
     name: "putOnSale",
     outputs: [],
