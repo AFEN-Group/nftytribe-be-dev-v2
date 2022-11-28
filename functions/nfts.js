@@ -261,6 +261,16 @@ class Nfts {
           },
         },
       }),
+      [Op.or]: [
+        {
+          timeout: null,
+        },
+        {
+          timeout: {
+            [Op.gt]: new Date(),
+          },
+        },
+      ],
     };
 
     console.log(inputs);

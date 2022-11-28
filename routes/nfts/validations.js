@@ -31,7 +31,7 @@ const getListingValidation = [
   query("limit").toInt().default(10),
   query("page").toInt().default(1),
   query("order").default("createdAt"),
-  query("direction").default("ASC"),
+  query("direction").default("DESC"),
 ];
 
 const favorite_like_Validations = [
