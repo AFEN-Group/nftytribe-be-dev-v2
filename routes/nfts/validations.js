@@ -46,8 +46,16 @@ const favorite_like_Validations = [
       true;
     }),
 ];
+
+const getBiddingValidations = [
+  param("nftId").not().isEmpty(),
+  query("limit").toInt().default(10),
+  query("page").toInt().default(1),
+];
+
 module.exports = {
   getNftsValidations,
   getListingValidation,
   favorite_like_Validations,
+  getBiddingValidations,
 };

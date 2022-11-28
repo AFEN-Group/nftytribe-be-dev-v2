@@ -31,6 +31,9 @@ const bidListings = expressAsyncHandler(async (req, res) => {
 });
 const getBids = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const { nftId } = req.params;
+  const bids = await new Nfts().getBids(nftId, req.query);
+  res.send(bids);
 });
 const likeListing = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);

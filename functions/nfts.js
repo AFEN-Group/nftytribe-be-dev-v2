@@ -521,6 +521,36 @@ class Nfts {
       return bid;
     }
   };
+
+  getBids = async (id, params = {}) => {
+    const { page, limit } = params;
+    const options = {
+      nftId: id,
+    };
+    const total = await db.bids.count({
+      where: options,
+    });
+
+    const offset = (page - 1) * limit;
+
+    const bids = await db.bids.findAll({
+      where: options,
+      include: [
+        {
+          model: db.users,
+        },
+      ],
+      limit,
+      offset,
+    });
+
+    return {
+      page,
+      total,
+      totalPages: Math.ceil(total / limit),
+      results: bids,
+    };
+  };
 }
 
 module.exports = Nfts;
