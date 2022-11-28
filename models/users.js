@@ -66,6 +66,12 @@ const users = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    users.hasMany(models.bids, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
     users.hasMany(models.collectionFavorites, {
       onDelete: "cascade",
       foreignKey: {

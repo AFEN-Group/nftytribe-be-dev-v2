@@ -1,10 +1,100 @@
 const brokerV2 = [
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_brokerage",
+        type: "uint256",
+      },
+    ],
+    name: "addERC20TokenPayment",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "bid",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+    ],
+    name: "buy",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+    ],
+    name: "collect",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
         name: "_brokerage",
         type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "erc20DefaultPayMethod",
+        type: "address",
       },
     ],
     payable: false,
@@ -196,6 +286,42 @@ const brokerV2 = [
     type: "event",
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "",
+        type: "bytes",
+      },
+    ],
+    name: "onERC721Received",
+    outputs: [
+      {
+        internalType: "bytes4",
+        name: "",
+        type: "bytes4",
+      },
+    ],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -309,6 +435,111 @@ const brokerV2 = [
     constant: false,
     inputs: [
       {
+        internalType: "uint256",
+        name: "_tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_startingPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_auctionType",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_buyPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_duration",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_category",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "_isPhysical",
+        type: "bool",
+      },
+    ],
+    name: "putOnSale",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+    ],
+    name: "putSaleOff",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+    ],
+    name: "removeERC20TokenPayment",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
         internalType: "address",
         name: "_erc20Token",
         type: "address",
@@ -319,7 +550,66 @@ const brokerV2 = [
         type: "uint256",
       },
     ],
-    name: "addERC20TokenPayment",
+    name: "updateBrokerage",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenID",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_mintableToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_newPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+    ],
+    name: "updatePrice",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: "withdraw",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: "address",
+        name: "_erc20Token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "withdrawERC20",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
@@ -396,34 +686,14 @@ const brokerV2 = [
         name: "category",
         type: "uint256",
       },
+      {
+        internalType: "bool",
+        name: "isPhysical",
+        type: "bool",
+      },
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "bid",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
     type: "function",
   },
   {
@@ -445,46 +715,6 @@ const brokerV2 = [
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-    ],
-    name: "buy",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-    ],
-    name: "collect",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -658,42 +888,6 @@ const brokerV2 = [
     type: "function",
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
-      },
-    ],
-    name: "onERC721Received",
-    outputs: [
-      {
-        internalType: "bytes4",
-        name: "",
-        type: "bytes4",
-      },
-    ],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     constant: true,
     inputs: [],
     name: "owner",
@@ -706,180 +900,6 @@ const brokerV2 = [
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_startingPrice",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_auctionType",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_buyPrice",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_duration",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_category",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_erc20Token",
-        type: "address",
-      },
-    ],
-    name: "putOnSale",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-    ],
-    name: "putSaleOff",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_erc20Token",
-        type: "address",
-      },
-    ],
-    name: "removeERC20TokenPayment",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "transferOwnership",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_erc20Token",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_brokerage",
-        type: "uint256",
-      },
-    ],
-    name: "updateBrokerage",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenID",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_mintableToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_newPrice",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_erc20Token",
-        type: "address",
-      },
-    ],
-    name: "updatePrice",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: "withdraw",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_erc20Token",
-        type: "address",
-      },
-    ],
-    name: "withdrawERC20",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
     type: "function",
   },
 ];

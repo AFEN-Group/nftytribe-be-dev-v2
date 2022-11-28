@@ -30,6 +30,15 @@ class Nfts {
     return nft;
   };
 
+  getFields = (params = []) => {
+    const data = {};
+    while (params.length > Object.keys(data).length) {
+      const index = Object.keys(data).length;
+      data[params[index].name.replace("_", "")] = params[index].value;
+    }
+    return data;
+  };
+
   putOnSale = async (params = [], walletAddress, chain) => {
     //const validate chain, collection and userId
 
@@ -43,11 +52,7 @@ class Nfts {
     ]);
 
     if (chainId && user) {
-      const data = {};
-      while (params.length > Object.keys(data).length) {
-        const index = Object.keys(data).length;
-        data[params[index].name.replace("_", "")] = params[index].value;
-      }
+      const data = this.getFields(params);
       const collection = await db.collections.findOne({
         where: {
           contractAddress: data.mintableToken,
@@ -58,14 +63,14 @@ class Nfts {
         await this.getTokenData(data.erc20Token, chain),
       ]);
 
-      console.log(tokenData);
+      // console.log(tokenData);
 
       // building data
       const values = {
         name: nftMetadata.name,
         tokenId: data.tokenID,
         description: nftMetadata.metadata?.description,
-        category: Number(data.category) || undefined,
+        categoryId: Number(data.category) || undefined,
         url:
           nftMetadata.metadata?.image ||
           nftMetadata.metadata?.file ||
@@ -490,6 +495,31 @@ class Nfts {
       isLiked: result.dataValues.isLiked ? true : false,
       isFavorite: result.dataValues.isFavorite ? true : false,
     };
+  };
+  newBid = async (params = [], walletAddress) => {
+    const data = this.getFields(params);
+    const listing = await db.nfts.findOne({
+      where: {
+        tokenId: data.tokenID,
+        moreInfo: {
+          contractAddress: data.mintableToken,
+        },
+      },
+    });
+    const bidder = await db.users.findOne({
+      where: {
+        walletAddress,
+      },
+    });
+
+    if (listing && bidder) {
+      const bid = await db.bids.create({
+        nftId: listing.id,
+        userId: bidder.id,
+        amount: data.amount,
+      });
+      return bid;
+    }
   };
 }
 

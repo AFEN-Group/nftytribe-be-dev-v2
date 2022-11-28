@@ -8,7 +8,7 @@ abiDecoder.addABI(brokerV2.brokerV2);
 
 broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { txs, chainId, confirmed } = req.body;
     const [txsData] = txs;
     if (txsData && !confirmed) {
@@ -34,6 +34,10 @@ broker.route("/").post(
           fromAddress,
           chainId
         );
+      }
+
+      if (data.name.toLowerCase() === "bid") {
+        const newBid = await nfts.newBid(data.params, fromAddress);
       }
     } else if (txsData && confirmed) {
       //changed confirmed to true
