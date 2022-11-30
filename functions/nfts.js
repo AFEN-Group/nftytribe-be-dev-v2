@@ -1,11 +1,8 @@
 const moralis = require("./moralis");
-const Moralis = require("moralis").default;
+const Moralis = require("./Moralis.sdk");
 const db = require("../models");
 const { Op } = require("sequelize");
 
-Moralis.start({
-  apiKey: process.env.moralis_api_key,
-});
 class Nfts {
   getNfts = async (options, walletAddress) => {
     const { limit, page: cursor, chain } = options;

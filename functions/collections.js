@@ -2,11 +2,7 @@ const { Op } = require("sequelize");
 const owner = require("../abi/owner");
 const db = require("../models");
 const moralis = require("./moralis");
-const Moralis = require("moralis").default;
-
-Moralis.start({
-  apiKey: process.env.moralis_api_key,
-});
+const Moralis = require("./Moralis.sdk");
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -340,4 +336,5 @@ class Collections {
 //     "0x93dd857159351cc732be2f0a42b698f130ac7e9b"
 //   )
 //   .catch(console.log);
+// exports.Moralis = Moralis;
 module.exports = Collections;
