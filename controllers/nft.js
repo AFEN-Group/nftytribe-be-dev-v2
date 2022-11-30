@@ -25,9 +25,16 @@ const getListings = expressAsyncHandler(async (req, res) => {
 });
 const watchListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const { id } = req.user;
+  const { nftId } = req.params;
+  const result = await new Nfts().watchListing(nftId, id);
+  res.send(result);
 });
 const getWatchers = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
+  const { nftId } = req.params;
+  const result = await new Nfts().getWatchers(nftId, req.query);
+  res.send(result);
 });
 const bidListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);

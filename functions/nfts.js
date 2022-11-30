@@ -390,7 +390,7 @@ class Nfts {
       ],
       order: [getOrder()],
     });
-
+    console.log(result);
     return {
       page,
       totalPages,
@@ -647,7 +647,7 @@ class Nfts {
         userId,
       });
       return {
-        ...res,
+        ...res.dataValues,
         status: "watched",
       };
     }

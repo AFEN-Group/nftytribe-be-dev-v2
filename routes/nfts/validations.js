@@ -54,9 +54,19 @@ const getBiddingValidations = [
   query("page").toInt().default(1),
 ];
 
+const addWatchValidations = [param("nftId").not().isEmpty().toInt()];
+
+const getWatchersValidations = [
+  param("nftId").not().isEmpty().toInt(),
+  query("page").toInt().default(1),
+  query("limit").toInt().default(10),
+];
+
 module.exports = {
   getNftsValidations,
   getListingValidation,
   favorite_like_Validations,
   getBiddingValidations,
+  addWatchValidations,
+  getWatchersValidations,
 };
