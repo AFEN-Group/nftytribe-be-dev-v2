@@ -161,6 +161,7 @@ class Nfts {
       order,
       direction,
       physical,
+      hasCollection,
     } = inputs;
 
     const getOrder = () => {
@@ -189,6 +190,17 @@ class Nfts {
 
     // building out options for query
     const options = {
+      ...(hasCollection !== undefined && {
+        ...(hasCollection
+          ? {
+              collectionId: {
+                [Op.not]: null,
+              },
+            }
+          : {
+              collectionId: null,
+            }),
+      }),
       ...(lazyMint !== undefined && {
         lazyMint: lazyMint,
       }),
