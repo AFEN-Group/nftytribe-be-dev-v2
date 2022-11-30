@@ -26,6 +26,9 @@ const getListings = expressAsyncHandler(async (req, res) => {
 const watchListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
 });
+const getWatchers = expressAsyncHandler(async (req, res) => {
+  await checkError(req, validationResult);
+});
 const bidListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
 });
@@ -58,4 +61,5 @@ module.exports = {
   getBids,
   likeListing,
   favoriteListing,
+  getWatchers,
 };

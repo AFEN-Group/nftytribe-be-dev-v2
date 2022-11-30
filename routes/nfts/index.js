@@ -19,6 +19,7 @@ const nfts = require("express").Router();
 nfts.route("/user/:field").get(getNftsValidations, getNfts);
 nfts.route("/listings").get(getListingValidation, getListings);
 nfts.route("/listings/:id").get(getSingleNftListing);
+nfts.route("/listings/watch").get().post(userProtect);
 nfts
   .route("/like/:nftId")
   .post(userProtect, favorite_like_Validations, likeListing);

@@ -315,6 +315,10 @@ class Nfts {
         attributes: [],
       },
       {
+        model: db.listingWatchers,
+        attributes: [],
+      },
+      {
         model: db.users,
         attributes: ["username", "walletAddress", "id"],
         include: {
@@ -343,6 +347,12 @@ class Nfts {
             ),
             "favoriteCount",
           ],
+          [
+            db.Sequelize.literal(
+              "(select count(*) from listingWatchers where id = listingWatchers.id)"
+            ),
+            "watchCount",
+          ],
           userId && [
             db.Sequelize.where(
               db.Sequelize.col("nftLikes.userId"),
@@ -359,11 +369,25 @@ class Nfts {
             ),
             "isFavorite",
           ],
+          userId && [
+            db.Sequelize.where(
+              db.Sequelize.col("listingWatchers.userId"),
+              Op.eq,
+              userId
+            ),
+            "isWatched",
+          ],
         ].filter((data) => data && data),
       },
       limit,
       offset,
-      group: ["nfts.id", "user.id", "nftLikes.id", "nftFavorites.id"],
+      group: [
+        "nfts.id",
+        "user.id",
+        "nftLikes.id",
+        "nftFavorites.id",
+        "listingWatchers.id",
+      ],
       order: [getOrder()],
     });
 
@@ -375,6 +399,7 @@ class Nfts {
         const value = { ...data.dataValues };
         value.isLiked = value.isLiked ? true : false;
         value.isFavorite = value.isFavorite ? true : false;
+        value.isWatched = value.isWatched ? true : false;
         return value;
       }),
     };
@@ -461,6 +486,12 @@ class Nfts {
             ),
             "favoriteCount",
           ],
+          [
+            db.Sequelize.literal(
+              "(select count(*) from listingWatchers where id = listingWatchers.id)"
+            ),
+            "watchCount",
+          ],
           userId && [
             db.Sequelize.where(
               db.Sequelize.col("nftLikes.userId"),
@@ -477,6 +508,14 @@ class Nfts {
               userId
             ),
             "isFavorite",
+          ],
+          userId && [
+            db.Sequelize.where(
+              db.Sequelize.col("listingWatchers.userId"),
+              Op.eq,
+              userId
+            ),
+            "isWatched",
           ],
         ].filter((data) => data && data),
       },
@@ -504,8 +543,17 @@ class Nfts {
           model: db.nftFavorites,
           attributes: [],
         },
+        {
+          model: db.listingWatchers,
+          attributes: [],
+        },
       ],
-      group: ["nfts.id", "nftLikes.id", "nftFavorites.id"],
+      group: [
+        "nfts.id",
+        "nftLikes.id",
+        "nftFavorites.id",
+        "listingWatchers.id",
+      ],
     });
     if (!result)
       throw {
@@ -571,6 +619,57 @@ class Nfts {
       total,
       totalPages: Math.ceil(total / limit),
       results: bids,
+    };
+  };
+
+  watchListing = async (nftId, userId) => {
+    const isWatching = await db.listingWatchers.findOne({
+      where: {
+        userId,
+        nftId,
+      },
+    });
+    if (isWatching) {
+      await db.listingWatchers.destroy({
+        where: {
+          nftId,
+          userId,
+        },
+      });
+
+      return {
+        id: isWatching.id,
+        status: "unwatched",
+      };
+    } else {
+      const res = await db.listingWatchers.create({
+        nftId,
+        userId,
+      });
+      return {
+        ...res,
+        status: "watched",
+      };
+    }
+  };
+
+  getWatchers = async (nftId, options = {}) => {
+    const { page, limit } = options;
+    const total = await db.listingWatchers.count({ where: { nftId } });
+    const offset = (page - 1) * limit;
+    const res = await db.listingWatchers.findAll({
+      where: {
+        nftId,
+      },
+      limit,
+      offset,
+    });
+    return {
+      results: res,
+      page,
+      total,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   };
 }

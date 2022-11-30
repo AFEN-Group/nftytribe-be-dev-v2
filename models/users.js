@@ -90,6 +90,12 @@ const users = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    users.hasMany(models.listingWatchers, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
   };
   return users;
 };

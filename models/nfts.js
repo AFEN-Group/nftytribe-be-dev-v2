@@ -77,6 +77,12 @@ const nfts = (sequelize, dataTypes) => {
       },
       onDelete: "cascade",
     });
+    nfts.hasMany(models.listingWatchers, {
+      foreignKey: {
+        allowNull: false,
+      },
+      onDelete: "cascade",
+    });
 
     nfts.belongsTo(models.collections);
     nfts.belongsTo(models.chains);
