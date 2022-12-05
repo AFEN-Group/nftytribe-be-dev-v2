@@ -14,6 +14,8 @@ class Nfts {
       limit,
       cursor,
     });
+
+    console.log(nfts, cursor, "the produced result");
     return {
       ...nfts,
       result: nfts.result.map((data) => ({

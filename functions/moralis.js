@@ -13,7 +13,7 @@ const moralis = async (url, method = "get", params = {}) => {
     url,
     params,
   });
-
+  console.log(process.env.moralis_api_key);
   return data;
 };
 
