@@ -17,10 +17,11 @@ class Nfts {
       address: walletAddress,
     });
 
-    console.log(nfts);
+    const results = nfts.toJSON();
+    console.log(results);
     return {
       ...nfts.pagination,
-      result: nfts.toJSON().map((data) => ({
+      result: results.toJSON().map((data) => ({
         ...data,
       })),
     };
