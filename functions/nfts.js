@@ -21,7 +21,7 @@ class Nfts {
     console.log(results);
     return {
       ...nfts.pagination,
-      result: results.toJSON().map((data) => ({
+      result: results.map((data) => ({
         ...data,
       })),
     };
