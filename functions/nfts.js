@@ -9,18 +9,19 @@ class Nfts {
 
     //validations will be re done on chains
     // const { symbol } = await db.chains.findOne({ where: { id: chain } });
-    const nfts = await moralis(`${walletAddress}/nft`, "get", {
-      chain,
+
+    const nfts = await Moralis.EvmApi.nft.getWalletNFTs({
       limit,
       cursor,
+      chain,
+      address: walletAddress,
     });
 
-    console.log(nfts, cursor, "the produced result");
+    console.log(nfts);
     return {
-      ...nfts,
-      result: nfts.result.map((data) => ({
+      ...nfts.pagination,
+      result: nfts.toJSON().map((data) => ({
         ...data,
-        metadata: JSON.parse(data.metadata),
       })),
     };
   };
