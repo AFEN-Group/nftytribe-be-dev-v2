@@ -20,8 +20,14 @@ class Nfts {
     const results = nfts.toJSON();
     console.log(results);
     return {
-      // ...nfts.pagination,
-      result: results,
+      ...nfts.pagination,
+      result:
+        results.result?.map((data) => {
+          return {
+            ...data,
+            metadata: data.metadata ? JSON.parse(data.metadata) : {},
+          };
+        }) || results,
     };
   };
 
