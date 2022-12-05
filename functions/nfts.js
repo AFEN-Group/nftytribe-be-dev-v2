@@ -20,12 +20,11 @@ class Nfts {
     const results = nfts.toJSON();
     console.log(results);
     return {
-      ...nfts.pagination,
-      result: results.map((data) => ({
-        ...data,
-      })),
+      // ...nfts.pagination,
+      result: results,
     };
   };
+
   getSingleNft = async (id) => {
     const nft = await db.nfts.findOne({ where: { id } });
     return nft;
