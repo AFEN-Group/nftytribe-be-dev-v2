@@ -117,7 +117,9 @@ class Nfts {
       chain,
       tokenId,
     });
-    return nftMetadata?.toJSON();
+    const result = nftMetadata?.toJSON();
+    console.log(result);
+    return result;
   };
 
   getTokenData = async (address, chain) => {
