@@ -118,8 +118,8 @@ class Nfts {
       tokenId,
     });
     const result = nftMetadata.result.toJSON();
-    // console.log(nftMetadata);
-    // console.log(result);
+    console.log(nftMetadata);
+    console.log(result);
     return result;
   };
 
