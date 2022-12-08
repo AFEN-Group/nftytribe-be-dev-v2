@@ -89,9 +89,9 @@ class Nfts {
             : new Date(Date.now() + data.duration * 1000),
         moreInfo: {
           erc20TokenAddress: data.erc20Token,
-          erc20TokenName: tokenData.token.name,
-          erc20TokenSymbol: tokenData.token.symbol,
-          erc20TokenDecimals: tokenData.token.decimals,
+          erc20TokenName: tokenData.name,
+          erc20TokenSymbol: tokenData.symbol,
+          erc20TokenDecimals: tokenData.decimals,
           nftContractType: nftMetadata.contractType,
           symbol: nftMetadata.symbol,
           contractAddress: nftMetadata.tokenAddress,
@@ -118,8 +118,8 @@ class Nfts {
       tokenId,
     });
     const result = nftMetadata.result.toJSON();
-    console.log(nftMetadata);
-    console.log(result);
+    // console.log(nftMetadata);
+    // console.log(result);
     return result;
   };
 
@@ -130,7 +130,6 @@ class Nfts {
     });
 
     const result = data;
-    console.log(result);
     return result?.toJSON()[0];
   };
 
