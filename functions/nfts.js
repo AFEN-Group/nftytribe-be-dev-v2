@@ -17,7 +17,7 @@ class Nfts {
       address: walletAddress,
     });
 
-    const results = nfts.toJSON();
+    const results = nfts.result.toJSON();
     console.log(results);
     return {
       ...nfts.pagination,
@@ -117,7 +117,7 @@ class Nfts {
       chain,
       tokenId,
     });
-    const result = nftMetadata?.toJSON();
+    const result = nftMetadata.result.toJSON();
     console.log(result);
     return result;
   };
@@ -127,7 +127,7 @@ class Nfts {
       addresses: [address],
       chain,
     });
-    return data?.toJSON()[0];
+    return data?.result.toJSON()[0];
   };
 
   putOffSale = async (contractAddress, walletAddress, tokenId) => {
