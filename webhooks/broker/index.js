@@ -18,7 +18,7 @@ broker.route("/").post(
       console.log(data);
 
       if (data.name.toLowerCase() === "putsaleoff") {
-        //handle putting sale offx
+        //handle putting sale off
         const [tokenId, address] = data.params;
 
         const putOffSale = await nfts.putOffSale(

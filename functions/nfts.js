@@ -1,4 +1,3 @@
-const moralis = require("./moralis");
 const Moralis = require("./Moralis.sdk");
 const db = require("../models");
 const { Op } = require("sequelize");
@@ -59,13 +58,14 @@ class Nfts {
 
     if (chainId && user) {
       const data = this.getFields(params);
+      console.log(data);
       const collection = await db.collections.findOne({
         where: {
-          contractAddress: data.mintableToken,
+          contractAddress: data.erc721,
         },
       });
       const [nftMetadata, tokenData] = await Promise.all([
-        await this.getNftMetaData(data.tokenID, data.mintableToken, chain),
+        await this.getNftMetaData(data.tokenId, data.erc721, chain),
         await this.getTokenData(data.erc20Token, chain),
       ]);
 
@@ -74,19 +74,16 @@ class Nfts {
       // building data
       const values = {
         name: nftMetadata.name,
-        tokenId: data.tokenID,
+        tokenId: data.tokenId,
         description: nftMetadata.metadata?.description,
         categoryId: Number(data.category) || undefined,
         url:
           nftMetadata.metadata?.image ||
           nftMetadata.metadata?.file ||
           nftMetadata.metadata?.video,
-        price: data.auctionType === "1" ? data.buyPrice : data.startingPrice,
+        price: data.startPrice,
         listingType: data.auctionType === "1" ? "NORMAL" : "AUCTION",
-        timeout:
-          data.auctionType === "1"
-            ? null
-            : new Date(Date.now() + data.duration * 1000),
+        timeout: new Date(Date.now() + data.endTime * 1000),
         moreInfo: {
           erc20TokenAddress: data.erc20Token,
           erc20TokenName: tokenData.name,
@@ -118,8 +115,8 @@ class Nfts {
       tokenId,
     });
     const result = nftMetadata.result.toJSON();
-    console.log(nftMetadata);
-    console.log(result);
+    // console.log(nftMetadata);
+    // console.log(result);
     return result;
   };
 
@@ -477,6 +474,7 @@ class Nfts {
       };
     }
   };
+
   getSingleListing = async (id, userId) => {
     const result = await db.nfts.findOne({
       // subQuery: false,
@@ -577,13 +575,14 @@ class Nfts {
       isFavorite: result.dataValues.isFavorite ? true : false,
     };
   };
+
   newBid = async (params = [], walletAddress) => {
     const data = this.getFields(params);
     const listing = await db.nfts.findOne({
       where: {
-        tokenId: data.tokenID,
+        tokenId: data.tokenId,
         moreInfo: {
-          contractAddress: data.mintableToken,
+          contractAddress: data.erc721,
         },
       },
     });

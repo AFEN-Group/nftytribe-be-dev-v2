@@ -96,6 +96,20 @@ const users = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    users.hasMany(models.transactions, {
+      onDelete: "cascade",
+      as: "buyer",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+    users.hasMany(models.transactions, {
+      onDelete: "cascade",
+      as: "seller",
+      foreignKey: {
+        allowNull: false,
+      },
+    });
   };
   return users;
 };
