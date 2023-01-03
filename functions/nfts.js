@@ -686,7 +686,7 @@ class Nfts {
   buyNft = async (params = [], from) => {
     //verify and remove listing
     const data = this.getFields(params);
-    console.log(data);
+
     const { tokenId, erc721 } = data;
 
     const buyer = await db.users.findOne({
@@ -697,16 +697,16 @@ class Nfts {
     const listing = await db.nfts.findOne({
       where: {
         tokenId,
-        moreInfo: { contractAddress: erc721 },
+        "moreInfo.contractAddress": erc721,
       },
     });
-
+    console.log(data, listing, from, tokenId, erc721);
+    console.log("then this", buyer, listing);
     if (listing && buyer) {
       //create transaction
-      await db.nfts.destroy({
-        id: listing.id,
-      });
-      return await db.transactions.create({
+      //use sequelize transaction on this section later
+
+      const newTransaction = await db.transactions.create({
         amount: listing.amount,
         price: listing.price,
         erc20Info: {
@@ -735,8 +735,24 @@ class Nfts {
         buyerId: buyer.id,
         sellerId: listing.userId,
       });
+
+      await db.nfts.destroy({
+        where: { id: listing.id },
+      });
+      return newTransaction;
     }
   };
 }
 
 module.exports = Nfts;
+
+// db.nfts
+//   .findOne({
+//     where: {
+//       tokenId: "25",
+//       moreInfo: {
+//         contractAddress: "0xc5d8cb7b9aafee5c5bdbfabbf46b4153874646f4",
+//       },
+//     },
+//   })
+//   .then((e) => console.log(e));
