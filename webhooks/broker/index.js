@@ -39,6 +39,10 @@ broker.route("/").post(
       if (data.name.toLowerCase() === "bid") {
         const newBid = await nfts.newBid(data.params, fromAddress);
       }
+      if (data.name.toLowerCase() === "buy") {
+        const newSales = await nfts.buyNft(data.params, fromAddress);
+        console.log(newSales);
+      }
     } else if (txsData && confirmed) {
       //changed confirmed to true
     }

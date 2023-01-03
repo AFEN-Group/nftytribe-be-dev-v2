@@ -682,6 +682,61 @@ class Nfts {
       totalPages: Math.ceil(total / limit),
     };
   };
+
+  buyNft = async (params = [], from) => {
+    //verify and remove listing
+    const data = this.getFields(params);
+    console.log(data);
+    const { tokenId, erc721 } = data;
+
+    const buyer = await db.users.findOne({
+      where: {
+        walletAddress: from,
+      },
+    });
+    const listing = await db.nfts.findOne({
+      where: {
+        tokenId,
+        moreInfo: { contractAddress: erc721 },
+      },
+    });
+
+    if (listing && buyer) {
+      //create transaction
+      await db.nfts.destroy({
+        id: listing.id,
+      });
+      return await db.transactions.create({
+        amount: listing.amount,
+        price: listing.price,
+        erc20Info: {
+          address: listing.moreInfo.erc20TokenAddress,
+          name: listing.moreInfo.erc20TokenName,
+          symbol: listing.moreInfo.erc20TokenSymbol,
+          decimals: listing.moreInfo.erc20TokenDecimals,
+        },
+        nftInfo: {
+          type: listing.moreInfo.nftContractType,
+          symbol: listing.moreInfo.symbol,
+          address: listing.moreInfo.contractAddress,
+        },
+        listingInfo: {
+          name: listing.name,
+          tokenId: listing.tokenId,
+          description: listing.description,
+          categoryId: listing.categoryId,
+          url: listing.url,
+          price: listing.price,
+          listingType: listing.listingType,
+          timeout: listing.timeout,
+          chain: listing.chainId,
+          collectionId: listing.collectionId,
+        },
+        buyerId: buyer.id,
+        sellerId: listing.userId,
+      });
+    }
+  };
 }
 
 module.exports = Nfts;

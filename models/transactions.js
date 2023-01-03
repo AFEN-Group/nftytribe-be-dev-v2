@@ -26,16 +26,13 @@ const transactions = (sequelize, dataTypes) => {
   transactions.associate = (models) => {
     transactions.belongsTo(models.users, {
       onDelete: "cascade",
-      foreignKey: {
-        allowNull: false,
-      },
+      foreignKey: "buyerId",
+      // targetKey: "",
       as: "buyer",
     });
     transactions.belongsTo(models.users, {
       onDelete: "cascade",
-      foreignKey: {
-        allowNull: false,
-      },
+      foreignKey: "sellerId",
       as: "seller",
     });
   };
