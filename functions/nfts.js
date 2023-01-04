@@ -334,6 +334,13 @@ class Nfts {
           },
         },
       ],
+      ...(!owner &&
+        userId && {
+          // do not get users own listings
+          userId: {
+            [Op.ne]: userId,
+          },
+        }),
     };
 
     // console.log(inputs);
