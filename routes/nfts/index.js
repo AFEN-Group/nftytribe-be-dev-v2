@@ -7,6 +7,7 @@ const {
   getBids,
   watchListings,
   getWatchers,
+  singleWalletNft,
 } = require("../../controllers/nft");
 const userProtect = require("../../middlewares/userProtect.middleware");
 const {
@@ -16,6 +17,7 @@ const {
   getBiddingValidations,
   getWatchersValidations,
   addWatchValidations,
+  singleWalletNftVerifications,
 } = require("./validations");
 
 const nfts = require("express").Router();
@@ -34,4 +36,5 @@ nfts
   .route("/favorite/:nftId")
   .post(userProtect, favorite_like_Validations, favoriteListing);
 nfts.route("/bids/:nftId").get(getBiddingValidations, getBids);
+nfts.route("/meta-data").get(singleWalletNftVerifications, singleWalletNft);
 module.exports = nfts;

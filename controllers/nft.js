@@ -58,6 +58,17 @@ const favoriteListing = expressAsyncHandler(async (req, res) => {
   res.send(result);
 });
 
+const singleWalletNft = expressAsyncHandler(async (req, res) => {
+  await checkError(req, validationResult);
+  const { tokenId, contractAddress, chain } = req.query;
+  const result = await new Nfts().getNftMetaData(
+    tokenId,
+    contractAddress,
+    chain
+  );
+  res.send(result);
+});
+
 module.exports = {
   getNfts,
   getSingleNftListing,
@@ -69,4 +80,5 @@ module.exports = {
   likeListing,
   favoriteListing,
   getWatchers,
+  singleWalletNft,
 };

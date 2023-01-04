@@ -62,6 +62,9 @@ const getWatchersValidations = [
   query("limit").toInt().default(10),
 ];
 
+const singleWalletNftVerifications = [
+  query(["tokenId", "chain", "contractAddress"]).not().isEmpty(),
+];
 module.exports = {
   getNftsValidations,
   getListingValidation,
@@ -69,4 +72,5 @@ module.exports = {
   getBiddingValidations,
   addWatchValidations,
   getWatchersValidations,
+  singleWalletNftVerifications,
 };

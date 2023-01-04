@@ -745,14 +745,3 @@ class Nfts {
 }
 
 module.exports = Nfts;
-
-// db.nfts
-//   .findOne({
-//     where: {
-//       tokenId: "25",
-//       moreInfo: {
-//         contractAddress: "0xc5d8cb7b9aafee5c5bdbfabbf46b4153874646f4",
-//       },
-//     },
-//   })
-//   .then((e) => console.log(e));
