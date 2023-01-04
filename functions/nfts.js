@@ -252,11 +252,16 @@ class Nfts {
         physical,
       }),
       ...(owner && {
-        [Op.or]: [
-          {
-            userId: owner,
-          },
-        ],
+        [Op.and]: {
+          [Op.or]: [
+            {
+              userId: owner,
+            },
+            {
+              "moreInfo.contractAddress": owner,
+            },
+          ],
+        },
       }),
       ...(category && {
         categoryId: category,
@@ -268,27 +273,29 @@ class Nfts {
         chainId: chain,
       }),
       ...(search && {
-        [Op.or]: [
-          {
-            name: {
-              [Op.like]: `%${search}%`,
-            },
-          },
-          {
-            moreInfo: {
-              symbol: {
+        [Op.and]: {
+          [Op.or]: [
+            {
+              name: {
                 [Op.like]: `%${search}%`,
               },
             },
-          },
-          {
-            moreInfo: {
-              contractAddress: {
-                [Op.like]: `%${search}%`,
+            {
+              moreInfo: {
+                symbol: {
+                  [Op.like]: `%${search}%`,
+                },
               },
             },
-          },
-        ],
+            {
+              moreInfo: {
+                contractAddress: {
+                  [Op.like]: `%${search}%`,
+                },
+              },
+            },
+          ],
+        },
       }),
       ...((priceHighest || priceLowest) && {
         price: {
@@ -329,7 +336,7 @@ class Nfts {
       ],
     };
 
-    console.log(inputs);
+    // console.log(inputs);
     const count = await db.nfts.count({
       where: options,
     });
@@ -377,6 +384,7 @@ class Nfts {
       where: options,
       include: includeOptions,
       subQuery: false,
+      raw: true,
       attributes: {
         include: [
           [
@@ -434,13 +442,12 @@ class Nfts {
       ],
       order: [getOrder()],
     });
-    console.log(result);
     return {
       page,
       totalPages,
       limit,
       results: [...result].map((data) => {
-        const value = { ...data.dataValues };
+        const value = data;
         value.isLiked = value.isLiked ? true : false;
         value.isFavorite = value.isFavorite ? true : false;
         value.isWatched = value.isWatched ? true : false;
