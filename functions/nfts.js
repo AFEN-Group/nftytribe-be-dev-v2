@@ -1,6 +1,7 @@
 const Moralis = require("./Moralis.sdk");
 const db = require("../models");
 const { Op } = require("sequelize");
+const moment = require("moment");
 
 class Nfts {
   getNfts = async (options, walletAddress) => {
@@ -17,6 +18,17 @@ class Nfts {
     });
 
     const results = nfts.toJSON();
+
+    const listed = await db.nfts.findAll({
+      where: {
+        tokenId: results.result.map((data) => Number(data.token_id)),
+        moreInfo: {
+          contractAddress: {
+            [Op.in]: results.result.map((data) => data.token_address),
+          },
+        },
+      },
+    });
     // console.log(results);
     return {
       ...nfts.pagination,
@@ -25,6 +37,15 @@ class Nfts {
           return {
             ...data,
             metadata: data.metadata ? JSON.parse(data.metadata) : {},
+            isListed:
+              listed
+                .map((data) => data.tokenId)
+                .includes(Number(data.token_id)) &&
+              listed
+                .map((data) => data.moreInfo.contractAddress)
+                .includes(data.token_address)
+                ? true
+                : false,
           };
         }) || results,
     };
@@ -83,7 +104,7 @@ class Nfts {
           nftMetadata.metadata?.video,
         price: data.startPrice,
         listingType: data.auctionType === "1" ? "NORMAL" : "AUCTION",
-        timeout: new Date(Date.now() + data.endTime * 1000),
+        timeout: moment.unix(data.endTime),
         moreInfo: {
           erc20TokenAddress: data.erc20Token,
           erc20TokenName: tokenData.name,
@@ -114,10 +135,25 @@ class Nfts {
       chain,
       tokenId,
     });
-    const result = nftMetadata.result.toJSON();
+    const result = nftMetadata?.result.toJSON();
+    const listing = await db.nfts.findOne({
+      where: {
+        tokenId,
+        moreInfo: {
+          contractAddress: address,
+        },
+      },
+    });
     // console.log(nftMetadata);
     // console.log(result);
-    return result;
+    if (result) {
+      return { ...result, isListed: listing ? true : false };
+    } else {
+      throw {
+        status: 404,
+        message: "nft not found",
+      };
+    }
   };
 
   getTokenData = async (address, chain) => {
@@ -745,3 +781,4 @@ class Nfts {
 }
 
 module.exports = Nfts;
+// console.log(moment().add(30, "day").unix());
