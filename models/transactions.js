@@ -35,6 +35,19 @@ const transactions = (sequelize, dataTypes) => {
       foreignKey: "sellerId",
       as: "seller",
     });
+    transactions.belongsTo(models.collections, {
+      foreignKey: {
+        allowNull: true,
+      },
+      onDelete: "cascade",
+    });
+    transactions.belongsTo(models.chains, {
+      foreignKey: {
+        allowNull: false,
+        defaultValue: 1,
+      },
+      onDelete: "cascade",
+    });
   };
 
   return transactions;

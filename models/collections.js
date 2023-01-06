@@ -51,6 +51,12 @@ const collections = (sequelize, dataTypes) => {
       },
     });
     collections.hasMany(models.nfts);
+    collections.hasMany(models.transactions, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: true,
+      },
+    });
   };
   return collections;
 };

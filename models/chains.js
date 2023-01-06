@@ -24,6 +24,13 @@ const chains = (sequelize, dataTypes) => {
         allowNull: false,
       },
     });
+    chains.hasMany(models.transactions, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: false,
+        // default: 1,
+      },
+    });
   };
   return chains;
 };
