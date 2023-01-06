@@ -27,7 +27,6 @@ const transactions = (sequelize, dataTypes) => {
     transactions.belongsTo(models.users, {
       onDelete: "cascade",
       foreignKey: "buyerId",
-      // targetKey: "",
       as: "buyer",
     });
     transactions.belongsTo(models.users, {

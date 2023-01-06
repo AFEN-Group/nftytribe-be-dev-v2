@@ -759,6 +759,8 @@ class Nfts {
       const newTransaction = await db.transactions.create({
         amount: listing.amount,
         price: listing.price,
+        collectionId: listing.collectionId,
+        chainId: listing.chainId,
         erc20Info: {
           address: listing.moreInfo.erc20TokenAddress,
           name: listing.moreInfo.erc20TokenName,
@@ -779,8 +781,7 @@ class Nfts {
           price: listing.price,
           listingType: listing.listingType,
           timeout: listing.timeout,
-          chain: listing.chainId,
-          collectionId: listing.collectionId,
+          usd: null,
         },
         buyerId: buyer.id,
         sellerId: listing.userId,

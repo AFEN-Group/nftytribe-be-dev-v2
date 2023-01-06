@@ -21,7 +21,7 @@ class Collections {
           address: contractAddress,
           chain: chainId,
         });
-        resolve(sync?.toJSON());
+        return resolve(sync?.toJSON());
       }, 800);
     });
 
@@ -36,6 +36,7 @@ class Collections {
     });
 
     const metaData = result?.toJSON();
+    console.log(metaData);
 
     const user = await db.users.findOne({
       where: { walletAddress },
@@ -68,6 +69,7 @@ class Collections {
         contractAddress,
         coverImage: coverImage || user.avatar.url,
         chainId: chain.id,
+        contractType: metaData.contract_type,
       });
 
       return collection;
