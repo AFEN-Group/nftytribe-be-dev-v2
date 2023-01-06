@@ -792,6 +792,61 @@ class Nfts {
       return newTransaction;
     }
   };
+
+  getSold = async (data = {}, userId) => {
+    const { limit, page } = data;
+    const offset = (page - 1) * limit;
+
+    const options = {
+      sellerId: userId,
+    };
+
+    const totalSold = await db.transactions.count({
+      where: options,
+    });
+
+    const sold = await db.transactions.findAll({
+      where: options,
+      limit,
+      offset,
+      order: [["id", "desc"]],
+    });
+
+    return {
+      page,
+      totalCount: totalSold,
+      totalPages: Math.ceil(totalSold / limit),
+      limit,
+      results: sold,
+    };
+  };
+  getCollected = async (data = {}, userId) => {
+    const { limit, page } = data;
+    const offset = (page - 1) * limit;
+
+    const options = {
+      buyerId: userId,
+    };
+
+    const totalCollected = await db.transactions.count({
+      where: options,
+    });
+
+    const collected = await db.transactions.findAll({
+      where: options,
+      limit,
+      offset,
+      order: [["id", "desc"]],
+    });
+
+    return {
+      page,
+      totalCount: totalCollected,
+      totalPages: Math.ceil(totalCollected / limit),
+      limit,
+      results: collected,
+    };
+  };
 }
 
 module.exports = Nfts;
