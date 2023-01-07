@@ -9,6 +9,7 @@ const transactions = (sequelize, dataTypes) => {
       type: dataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+
     erc20Info: {
       type: dataTypes.JSON,
       allowNull: false,

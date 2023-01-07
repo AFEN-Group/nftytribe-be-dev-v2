@@ -735,6 +735,7 @@ class Nfts {
 
   buyNft = async (params = [], from) => {
     //verify and remove listing
+    console.log(params); //testing purposes
     const data = this.getFields(params);
 
     const { tokenId, erc721 } = data;
@@ -755,6 +756,10 @@ class Nfts {
     if (listing && buyer) {
       //create transaction
       //use sequelize transaction on this section later
+      const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
+        address: listing.moreInfo.erc20TokenAddress,
+        chain: listing.chainId,
+      });
 
       const newTransaction = await db.transactions.create({
         amount: listing.amount,
@@ -778,10 +783,10 @@ class Nfts {
           description: listing.description,
           categoryId: listing.categoryId,
           url: listing.url,
-          price: listing.price,
           listingType: listing.listingType,
           timeout: listing.timeout,
-          usd: null,
+          usd: tokenPrice?.toJSON().usdPrice || 0,
+          nativePrice: tokenPrice?.toJSON().nativePrice,
         },
         buyerId: buyer.id,
         sellerId: listing.userId,
