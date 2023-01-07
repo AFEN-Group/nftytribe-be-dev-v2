@@ -102,7 +102,7 @@ class Nfts {
           nftMetadata.metadata?.image ||
           nftMetadata.metadata?.file ||
           nftMetadata.metadata?.video,
-        price: data.startPrice,
+        price: data.startPrice / 10 ** tokenData.decimals,
         listingType: data.auctionType === "1" ? "NORMAL" : "AUCTION",
         timeout: moment.unix(data.endTime),
         moreInfo: {
@@ -389,6 +389,7 @@ class Nfts {
 
     const result = await db.nfts.findAll({
       where: options,
+      nest: true,
       include: includeOptions,
       subQuery: false,
       raw: true,
@@ -646,7 +647,7 @@ class Nfts {
       const bid = await db.bids.create({
         nftId: listing.id,
         userId: bidder.id,
-        amount: data.amount,
+        amount: data.amount / 10 ** listing.moreInfo.erc20TokenDecimals,
       });
       return bid;
     }
@@ -750,15 +751,16 @@ class Nfts {
         tokenId,
         "moreInfo.contractAddress": erc721,
       },
+      include: {
+        model: db.chains,
+      },
     });
-    console.log(data, listing, from, tokenId, erc721);
-    console.log("then this", buyer, listing);
     if (listing && buyer) {
       //create transaction
       //use sequelize transaction on this section later
       const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
         address: listing.moreInfo.erc20TokenAddress,
-        chain: listing.chainId,
+        chain: listing.chain.chain,
       });
 
       const newTransaction = await db.transactions.create({
@@ -785,8 +787,16 @@ class Nfts {
           url: listing.url,
           listingType: listing.listingType,
           timeout: listing.timeout,
-          usd: tokenPrice?.toJSON().usdPrice || 0,
-          nativePrice: tokenPrice?.toJSON().nativePrice,
+          usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
+          nativePrice: tokenPrice?.toJSON().nativePrice
+            ? {
+                ...tokenPrice?.toJSON().nativePrice,
+                value:
+                  (tokenPrice?.toJSON().nativePrice.value /
+                    tokenPrice?.toJSON().nativePrice.decimals) *
+                  listing.price,
+              }
+            : {},
         },
         buyerId: buyer.id,
         sellerId: listing.userId,
@@ -856,4 +866,18 @@ class Nfts {
 }
 
 module.exports = Nfts;
-// console.log(moment().add(30, "day").unix());
+
+const testParamsBuy = [
+  { name: "_tokenId", value: "26", type: "uint256" },
+  {
+    name: "_erc721",
+    value: "0xc5d8cb7b9aafee5c5bdbfabbf46b4153874646f4",
+    type: "address",
+  },
+];
+
+// new Nfts()
+//   .buyNft(testParamsBuy, "0x9dE3eBed16423B3A6BecDd77823485d44F5A7b8B")
+//   .then((done) => {
+//     console.log(done);
+//   });

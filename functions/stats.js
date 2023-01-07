@@ -4,7 +4,7 @@ const { Sequelize } = require("../models");
 const moment = require("moment");
 class Stats {
   getCollectionStats = async (data = {}) => {
-    const { startDate, endDate, limit, page } = data;
+    const { startDate, endDate, limit, page, chain } = data;
     const offset = (page - 1) * limit;
     //get collection with highest buy based on date
     const options = {
@@ -14,6 +14,9 @@ class Stats {
           [Op.lte]: new Date(moment(endDate).add(24, "hours")),
         },
       },
+      ...(chain && {
+        chainId: chain,
+      }),
     };
     const include = [
       {
@@ -84,14 +87,14 @@ class Stats {
                 select count(collectionId)  
             )`
           ),
-          "num",
+          "salesCount",
         ],
       ],
       include,
       group: ["collectionId"],
       limit,
       offset,
-      order: [["num", "desc"]],
+      order: [["salesCount", "desc"]],
     });
 
     return {
