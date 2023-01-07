@@ -758,10 +758,15 @@ class Nfts {
     if (listing && buyer) {
       //create transaction
       //use sequelize transaction on this section later
-      const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
-        address: listing.moreInfo.erc20TokenAddress,
-        chain: listing.chain.chain,
-      });
+      let tokenPrice;
+      try {
+        tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
+          address: listing.moreInfo.erc20TokenAddress,
+          chain: listing.chain.chain,
+        });
+      } catch (err) {
+        console.log(err);
+      }
 
       const newTransaction = await db.transactions.create({
         amount: listing.amount,
@@ -788,7 +793,7 @@ class Nfts {
           listingType: listing.listingType,
           timeout: listing.timeout,
           usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
-          nativePrice: tokenPrice?.toJSON().nativePrice
+          nativePrice: tokenPrice?.toJSON()?.nativePrice
             ? {
                 ...tokenPrice?.toJSON().nativePrice,
                 value:
@@ -796,7 +801,13 @@ class Nfts {
                     tokenPrice?.toJSON().nativePrice.decimals) *
                   listing.price,
               }
-            : {},
+            : {
+                //dummy data
+                name: "Binance Coin",
+                value: "3824552021216254",
+                symbol: "BNB",
+                decimals: 18,
+              },
         },
         buyerId: buyer.id,
         sellerId: listing.userId,
@@ -867,17 +878,34 @@ class Nfts {
 
 module.exports = Nfts;
 
-const testParamsBuy = [
-  { name: "_tokenId", value: "26", type: "uint256" },
-  {
-    name: "_erc721",
-    value: "0xc5d8cb7b9aafee5c5bdbfabbf46b4153874646f4",
-    type: "address",
-  },
-];
+// const testParamsBuy = [
+//   { name: "_tokenId", value: "26", type: "uint256" },
+//   {
+//     name: "_erc721",
+//     value: "0xc5d8cb7b9aafee5c5bdbfabbf46b4153874646f4",
+//     type: "address",
+//   },
+// ];
 
 // new Nfts()
 //   .buyNft(testParamsBuy, "0x9dE3eBed16423B3A6BecDd77823485d44F5A7b8B")
 //   .then((done) => {
 //     console.log(done);
 //   });
+
+// const dummyData = {
+//   url: "ipfs://QmYkmN4kX4C79H4rQvWYHNhSw8kUCGEEsqjEHWkJRtvht6/26.png",
+//   usd: 1.0001821141448397,
+//   name: "TheSe7enContinents",
+//   timeout: "2023-02-03T17:06:02.000Z",
+//   tokenId: 26,
+//   categoryId: null,
+//   description: "Jungle Arts of Fantom Kaolas",
+//   listingType: "NORMAL",
+//   nativePrice: {
+//     name: "Binance Coin",
+//     value: "3824552021216254",
+//     symbol: "BNB",
+//     decimals: 18,
+//   },
+// };
