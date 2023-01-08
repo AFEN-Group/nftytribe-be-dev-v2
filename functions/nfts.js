@@ -802,7 +802,7 @@ class Nfts {
                   listing.price,
               }
             : {
-                //dummy data
+                //dummy data and will be removed soon
                 name: "Binance Coin",
                 value: "3824552021216254",
                 symbol: "BNB",
