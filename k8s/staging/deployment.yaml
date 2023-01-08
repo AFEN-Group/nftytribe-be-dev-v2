@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nftytribe-v2-be
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       nftytribe-v2-dev: api
@@ -14,6 +14,10 @@ spec:
     spec:
       containers:
         - name: nftytribe-v2-api
+          resources:
+            requests:
+              cpu: 100m
+              memory: 250Mi
           image: radianceobi/nftytribe-v2-be
           ports:
             - containerPort: 4000

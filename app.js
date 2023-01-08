@@ -30,7 +30,9 @@ app.use("/hook", hooks);
 app.use(errorHandler);
 
 const server = http.createServer(app);
-const io = new Socket(server);
+const io = new Socket(server, {
+  transports: ["websocket"],
+});
 
 io.on("connection", (socket) => {
   console.log("connected");
