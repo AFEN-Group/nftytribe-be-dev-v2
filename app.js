@@ -7,7 +7,8 @@ const route = require("./routes");
 const cors = require("cors");
 const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
-const { Server: Socket } = require("socket.io");
+const { createAdapter } = require("@socket.io/redis-adapter");
+const { startSocket } = require("./helpers/socket");
 
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -30,11 +31,6 @@ app.use("/hook", hooks);
 app.use(errorHandler);
 
 const server = http.createServer(app);
-const io = new Socket(server, {
-  transports: ["websocket"],
-});
+startSocket(server);
 
-io.on("connection", (socket) => {
-  console.log("connected");
-});
 module.exports = server;

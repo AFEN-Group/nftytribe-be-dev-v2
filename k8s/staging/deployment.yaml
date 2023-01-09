@@ -127,3 +127,5 @@ spec:
                 secretKeyRef:
                   name: nftytribev2secret
                   key: "afen_market_place_address"
+            - name: redis
+              value: redis-service
