@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nftytribe-v2-be
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       nftytribe-v2-dev: api

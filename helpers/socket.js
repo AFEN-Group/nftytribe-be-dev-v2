@@ -5,10 +5,6 @@ const { Emitter } = require("@socket.io/redis-emitter");
 
 exports.socketEmitter = new Emitter(redis);
 
-// setInterval(() => {
-//   this.socketEmitter.emit("time", new Date());
-// }, 2000);
-
 exports.startSocket = (server) => {
   const io = new Socket(server, {
     transports: ["websocket"],
@@ -16,13 +12,6 @@ exports.startSocket = (server) => {
   });
 
   io.on("connect", (socket) => {
-    console.log("new socket connection....");
-    socket.once("join-room", (room) => {
-      console.log(`joining room ${room}`);
-      socket.join(room);
-    });
-    socket.on("send-message", (message, room) => {
-      this.socketEmitter.to(room).emit("new-message", message);
-    });
+    //authenticate
   });
 };
