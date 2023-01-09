@@ -16,6 +16,7 @@ exports.startSocket = (server) => {
   });
 
   io.on("connect", (socket) => {
+    console.log("new socket connection....");
     socket.once("join-room", (room) => {
       console.log(`joining room ${room}`);
       socket.join(room);
