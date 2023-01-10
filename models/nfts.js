@@ -93,8 +93,13 @@ const nfts = (sequelize, dataTypes) => {
       onDelete: "cascade",
     });
     nfts.belongsTo(models.categories);
+    nfts.hasOne(models.physicalItems, {
+      foreignKey: {
+        allowNull: false,
+      },
+      onDelete: "cascade",
+    });
   };
-
   return nfts;
 };
 

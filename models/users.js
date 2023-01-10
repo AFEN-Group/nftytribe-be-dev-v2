@@ -107,6 +107,9 @@ const users = (sequelize, dataTypes) => {
       as: "seller",
       foreignKey: "sellerId",
     });
+    users.hasMany(models.physicalItemBuyers, {
+      onDelete: "cascade",
+    });
   };
   return users;
 };
