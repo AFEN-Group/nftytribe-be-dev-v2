@@ -12,6 +12,10 @@ spec:
       labels:
         nftytribe-v2-dev: api
     spec:
+      volumes:
+        - name: nftytribe
+          persistentVolumeClaim:
+            claimName: nftytribe-be
       containers:
         - name: nftytribe-v2-api
           resources:
@@ -21,6 +25,9 @@ spec:
           image: radianceobi/nftytribe-v2-be
           ports:
             - containerPort: 4000
+          volumeMounts:
+            - mountPath: /logs
+              name: nftytribe
           env:
             - name: NODE_ENV
               value: staging

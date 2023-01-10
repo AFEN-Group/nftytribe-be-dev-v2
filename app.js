@@ -7,9 +7,8 @@ const route = require("./routes");
 const cors = require("cors");
 const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
-const { createAdapter } = require("@socket.io/redis-adapter");
 const { startSocket } = require("./helpers/socket");
-
+const logger = require("morgan");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 100,
@@ -18,6 +17,7 @@ const limiter = rateLimit({
 });
 
 const app = express();
+app.use(logger.format("tiny"));
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
