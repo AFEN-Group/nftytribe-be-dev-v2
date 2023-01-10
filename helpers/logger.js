@@ -1,5 +1,5 @@
 const winston = require("winston");
-
+const moment = require("moment");
 exports.logger = (data, filename = "error.log", level = "info") => {
   if (
     process.env.NODE_ENV !== "production" &&
@@ -7,9 +7,7 @@ exports.logger = (data, filename = "error.log", level = "info") => {
   ) {
     const log = winston.createLogger({
       format: winston.format.simple(),
-      transports: [
-        new winston.transports.Console({ filename: `../logs/${filename}` }),
-      ],
+      transports: [new winston.transports.Console()],
     });
     log.log(level, data);
     return;
@@ -18,7 +16,11 @@ exports.logger = (data, filename = "error.log", level = "info") => {
   const log = winston.createLogger({
     format: winston.format.json(),
     transports: [
-      new winston.transports.File({ filename: `../logs/internal-${filename}` }),
+      new winston.transports.File({
+        filename: `../logs/internal-${filename}-${moment().format(
+          "DD-MM-YYYY"
+        )}`,
+      }),
     ],
   });
 
