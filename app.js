@@ -17,7 +17,7 @@ const limiter = rateLimit({
 });
 
 const app = express();
-app.use(logger.format("tiny"));
+// app.use(logger.format("tiny"));
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
