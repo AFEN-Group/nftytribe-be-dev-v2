@@ -1,5 +1,13 @@
+const { Sequelize } = require("sequelize");
+
 const uploads = (sequelize, dataTypes) => {
   const uploads = sequelize.define("uploads", {
+    id: {
+      type: Sequelize.UUID,
+      unique: "id",
+      primaryKey: true,
+      autoIncrement: false,
+    },
     url: {
       allowNull: false,
       type: dataTypes.STRING,
