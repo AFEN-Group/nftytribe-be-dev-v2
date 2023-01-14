@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const uploads = (sequelize, dataTypes) => {
   const uploads = sequelize.define("uploads", {
@@ -7,6 +7,7 @@ const uploads = (sequelize, dataTypes) => {
       unique: "id",
       primaryKey: true,
       autoIncrement: false,
+      defaultValue: DataTypes.UUIDV4,
     },
     url: {
       allowNull: false,
