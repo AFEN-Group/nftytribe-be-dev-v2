@@ -24,6 +24,9 @@ const physicalItems = (sequelize, dataTypes) => {
     weight: {
       type: dataTypes.DECIMAL(10, 2),
     },
+    deliveryChannels: {
+      type: dataTypes.JSON,
+    },
   });
 
   physicalItems.associate = (models) => {
