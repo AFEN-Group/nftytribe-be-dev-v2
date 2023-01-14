@@ -9,15 +9,14 @@ const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
 const { startSocket } = require("./helpers/socket");
 const logger = require("morgan");
+const t = require("./functions/physicalItems");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 100,
   standardHeaders: false,
   legacyHeaders: false,
 });
-
 const app = express();
-// app.use(logger.format("tiny"));
 app.use(cors());
 app.use(express.json());
 app.use(limiter);

@@ -27,6 +27,10 @@ const physicalItems = (sequelize, dataTypes) => {
     deliveryChannels: {
       type: dataTypes.JSON,
     },
+    images: {
+      type: dataTypes.JSON,
+      defaultValue: [],
+    },
   });
 
   physicalItems.associate = (models) => {
@@ -37,6 +41,12 @@ const physicalItems = (sequelize, dataTypes) => {
       },
     });
     physicalItems.hasMany(models.physicalItemBuyers, {
+      onDelete: "cascade",
+      foreignKey: {
+        allowNull: true,
+      },
+    });
+    physicalItems.hasMany(models.uploads, {
       onDelete: "cascade",
       foreignKey: {
         allowNull: true,
