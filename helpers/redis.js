@@ -1,5 +1,4 @@
 const Redis = require("ioredis");
-const { logger } = require("./logger");
 
 try {
   exports.redis = new Redis({ host: process.env.redis });
@@ -8,4 +7,4 @@ try {
   console.log(err);
   process.exit(1);
 }
-logger("hello");
+// logger("hello");

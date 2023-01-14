@@ -4,6 +4,10 @@ const physicalItemBuyers = (sequelize, dataTypes) => {
       type: dataTypes.STRING,
       allowNull: false,
     },
+    city: {
+      type: dataTypes.STRING,
+      allowNull: true,
+    },
     state: {
       type: dataTypes.STRING,
       allowNull: false,

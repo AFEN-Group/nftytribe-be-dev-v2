@@ -1,16 +1,28 @@
 const physicalItems = (sequelize, dataTypes) => {
   const physicalItems = sequelize.define("physicalItems", {
-    twitter: {
+    address: {
+      type: dataTypes.STRING,
+      allowNull: false,
+    },
+    city: {
       type: dataTypes.STRING,
     },
-    linkedn: {
+    state: {
+      type: dataTypes.STRING,
+      allowNull: false,
+    },
+    country: {
+      type: dataTypes.STRING,
+      allowNull: false,
+    },
+    tokenId: {
+      type: dataTypes.INTEGER,
+    },
+    tokenAddress: {
       type: dataTypes.STRING,
     },
-    artistSignature: {
-      type: dataTypes.STRING,
-    },
-    issuedIdUrl: {
-      type: dataTypes.STRING,
+    weight: {
+      type: dataTypes.DECIMAL(10, 2),
     },
   });
 
@@ -18,13 +30,13 @@ const physicalItems = (sequelize, dataTypes) => {
     physicalItems.belongsTo(models.nfts, {
       onDelete: "cascade",
       foreignKey: {
-        allowNull: false,
+        allowNull: true,
       },
     });
     physicalItems.hasMany(models.physicalItemBuyers, {
       onDelete: "cascade",
       foreignKey: {
-        allowNull: false,
+        allowNull: true,
       },
     });
   };
