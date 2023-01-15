@@ -2,6 +2,7 @@ const Moralis = require("./Moralis.sdk");
 const db = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
+const { linkPhysicalItems } = require("./physicalItems");
 
 class Nfts {
   getNfts = async (options, walletAddress) => {
@@ -123,6 +124,12 @@ class Nfts {
       // store to db
       console.log(values);
       const newListing = await db.nfts.create(values);
+
+      //check for physical item
+      if (data.physical?.trim() !== "") {
+        await linkPhysicalItems(data.physical, newListing.id);
+      }
+
       return newListing;
     } else {
       //do nothing

@@ -1,6 +1,7 @@
 const { body, param, query } = require("express-validator");
 const db = require("../../models");
-
+const { redis } = require("../../helpers/redis");
+const NODE_ENV = process.env.NODE_ENV;
 const getNftsValidations = [
   param("field").not().isEmpty().trim().escape(),
   query("limit").toInt().default(10),
@@ -72,6 +73,34 @@ const getTransactionsValidation = [
   query("page").default(1),
   query("type").default("sold"),
 ];
+
+const createPhysicalItemValidations = [
+  body(["address", "state", "country", "weight"]).not().isEmpty(),
+  NODE_ENV === "production" &&
+    body("deliveryChannels").custom(async (channels) => {
+      if (!channels || !channels?.length) throw "invalid channels";
+      return await Promise.all(
+        channels.map(async (channel) => {
+          const found = await db.deliveryChannels.findOne({
+            where: {
+              name: channel,
+            },
+          });
+          if (!found) throw channel + " not found";
+        })
+      );
+    }),
+  body("imageKey")
+    .optional({ checkFalsy: true })
+    .custom(async (key) => {
+      if (key.trim() !== "") {
+        const data = await redis.get(key);
+        if (!data) throw "key has either does not exist or has expired!";
+      }
+      return key;
+    }),
+].filter((data) => data && data);
+
 module.exports = {
   getNftsValidations,
   getListingValidation,
@@ -81,4 +110,5 @@ module.exports = {
   getWatchersValidations,
   singleWalletNftVerifications,
   getTransactionsValidation,
+  createPhysicalItemValidations,
 };

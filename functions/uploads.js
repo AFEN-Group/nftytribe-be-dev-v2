@@ -1,7 +1,8 @@
 const sharp = require("sharp");
 const AWS = require("aws-sdk");
 const rm = require("randomstring");
-const db = require("../models");
+const { redis } = require("../helpers/redis");
+// const db = require("../models");
 const config = process.env;
 const s3 = new AWS.S3({
   accessKeyId: config.spaces_access_key,
@@ -52,6 +53,24 @@ class Uploads {
     const [avatar] = await this.compressImages(images);
     const location = await this.upload(avatar, path);
     return location;
+  };
+
+  saveTempImages = async (namesOfImages = []) => {
+    if (namesOfImages.length) {
+      const key = rm.generate({ length: 16 });
+
+      //expires in 20 mins
+      await redis.setex(key, 1200, JSON.stringify(namesOfImages));
+      return {
+        key,
+        images: JSON.parse(await redis.get(key)),
+      };
+    } else {
+      throw {
+        status: 400,
+        message: "no image uploaded",
+      };
+    }
   };
 }
 module.exports = Uploads;
