@@ -1,7 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
-const checkError = require("$functions/checkError");
+const checkError = require("functions/checkError");
 const { validationResult } = require("express-validator");
-const Stats = require("$functions/stats");
+const Stats = require("functions/stats");
 
 exports.getCollectionStats = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);

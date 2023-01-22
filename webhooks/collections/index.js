@@ -1,5 +1,5 @@
 const expressAsyncHandler = require("express-async-handler");
-const Collections = require("$functions//collections");
+const Collections = require("functions//collections");
 const collections = require("express").Router();
 
 collections.route("/").post(

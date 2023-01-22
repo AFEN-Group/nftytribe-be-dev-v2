@@ -1,5 +1,5 @@
 const expressAsyncHandler = require("express-async-handler");
-const Uploads = require("$functions/uploads");
+const Uploads = require("functions/uploads");
 
 exports.tempUploads = expressAsyncHandler(async (req, res) => {
   const files = req.files;
