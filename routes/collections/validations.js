@@ -6,15 +6,15 @@ const importCollectionValidations = [
     .not()
     .isEmpty()
     .custom(async (contractAddress) => {
-      // if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
-      //   throw "invalid contract address";
-      // }
-      // const collection = await db.collections.findOne({
-      //   where: {
-      //     contractAddress,
-      //   },
-      // });
-      // if (collection) throw "collection already exists!";
+      if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
+        throw "invalid contract address";
+      }
+      const collection = await db.collections.findOne({
+        where: {
+          contractAddress,
+        },
+      });
+      if (collection) throw "collection already exists!";
       return true;
     }),
   body("chain")

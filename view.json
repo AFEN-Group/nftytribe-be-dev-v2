@@ -1,0 +1,19 @@
+{
+  "url": "ipfs://QmYkmN4kX4C79H4rQvWYHNhSw8kUCGEEsqjEHWkJRtvht6/25.png",
+  "name": "TheSe7enContinents",
+  "chain": 1,
+  "price": "100.00",
+  "timeout": "2023-02-03T07:12:44.000Z",
+  "tokenId": 25,
+  "usdPrice": 16115.165641767926,
+  "categoryId": null,
+  "description": "Jungle Arts of Fantom Kaolas",
+  "listingType": "NORMAL",
+  "nativePrice": {
+    "name": "Ether",
+    "value": "100",
+    "symbol": "ETH",
+    "decimals": 18
+  },
+  "collectionId": null
+}

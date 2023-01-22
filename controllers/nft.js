@@ -1,8 +1,8 @@
 const expressAsyncHandler = require("express-async-handler");
 const { validationResult, matchedData } = require("express-validator");
-const checkError = require("functions/checkError");
-const Nfts = require("functions/nfts");
-const { createPhysicalItems } = require("functions/physicalItems");
+const checkError = require("$functions/checkError");
+const Nfts = require("$functions/nfts");
+const { createPhysicalItems } = require("$functions/physicalItems");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
