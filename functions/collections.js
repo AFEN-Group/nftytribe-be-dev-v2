@@ -1,8 +1,9 @@
 const { Op } = require("sequelize");
-const owner = require("../abi/owner");
-const db = require("../models");
+const owner = require("abi/owner");
+const db = require("models");
 const moralis = require("./moralis");
 const Moralis = require("./Moralis.sdk");
+const { Sequelize } = require("../models");
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -22,7 +23,7 @@ class Collections {
           chain: chainId,
         });
         return resolve(sync?.toJSON());
-      }, 0);
+      }, 1000);
     });
 
     const result = await new Promise((resolve, reject) => {
@@ -32,7 +33,7 @@ class Collections {
           chain: chainId,
         });
         resolve(data);
-      }, 0);
+      }, 500);
     });
 
     const metaData = result?.toJSON();
@@ -54,7 +55,7 @@ class Collections {
         });
         resolve(isOwner?.toJSON());
         console.log(isOwner?.toJSON());
-      }, 0);
+      }, 500);
     });
     if (ownerAddress.toLowerCase() !== user.walletAddress.toLowerCase())
       throw {
@@ -164,6 +165,18 @@ class Collections {
               db.Sequelize.col("collectionFavorites.id")
             ),
             "favoriteCount",
+          ],
+          [
+            Sequelize.literal(`(
+              select sum(listingInfo->>"$.nativePrice.value") from transactions where nftInfo->>"$.address" = collections.contractAddress
+            )`),
+            "volume",
+          ],
+          [
+            Sequelize.literal(`(
+              select min()
+            )`),
+            "floorPrice",
           ],
           userId && [
             db.Sequelize.cast(
