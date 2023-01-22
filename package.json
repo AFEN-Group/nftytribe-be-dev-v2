@@ -19,6 +19,7 @@
     "helmet": "^6.0.0",
     "ioredis": "^5.2.4",
     "jsonwebtoken": "^8.5.1",
+    "module-alias": "^2.2.2",
     "moment": "^2.29.4",
     "moralis": "^2.8.2",
     "morgan": "^1.10.0",
@@ -34,10 +35,19 @@
     "winston": "^3.8.2"
   },
   "scripts": {
-    "dev": "NODE_ENV=development nodemon server.js",
-    "staging": "NODE_ENV=staging node server.js"
+    "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config  server.js",
+    "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
+  },
+  "_moduleAliases": {
+    "root": ".",
+    "models": "./models",
+    "controllers": "./controllers",
+    "email-templates": "./email_templates",
+    "abi": "./abi",
+    "middlewares": "./middlewares",
+    "functions": "./functions"
   }
 }

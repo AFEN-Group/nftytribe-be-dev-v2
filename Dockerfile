@@ -1,4 +1,4 @@
-FROM node:16.18.1-alpine3.15
+FROM node:18.13-alpine
 RUN apk add git openssh --update python3 make g++ && rm -rf /var/cache/apk/*
 RUN npm i -g sequelize-cli sequelize 
 WORKDIR /app

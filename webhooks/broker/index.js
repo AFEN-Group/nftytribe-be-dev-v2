@@ -3,7 +3,7 @@ const brokerV2 = require("../../abi/brokerV2");
 const broker = require("express").Router();
 
 const abiDecoder = require("abi-decoder");
-const Nfts = require("../../functions/nfts");
+const Nfts = require("functions/nfts");
 abiDecoder.addABI(brokerV2.brokerV2);
 
 broker.route("/").post(
