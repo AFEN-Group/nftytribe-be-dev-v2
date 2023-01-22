@@ -191,70 +191,68 @@ class Collections {
           [
             Sequelize.literal(`(
               select 
-                (((volumes.lastVolume - volumes.currentVolume) / currentVolume) * 100)
+                 (((currentVolume.value - lastVolume.value) / lastVolume.value) * 100)
               from  (
-                select IFNULL((
-                  select 
-                    SUM(listingInfo->>"$.nativePrice.value") 
-                  from 
-                    transactions 
-                  where 
-                    DATE(transactions.createdAt) = '${moment()
-                      .subtract(1, "day")
-                      .format("YYYY-MM-DD")}'
-                    and 
-                      nftInfo->>"$.address" = collections.contractAddress
-                ), 0) as lastVolume,
-                IFNULL((
-                  select 
-                    SUM(listingInfo->>"$.nativePrice.value") 
-                  from 
-                    transactions 
-                  where 
-                    DATE(transactions.createdAt) = '${moment().format(
-                      "YYYY-MM-DD"
-                    )}'
-                  and 
-                    nftInfo->>"$.address" = collections.contractAddress
-                ), 0) as currentVolume
-              ) as volumes
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions 
+                where 
+                  DATE(transactions.createdAt) = CURDATE()
+                and 
+                  nftInfo->>"$.address" = collections.contractAddress
+              ) currentVolume,
+              (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions 
+                where 
+                  DATE(transactions.createdAt) = '${moment()
+                    .subtract(1, "day")
+                    .format("YYYY-MM-DD")}'
+                and 
+                  nftInfo->>"$.address" = collections.contractAddress
+              ) lastVolume
             )`),
             "24hrs",
           ],
           [
             Sequelize.literal(`(
               select 
-                (((volumes.lastVolume - volumes.currentVolume) / currentVolume) * 100)
-              from  (
-                select IFNULL((
-                  select 
-                    SUM(listingInfo->>"$.nativePrice.value") 
-                  from 
-                    transactions 
-                  where 
-                    DATE(transactions.createdAt) between '${moment()
-                      .subtract(2, "weeks")
-                      .format("YYYY-MM-DD")}' and '${moment()
-              .subtract(1, "week")
-              .format("YYYY-MM-DD")}'
-                    and 
-                      nftInfo->>"$.address" = collections.contractAddress
-                ), 0) as lastVolume,
-                IFNULL((
-                  select 
-                    SUM(listingInfo->>"$.nativePrice.value") 
-                  from 
-                    transactions 
-                  where 
-                    DATE(transactions.createdAt) between '${moment()
-                      .subtract(1, "days")
-                      .format("YYYY-MM-DD")}' and '${moment().format(
-              "YYYY-MM-DD"
-            )}'
-                  and 
-                    nftInfo->>"$.address" = collections.contractAddress
-                ), 0) as currentVolume
-              ) as volumes
+                 (((currentVolume.value - 0) / 1) * 100)
+              from (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions
+                where 
+                (
+                  DATE(transactions.createdAt)
+                  between 
+                  '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
+                  and
+                  CURDATE()
+                )
+                and
+                nftInfo->>"$.address" = collections.contractAddress
+              ) currentVolume,
+              (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions
+                where 
+                (
+                  DATE(transactions.createdAt)
+                  between 
+                  '${moment().subtract(2, "week").format("YYYY-MM-DD")}'
+                  and
+                  '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
+                )
+                and
+                nftInfo->>"$.address" = collections.contractAddress
+              ) lastVolume
             )`),
             "7days",
           ],
@@ -279,6 +277,21 @@ class Collections {
               moreInfo->>"$.contractAddress" = collections.contractAddress
           )`),
             "totalOwners",
+          ],
+          [
+            Sequelize.literal(`(
+              select 
+                    ifnull(SUM(listingInfo->>"$.nativePrice.value"), 0) 
+                  from 
+                    transactions 
+                  where 
+                    DATE(transactions.createdAt) = '${moment()
+                      .subtract(1, "day")
+                      .format("YYYY-MM-DD")}' 
+                    and 
+                      nftInfo->>"$.address" = collections.contractAddress
+            )`),
+            "test",
           ],
           userId && [
             db.Sequelize.cast(
