@@ -35,7 +35,7 @@
     "winston": "^3.8.2"
   },
   "scripts": {
-    "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config  server.js",
+    "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config server.js",
     "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js"
   },
   "devDependencies": {
