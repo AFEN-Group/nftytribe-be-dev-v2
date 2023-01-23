@@ -24,6 +24,13 @@ const collections = (sequelize, dataTypes) => {
         isUrl: true,
       },
     },
+    coverImage: {
+      allowNull: false,
+      type: dataTypes.STRING,
+      validate: {
+        isUrl: true,
+      },
+    },
   });
   collections.associate = (models) => {
     collections.belongsTo(models.users, {
@@ -52,7 +59,7 @@ const collections = (sequelize, dataTypes) => {
     });
     collections.hasMany(models.nfts);
     collections.hasMany(models.transactions, {
-      onDelete: "cascade",
+      onDelete: "SET NULL",
       foreignKey: {
         allowNull: true,
       },
