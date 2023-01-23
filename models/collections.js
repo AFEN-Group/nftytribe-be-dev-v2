@@ -24,7 +24,7 @@ const collections = (sequelize, dataTypes) => {
         isUrl: true,
       },
     },
-    coverImage: {
+    bg: {
       allowNull: false,
       type: dataTypes.STRING,
       validate: {
