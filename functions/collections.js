@@ -5,6 +5,7 @@ const moralis = require("./moralis");
 const Moralis = require("./Moralis.sdk");
 const { Sequelize } = require("../models");
 const moment = require("moment");
+const Uploads = require("./uploads");
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -457,6 +458,25 @@ class Collections {
           isFavorite: data.dataValues.isFavorite ? true : false,
         }
       : data;
+  };
+
+  static updateBg = async (id, buffer) => {
+    const upload = new Uploads();
+    const url = await upload.upload(
+      (
+        await upload.compressImages([buffer])
+      )[0],
+      "collections-bg"
+    );
+    const updated = await db.collections.update(
+      { bg: url },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    return { bg: url };
   };
 }
 

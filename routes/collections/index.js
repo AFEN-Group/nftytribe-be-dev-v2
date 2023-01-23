@@ -5,6 +5,7 @@ const {
   favoriteCollection,
   deleteCollection,
   getSingleCollection,
+  updateCollectionBg,
 } = require("../../controllers/collections");
 const userProtect = require("../../middlewares/userProtect.middleware");
 const { avatarUpload } = require("../user/validations");
@@ -15,7 +16,9 @@ const {
   favoriteCollectionValidation,
   deleteCollectionValidations,
   getSingleCollectionValidation,
+  uploadBgValidations,
 } = require("./validations");
+const { tempUploads } = require("helpers/multer");
 
 const collections = require("express").Router();
 
@@ -41,5 +44,14 @@ collections
   .route("/:id")
   .delete(userProtect, deleteCollectionValidations, deleteCollection)
   .get(getSingleCollectionValidation, getSingleCollection);
+
+collections
+  .route("/:id/bg")
+  .patch(
+    userProtect,
+    tempUploads.single("bg"),
+    uploadBgValidations,
+    updateCollectionBg
+  );
 
 module.exports = collections;

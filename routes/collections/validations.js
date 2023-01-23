@@ -1,5 +1,5 @@
 const { body, param, query } = require("express-validator");
-const db = require("../../models");
+const db = require("models");
 
 const importCollectionValidations = [
   body("contractAddress")
@@ -54,6 +54,18 @@ const getCollectionsValidation = [
 const getSingleCollectionValidation = [param("id").not().isEmpty()];
 const likeCollectionValidation = [param("id").not().isEmpty()];
 const favoriteCollectionValidation = [param("id").not().isEmpty()];
+const uploadBgValidations = [
+  param("id").custom(async (id, { req }) => {
+    const collection = await db.collections.findOne({
+      where: {
+        id,
+        userId: req.user.id,
+      },
+    });
+    if (!collection) throw { message: "invalid collection id" };
+    return true;
+  }),
+];
 
 module.exports = {
   importCollectionValidations,
@@ -62,4 +74,5 @@ module.exports = {
   getSingleCollectionValidation,
   likeCollectionValidation,
   favoriteCollectionValidation,
+  uploadBgValidations,
 };

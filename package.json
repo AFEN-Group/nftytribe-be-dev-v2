@@ -48,6 +48,7 @@
     "email-templates": "./email_templates",
     "abi": "./abi",
     "middlewares": "./middlewares",
-    "functions": "./functions"
+    "functions": "./functions",
+    "helpers": "./helpers"
   }
 }

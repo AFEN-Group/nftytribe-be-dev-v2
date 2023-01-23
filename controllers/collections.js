@@ -66,6 +66,15 @@ const deleteCollection = expressAsyncHandler(async (req, res) => {
   );
   res.send(result);
 });
+
+const updateCollectionBg = expressAsyncHandler(async (req, res) => {
+  const { params, file } = req;
+  if (!file)
+    throw { status: 400, message: "please select an image for upload" };
+  const data = await Collections.updateBg(params.id, file.buffer);
+  res.send(data);
+});
+
 module.exports = {
   importCollection,
   getAllCollections,
@@ -73,4 +82,5 @@ module.exports = {
   likeCollection,
   favoriteCollection,
   deleteCollection,
+  updateCollectionBg,
 };
