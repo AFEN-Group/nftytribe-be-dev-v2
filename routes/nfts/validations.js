@@ -105,7 +105,7 @@ const newNftValidations = [
   body(["name", "description", "imageKey"]).not().isEmpty(),
   body("lazyMint").isBoolean(),
   body("imageKey").custom(async (key, { req }) => {
-    const data = await redis.getOnce(key);
+    const data = await redis.getdel(key);
     if (!data) throw "invalid key";
     //set image from redis to image
     req.image = JSON.parse(data);
