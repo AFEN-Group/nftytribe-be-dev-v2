@@ -88,6 +88,14 @@ const newPhysicalItem = expressAsyncHandler(async (req, res) => {
   res.send(newItem);
 });
 
+const newNft = expressAsyncHandler(async (req, res) => {
+  await checkError(req, validationResult);
+  const data = matchedData(req, { locations: ["body"] });
+  const { image } = req;
+  const createNft = await Nfts.createNft(data, image, req.user.username);
+  res.send(createNft);
+});
+
 module.exports = {
   getNfts,
   getSingleNftListing,
@@ -102,4 +110,5 @@ module.exports = {
   singleWalletNft,
   getTransactions,
   newPhysicalItem,
+  newNft,
 };

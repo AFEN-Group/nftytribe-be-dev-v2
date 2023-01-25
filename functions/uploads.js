@@ -4,6 +4,8 @@ const rm = require("randomstring");
 const { redis } = require("../helpers/redis");
 // const db = require("../models");
 const config = process.env;
+const Moralis = require("./Moralis.sdk");
+
 const s3 = new AWS.S3({
   accessKeyId: config.spaces_access_key,
   secretAccessKey: config.spaces_secret_key,
@@ -71,6 +73,25 @@ class Uploads {
         message: "no image uploaded",
       };
     }
+  };
+
+  static tempImageForNft = async ({ base64, mime }) => {
+    const key = `${rm.generate(5)}-temp-ipfs-image-${rm.generate(5)}`;
+    //expires 10 mins
+    await redis.setex(key, 600, JSON.stringify({ base64, mime }));
+    return key;
+  };
+
+  static uploadFileToIpfs = async (image, mime, username) => {
+    const upload = await Moralis.EvmApi.ipfs.uploadFolder({
+      abi: [
+        {
+          path: `image/${username}-${rm.generate(6)}.${mime}`,
+          content: image,
+        },
+      ],
+    });
+    return upload.toJSON();
   };
 }
 module.exports = Uploads;

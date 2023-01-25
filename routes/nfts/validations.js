@@ -101,6 +101,20 @@ const createPhysicalItemValidations = [
     }),
 ].filter((data) => data && data);
 
+const newNftValidations = [
+  body(["name", "description", "imageKey"]).not().isEmpty(),
+  body("lazyMint").isBoolean(),
+  body("imageKey").custom(async (key, { req }) => {
+    const data = await redis.get(key);
+    if (!data) throw "invalid key";
+
+    //set image from redis to image
+    req.image = JSON.parse(data);
+    return true;
+  }),
+  body("website").isURL(),
+  //handle validation for if lazy minting is true
+];
 module.exports = {
   getNftsValidations,
   getListingValidation,
@@ -111,4 +125,5 @@ module.exports = {
   singleWalletNftVerifications,
   getTransactionsValidation,
   createPhysicalItemValidations,
+  newNftValidations,
 };

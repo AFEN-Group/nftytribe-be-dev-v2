@@ -13,3 +13,21 @@ exports.tempUploads = expressAsyncHandler(async (req, res) => {
   const temp = await new Uploads().saveTempImages(uploaded);
   res.send(temp);
 });
+
+exports.tempNftUploads = expressAsyncHandler(async (req, res) => {
+  const { file } = req;
+  if (!file) {
+    throw {
+      status: 400,
+      message: "image not found!",
+    };
+  }
+
+  const data = {
+    base64: file.buffer.toString("base64"),
+    mime: file.mimetype.split("/")[1],
+  };
+
+  const key = await Uploads.tempImageForNft(data);
+  res.send({ key });
+});

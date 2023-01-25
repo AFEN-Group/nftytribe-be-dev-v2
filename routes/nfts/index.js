@@ -10,7 +10,9 @@ const {
   singleWalletNft,
   getTransactions,
   newPhysicalItem,
+  newNft,
 } = require("../../controllers/nft");
+const { tempUploads } = require("../../helpers/multer");
 const userProtect = require("../../middlewares/userProtect.middleware");
 const {
   getNftsValidations,
@@ -22,6 +24,7 @@ const {
   singleWalletNftVerifications,
   getTransactionsValidation,
   createPhysicalItemValidations,
+  newNftValidations,
 } = require("./validations");
 
 const nfts = require("express").Router();
@@ -47,4 +50,6 @@ nfts
 nfts
   .route("/physical-item")
   .post(createPhysicalItemValidations, newPhysicalItem);
+
+nfts.route("/create-nft").post(userProtect, newNftValidations, newNft);
 module.exports = nfts;

@@ -3,6 +3,8 @@ const db = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
 const { linkPhysicalItems } = require("./physicalItems");
+const Uploads = require("./uploads");
+const { redis } = require("../helpers/redis");
 
 class Nfts {
   getNfts = async (options, walletAddress) => {
@@ -901,6 +903,43 @@ class Nfts {
       totalPages: Math.ceil(totalCollected / limit),
       limit,
       results: collected,
+    };
+  };
+
+  static createNft = async (data = {}, image, username) => {
+    const upload = await Uploads.uploadFileToIpfs(
+      image.base64,
+      image.mime,
+      username
+    );
+
+    //include data
+    data.date = moment().unix();
+    const [uriData] = upload;
+
+    //get ipfs alone
+    let uri = "ipfs://";
+    uri += uriData.path.split("/ipfs/")[1];
+    const jsonFileUpload = await Uploads.uploadFileToIpfs(
+      {
+        name: data.name,
+        description: data.description,
+        image: uri,
+        website: data.website || "",
+        date: data.date,
+      },
+      "json",
+      username
+    );
+    const [jsonUri] = jsonFileUpload;
+
+    if (data.lazyMint) {
+      //handle listing the item automatically
+    }
+
+    return {
+      path: jsonUri.path,
+      uri: "ipfs://" + jsonUri.path.split("/ipfs/")[1],
     };
   };
 }
