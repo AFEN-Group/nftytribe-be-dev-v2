@@ -25,7 +25,7 @@ const collections = (sequelize, dataTypes) => {
       },
     },
     bg: {
-      allowNull: false,
+      allowNull: true,
       type: dataTypes.STRING,
       validate: {
         isUrl: true,
