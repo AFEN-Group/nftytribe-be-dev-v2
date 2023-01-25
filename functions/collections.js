@@ -279,21 +279,7 @@ class Collections {
           )`),
             "totalOwners",
           ],
-          [
-            Sequelize.literal(`(
-              select 
-                    ifnull(SUM(listingInfo->>"$.nativePrice.value"), 0) 
-                  from 
-                    transactions 
-                  where 
-                    DATE(transactions.createdAt) = '${moment()
-                      .subtract(1, "day")
-                      .format("YYYY-MM-DD")}' 
-                    and 
-                      nftInfo->>"$.address" = collections.contractAddress
-            )`),
-            "test",
-          ],
+
           userId && [
             db.Sequelize.cast(
               db.Sequelize.where(
@@ -371,6 +357,116 @@ class Collections {
               db.Sequelize.col("collectionFavorites.id")
             ),
             "favoriteCount",
+          ],
+          [
+            Sequelize.literal(`(
+              select sum(listingInfo->>"$.nativePrice.value") 
+              from 
+                transactions 
+              where 
+                nftInfo->>"$.address" = collections.contractAddress
+            )`),
+            "volume",
+          ],
+          [
+            Sequelize.literal(`(
+              select min(listingInfo->>"$.nativePrice.value") 
+              from 
+                transactions 
+              where 
+                nftInfo->>"$.address" = collections.contractAddress
+            )`),
+            "floorPrice",
+          ],
+          [
+            Sequelize.literal(`(
+              select 
+                 (((currentVolume.value - lastVolume.value) / lastVolume.value) * 100)
+              from  (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions 
+                where 
+                  DATE(transactions.createdAt) = CURDATE()
+                and 
+                  nftInfo->>"$.address" = collections.contractAddress
+              ) currentVolume,
+              (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions 
+                where 
+                  DATE(transactions.createdAt) = '${moment()
+                    .subtract(1, "day")
+                    .format("YYYY-MM-DD")}'
+                and 
+                  nftInfo->>"$.address" = collections.contractAddress
+              ) lastVolume
+            )`),
+            "24hrs",
+          ],
+          [
+            Sequelize.literal(`(
+              select 
+                 (((currentVolume.value - 0) / 1) * 100)
+              from (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions
+                where 
+                (
+                  DATE(transactions.createdAt)
+                  between 
+                  '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
+                  and
+                  CURDATE()
+                )
+                and
+                nftInfo->>"$.address" = collections.contractAddress
+              ) currentVolume,
+              (
+                select 
+                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                from 
+                  transactions
+                where 
+                (
+                  DATE(transactions.createdAt)
+                  between 
+                  '${moment().subtract(2, "week").format("YYYY-MM-DD")}'
+                  and
+                  '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
+                )
+                and
+                nftInfo->>"$.address" = collections.contractAddress
+              ) lastVolume
+            )`),
+            "7days",
+          ],
+          [
+            Sequelize.literal(`(
+              select 
+                count(nfts.id) 
+              from 
+                nfts 
+              where 
+                moreInfo->>"$.contractAddress" = collections.contractAddress
+            )`),
+            "totalNfts",
+          ],
+          [
+            Sequelize.literal(`(
+            select 
+              count(distinct userId) 
+            from
+              nfts
+            where 
+              moreInfo->>"$.contractAddress" = collections.contractAddress
+          )`),
+            "totalOwners",
           ],
           userId && [
             db.Sequelize.cast(
