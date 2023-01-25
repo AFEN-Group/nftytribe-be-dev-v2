@@ -42,13 +42,13 @@
     "nodemon": "^2.0.20"
   },
   "_moduleAliases": {
-    "root": ".",
-    "models": "./models",
-    "controllers": "./controllers",
-    "email-templates": "./email_templates",
-    "abi": "./abi",
-    "middlewares": "./middlewares",
-    "functions": "./functions",
-    "helpers": "./helpers"
+    "@root": ".",
+    "@models": "./models",
+    "@controllers": "./controllers",
+    "@email-templates": "./email_templates",
+    "@abi": "./abi",
+    "@middlewares": "./middlewares",
+    "@functions": "./functions",
+    "@helpers": "./helpers"
   }
 }

@@ -1,5 +1,5 @@
 const { body, param, query } = require("express-validator");
-const db = require("models");
+const db = require("@models");
 
 const importCollectionValidations = [
   body("contractAddress")

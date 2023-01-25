@@ -1,7 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
-const Chains = require("functions/chains");
-const checkError = require("functions/checkError");
+const Chains = require("@functions/chains");
+const checkError = require("@functions/checkError");
 
 const addSupportedChain = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);

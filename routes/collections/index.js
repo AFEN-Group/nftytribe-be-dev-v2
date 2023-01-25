@@ -18,7 +18,7 @@ const {
   getSingleCollectionValidation,
   uploadBgValidations,
 } = require("./validations");
-const { tempUploads } = require("helpers/multer");
+const { tempUploads } = require("@helpers/multer");
 
 const collections = require("express").Router();
 

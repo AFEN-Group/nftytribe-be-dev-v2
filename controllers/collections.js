@@ -1,8 +1,8 @@
 const expressAsyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
-const checkError = require("functions/checkError");
-const Collections = require("functions/collections");
-const Uploads = require("functions/uploads");
+const checkError = require("@functions/checkError");
+const Collections = require("@functions/collections");
+const Uploads = require("@functions/uploads");
 
 const importCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);

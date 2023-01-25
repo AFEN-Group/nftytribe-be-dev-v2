@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
-const owner = require("abi/owner");
-const db = require("models");
+const owner = require("@abi/owner");
+const db = require("@models");
 const moralis = require("./moralis");
 const Moralis = require("./Moralis.sdk");
 const { Sequelize } = require("../models");

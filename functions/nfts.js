@@ -799,6 +799,7 @@ class Nfts {
           url: listing.url,
           listingType: listing.listingType,
           timeout: listing.timeout,
+          createdAt: listing.createdAt,
           usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
           nativePrice: tokenPrice?.toJSON()?.nativePrice
             ? {
@@ -830,22 +831,31 @@ class Nfts {
   getSold = async (data = {}, userId) => {
     const { limit, page } = data;
     const offset = (page - 1) * limit;
-
     const options = {
       sellerId: userId,
     };
-
+    const attributes = ["id", "username", "email", "walletAddress"];
     const totalSold = await db.transactions.count({
       where: options,
     });
-
     const sold = await db.transactions.findAll({
       where: options,
       limit,
       offset,
+      include: [
+        {
+          model: db.users,
+          as: "seller",
+          attributes,
+        },
+        {
+          model: db.users,
+          as: "buyer",
+          attributes,
+        },
+      ],
       order: [["id", "desc"]],
     });
-
     return {
       page,
       totalCount: totalSold,
@@ -865,11 +875,23 @@ class Nfts {
     const totalCollected = await db.transactions.count({
       where: options,
     });
-
+    const attributes = ["id", "username", "email", "walletAddress"];
     const collected = await db.transactions.findAll({
       where: options,
       limit,
       offset,
+      include: [
+        {
+          model: db.users,
+          as: "seller",
+          attributes,
+        },
+        {
+          model: db.users,
+          as: "buyer",
+          attributes,
+        },
+      ],
       order: [["id", "desc"]],
     });
 
