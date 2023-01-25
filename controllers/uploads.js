@@ -19,7 +19,7 @@ exports.tempNftUploads = expressAsyncHandler(async (req, res) => {
   if (!file) {
     throw {
       status: 400,
-      message: "image not found!",
+      message: "please upload an image!",
     };
   }
 

@@ -1,10 +1,11 @@
 const expressAsyncHandler = require("express-async-handler");
-const Collections = require("@functions//collections");
+const Collections = require("@functions/collections");
 const collections = require("express").Router();
 
 collections.route("/").post(
   expressAsyncHandler(async (req, res) => {
     try {
+      console.log(req.body);
       if (req.body.confirmed) {
         const data = {
           timestamp: req.body.block.timestamp,

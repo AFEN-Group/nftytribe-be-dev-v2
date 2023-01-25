@@ -192,7 +192,12 @@ class Collections {
           [
             Sequelize.literal(`(
               select 
-                 (((currentVolume.value - lastVolume.value) / lastVolume.value) * 100)
+                 (((currentVolume.value - lastVolume.value) / 
+                 case
+                  when lastVolume.value = 0 then 1
+                  else lastVolume.value
+                  end
+                  ) * 100)
               from  (
                 select 
                   IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
@@ -221,7 +226,12 @@ class Collections {
           [
             Sequelize.literal(`(
               select 
-                 (((currentVolume.value - 0) / 1) * 100)
+                 (((currentVolume.value - lastVolume.value) / 
+                 case
+                  when lastVolume.value = 0 then 1
+                  else lastVolume.value
+                end
+                 ) * 100)
               from (
                 select 
                   IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
@@ -381,7 +391,12 @@ class Collections {
           [
             Sequelize.literal(`(
               select 
-                 (((currentVolume.value - lastVolume.value) / lastVolume.value) * 100)
+                 (((currentVolume.value - lastVolume.value) / 
+                 case 
+                  when lastVolume.value = 0 then 1
+                  else lastVolume.value
+                  end
+                  ) * 100)
               from  (
                 select 
                   IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
@@ -410,7 +425,12 @@ class Collections {
           [
             Sequelize.literal(`(
               select 
-                 (((currentVolume.value - 0) / 1) * 100)
+                 (((currentVolume.value - lastVolume.value) / 
+                 case 
+                  when lastVolume.value = 0 then 1
+                  else lastVolume.value
+                  end
+                 ) * 100)
               from (
                 select 
                   IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
