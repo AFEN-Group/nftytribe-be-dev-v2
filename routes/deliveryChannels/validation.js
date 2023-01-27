@@ -27,5 +27,5 @@ exports.getStatesOrCitiesValidations = [
     return true;
   }),
   param("type").not().isEmpty(),
-  query("countryCode").isISO31661Alpha2(),
+  query("countryCode").optional().isISO31661Alpha2(),
 ];
