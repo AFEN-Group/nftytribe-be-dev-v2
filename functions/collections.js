@@ -354,10 +354,7 @@ class Collections {
           model: db.collectionFavorites,
           attributes: [],
         },
-        includeNfts && {
-          model: db.nfts,
-        },
-      ].filter((arr) => arr),
+      ],
       attributes: {
         include: [
           [
