@@ -6,6 +6,7 @@ const {
   getDeliveryChannels,
   deleteChannel,
 } = require("../functions/deliveryChannels");
+const DeliveryMethods = require("../functions/deliveryMethods");
 
 exports.createDeliveryChannels = expressAsyncHandler(async (req, res) => {
   const data = await checkError(req, validationResult, {
@@ -27,4 +28,22 @@ exports.deleteDeliveryChannel = expressAsyncHandler(async (req, res) => {
 exports.getMethods = expressAsyncHandler(async (req, res) => {
   const data = await getDeliveryChannels();
   res.send(data);
+});
+
+exports.getMethodsData = expressAsyncHandler(async (req, res) => {
+  const data = await checkError(req, validationResult, {
+    matchedData,
+    locations: ["params", "query"],
+  });
+  const method = await DeliveryMethods[data.methodName.toLowerCase()];
+
+  if (data.type.toLowerCase() === "cities") {
+    res.send(await method.getCities(data.countryCode));
+  }
+  if (data.type.toLowerCase() === "states") {
+    res.send(await method.getStates(data.countryCode));
+  }
+  if (data.type.toLowerCase() === "countries") {
+    res.send(await method.getCountries());
+  }
 });
