@@ -329,7 +329,7 @@ class Collections {
       }),
     };
   };
-  getSingleCollection = async (field, userId = this.userId) => {
+  getSingleCollection = async (field, userId = this.userId, includeNfts) => {
     const collection = await db.collections.findOne({
       subQuery: false,
       where: {
@@ -354,7 +354,10 @@ class Collections {
           model: db.collectionFavorites,
           attributes: [],
         },
-      ],
+        includeNfts && {
+          model: db.nfts,
+        },
+      ].filter((arr) => arr),
       attributes: {
         include: [
           [
@@ -510,7 +513,12 @@ class Collections {
           ],
         ].filter((data) => data && data),
       },
-      group: ["collections.id", "collectionLikes.id", "collectionFavorites.id"],
+      group: [
+        "collections.id",
+        "collectionLikes.id",
+        "collectionFavorites.id",
+        "nfts.id",
+      ],
     });
     return this.formatCollectionData(collection);
   };

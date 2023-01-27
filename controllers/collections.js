@@ -37,10 +37,11 @@ const getAllCollections = expressAsyncHandler(async (req, res) => {
 const getSingleCollection = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
   const { id } = req.params;
-
+  const { userId, token } = req.query;
+  console.log(token);
   const collection = await new Collections(
-    req.user?.id || req.query.userId
-  ).getSingleCollection(id);
+    req.user?.id || userId
+  ).getSingleCollection(id, undefined, token);
 
   res.send(collection);
 });

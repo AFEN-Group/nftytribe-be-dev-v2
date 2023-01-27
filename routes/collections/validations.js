@@ -51,7 +51,10 @@ const getCollectionsValidation = [
   query("favorites").toBoolean().default(false),
 ];
 
-const getSingleCollectionValidation = [param("id").not().isEmpty()];
+const getSingleCollectionValidation = [
+  param("id").not().isEmpty(),
+  query("token").default(false).toBoolean(true),
+];
 const likeCollectionValidation = [param("id").not().isEmpty()];
 const favoriteCollectionValidation = [param("id").not().isEmpty()];
 const uploadBgValidations = [
