@@ -514,7 +514,7 @@ class Collections {
         "collections.id",
         "collectionLikes.id",
         "collectionFavorites.id",
-        "nfts.id",
+        // "nfts.id",
       ],
     });
     return this.formatCollectionData(collection);

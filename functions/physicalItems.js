@@ -19,9 +19,10 @@ exports.createPhysicalItems = async (data = {}) => {
 
 exports.linkPhysicalItems = async (key, listingId) => {
   //delete key once gotten as its useless retaining the data
-  const data = await redis.getdel(key);
+  const data = JSON.parse(await redis.getdel(key));
   if (data) {
     //store physical item to database
+    console.log(data);
     const item = await db.physicalItems.create({ ...data, nftId: listingId });
 
     //link uploaded images with

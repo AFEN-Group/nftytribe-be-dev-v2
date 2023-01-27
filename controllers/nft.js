@@ -3,6 +3,7 @@ const { validationResult, matchedData } = require("express-validator");
 const checkError = require("@functions/checkError");
 const Nfts = require("@functions/nfts");
 const { createPhysicalItems } = require("@functions/physicalItems");
+const { linkPhysicalItems } = require("../functions/physicalItems");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -85,6 +86,8 @@ const newPhysicalItem = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
   const data = matchedData(req, { locations: ["body"] });
   const newItem = await createPhysicalItems(data);
+  process.env.NODE_ENV === "development" &&
+    (await linkPhysicalItems(newItem.key, 27));
   res.send(newItem);
 });
 

@@ -79,7 +79,7 @@ const createPhysicalItemValidations = [
   NODE_ENV === "production" &&
     body("deliveryChannels").custom(async (channels) => {
       if (!channels || !channels?.length) throw "invalid channels";
-      return await Promise.all(
+      const d = await Promise.all(
         channels.map(async (channel) => {
           const found = await db.deliveryChannels.findOne({
             where: {
@@ -89,6 +89,8 @@ const createPhysicalItemValidations = [
           if (!found) throw channel + " not found";
         })
       );
+      if (!d.length) throw "invalid channels";
+      return true;
     }),
   body("imageKey")
     .optional({ checkFalsy: true })
@@ -99,6 +101,7 @@ const createPhysicalItemValidations = [
       }
       return key;
     }),
+  body("city").optional(),
 ].filter((data) => data && data);
 
 const newNftValidations = [
