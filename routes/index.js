@@ -1,6 +1,7 @@
 const categories = require("./categories");
 const chain = require("./chain");
 const collections = require("./collections");
+const deliveryChannels = require("./deliveryChannels");
 const nfts = require("./nfts");
 const collectionStats = require("./stats");
 const uploads = require("./uploads");
@@ -15,5 +16,6 @@ route.use("/nft", nfts);
 route.use("/chain", chain);
 route.use("/category", categories);
 route.use("/uploads", uploads);
+route.use("/delivery-channels", deliveryChannels);
 
 module.exports = route;

@@ -1,6 +1,6 @@
 const db = require("../models");
 
-exports.createDeliveryChannels = async (name) => {
+exports.createDeliveryMethod = async (name) => {
   const channel = await db.deliveryChannels.create({
     name,
   });
@@ -19,4 +19,9 @@ exports.deleteChannel = async (id) => {
     message: "deleted",
     id,
   };
+};
+
+exports.getDeliveryChannels = async () => {
+  const channels = await db.deliveryChannels.findAll();
+  return channels;
 };
