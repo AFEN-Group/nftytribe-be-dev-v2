@@ -4,8 +4,11 @@ const topshipApi =
     : process.env.topship_api_live;
 
 const { default: Axios } = require("axios");
-const fetch = Axios.create({
+const fetchTopShip = Axios.create({
   baseURL: topshipApi,
+  headers: {
+    Authorization: `Bearer ${process.env.topship_api_key}`,
+  },
 });
 
 class DeliveryMethods {
@@ -15,13 +18,13 @@ class DeliveryMethods {
 
   static topship = {
     getCountries: async () => {
-      const data = await fetch({
+      const data = await fetchTopShip({
         url: "/get-countries",
       });
       return data.data;
     },
     getStates: async (countryCode = "NG") => {
-      const data = await fetch({
+      const data = await fetchTopShip({
         url: "/get-states",
         params: {
           countryCode,
@@ -30,7 +33,7 @@ class DeliveryMethods {
       return data.data;
     },
     getCities: async (countryCode = "NG") => {
-      const data = await fetch({
+      const data = await fetchTopShip({
         url: "/get-cities",
         params: {
           countryCode,
