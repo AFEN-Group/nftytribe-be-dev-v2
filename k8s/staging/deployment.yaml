@@ -136,3 +136,8 @@ spec:
                   key: "afen_market_place_address"
             - name: redis
               value: redis-service
+            - name: topship_api_key
+              valueFrom:
+                secretKeyRef:
+                  key: topship_api_key
+                  name: topship
