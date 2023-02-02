@@ -114,7 +114,7 @@ const newNftValidations = [
     req.image = JSON.parse(data);
     return true;
   }),
-  body("website").isURL(),
+  body("website").optional({ checkFalsy: true }).isURL(),
   //handle validation for if lazy minting is true
 ];
 module.exports = {

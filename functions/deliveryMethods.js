@@ -45,5 +45,3 @@ class DeliveryMethods {
 }
 
 module.exports = DeliveryMethods;
-// console.log(topshipApi);
-// DeliveryMethods.topship.getCities().then(console.log.bind(this));
