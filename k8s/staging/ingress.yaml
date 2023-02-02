@@ -5,6 +5,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: nftytribe-v2-be-cert
+    nginx.org/client-max-body: 50m
+    nginx.ingress.kubernetes.io/limit-req: "10r/s"
 spec:
   tls:
     - hosts:
