@@ -34,6 +34,7 @@ class DeliveryMethods {
       return data.data;
     },
     getCities: async (countryCode = "NG") => {
+      console.log(topshipApi);
       const data = await fetchTopShip({
         url: "/get-cities",
         params: {
