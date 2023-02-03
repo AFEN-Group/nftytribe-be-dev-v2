@@ -7,7 +7,7 @@ const uploads = (sequelize, dataTypes) => {
       unique: "id",
       primaryKey: true,
       autoIncrement: false,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV1,
     },
     url: {
       allowNull: false,
