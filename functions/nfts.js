@@ -401,7 +401,7 @@ class Nfts {
       nest: true,
       include: includeOptions,
       subQuery: false,
-      raw: true,
+      // raw: true,
       attributes: {
         include: [
           [
@@ -464,7 +464,7 @@ class Nfts {
       totalPages,
       limit,
       results: [...result].map((data) => {
-        const value = data;
+        const { dataValues: value } = data;
         value.isLiked = value.isLiked ? true : false;
         value.isFavorite = value.isFavorite ? true : false;
         value.isWatched = value.isWatched ? true : false;

@@ -54,3 +54,16 @@ exports.linkPhysicalItems = async (key, listingId) => {
     );
   }
 };
+exports.getPhysicalItem = async (listingId) => {
+  const item = await db.physicalItems.findOne({
+    where: {
+      nftId: listingId,
+    },
+  });
+  if (!item)
+    throw {
+      status: 404,
+      message: "no physical item found for this listing",
+    };
+  return item;
+};

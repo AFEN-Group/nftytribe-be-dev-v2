@@ -141,3 +141,8 @@ spec:
                 secretKeyRef:
                   key: topship_api_key
                   name: topship
+            - name: delivery_percentage
+              valueFrom:
+                secretKeyRef:
+                  key: fee
+                  name: delivery-extra

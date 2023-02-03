@@ -4,6 +4,7 @@ const topshipApi =
     : process.env.topship_api_live;
 
 const { default: Axios } = require("axios");
+const db = require("../models");
 const fetchTopShip = Axios.create({
   baseURL: topshipApi,
   headers: {
@@ -40,6 +41,35 @@ class DeliveryMethods {
         },
       });
       return data.data;
+    },
+    getDeliveryFee: async function (listingId, senderDetails = {}) {
+      const item = await db.physicalItems.findOne({
+        where: {
+          nftId: listingId,
+        },
+      });
+
+      const data = await fetchTopShip({
+        url: "/get-shipment-rate",
+        params: {
+          shipmentDetail: JSON.stringify({
+            senderDetails: {
+              cityName: senderDetails.city,
+              countryCode: senderDetails.countryCode,
+            },
+            receiverDetails: {
+              cityName: item.city,
+              countryCode: item.country,
+            },
+            totalWeight: Number(item.weight),
+          }),
+        },
+      });
+      const result = data.data[0];
+      const addedPercentage =
+        result.cost * (Number(process.env.delivery_percentage) / 100) +
+        result.cost;
+      return { ...result, cost: addedPercentage };
     },
   };
 }

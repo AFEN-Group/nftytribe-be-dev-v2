@@ -3,7 +3,10 @@ const { validationResult, matchedData } = require("express-validator");
 const checkError = require("@functions/checkError");
 const Nfts = require("@functions/nfts");
 const { createPhysicalItems } = require("@functions/physicalItems");
-const { linkPhysicalItems } = require("../functions/physicalItems");
+const {
+  linkPhysicalItems,
+  getPhysicalItem,
+} = require("../functions/physicalItems");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -99,6 +102,11 @@ const newNft = expressAsyncHandler(async (req, res) => {
   res.send(createNft);
 });
 
+const fetchPhysicalItem = expressAsyncHandler(async (req, res) => {
+  const item = await getPhysicalItem(req.params.listingId);
+  res.send(item);
+});
+
 module.exports = {
   getNfts,
   getSingleNftListing,
@@ -114,4 +122,5 @@ module.exports = {
   getTransactions,
   newPhysicalItem,
   newNft,
+  fetchPhysicalItem,
 };

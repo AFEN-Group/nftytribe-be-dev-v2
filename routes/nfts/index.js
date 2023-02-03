@@ -11,6 +11,7 @@ const {
   getTransactions,
   newPhysicalItem,
   newNft,
+  fetchPhysicalItem,
 } = require("../../controllers/nft");
 const { tempUploads } = require("../../helpers/multer");
 const userProtect = require("../../middlewares/userProtect.middleware");
@@ -50,6 +51,7 @@ nfts
 nfts
   .route("/physical-item")
   .post(createPhysicalItemValidations, newPhysicalItem);
+nfts.route("/physical-item/:listingId").get(fetchPhysicalItem);
 
 nfts.route("/create-nft").post(userProtect, newNftValidations, newNft);
 module.exports = nfts;

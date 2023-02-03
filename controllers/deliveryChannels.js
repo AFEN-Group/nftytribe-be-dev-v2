@@ -47,3 +47,15 @@ exports.getMethodsData = expressAsyncHandler(async (req, res) => {
     res.send(await method.getCountries());
   }
 });
+
+exports.getFee = expressAsyncHandler(async (req, res) => {
+  const data = await checkError(req, validationResult, {
+    matchedData,
+    locations: ["body", "params"],
+  });
+  // console.log(data);
+  const fee = await DeliveryMethods[
+    data.methodName.toLowerCase()
+  ].getDeliveryFee(data.listingId, data);
+  res.send(fee);
+});
