@@ -134,6 +134,16 @@ spec:
                 secretKeyRef:
                   name: nftytribev2secret
                   key: "afen_market_place_address"
+            - name: "topship_api_staging"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "topship_api_staging"
+            - name: "topship_api_live"
+              valueFrom:
+                secretKeyRef:
+                  name: nftytribev2secret
+                  key: "topship_api_live"
             - name: redis
               value: redis-service
             - name: topship_api_key
