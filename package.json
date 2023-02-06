@@ -36,7 +36,8 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config server.js",
-    "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js"
+    "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
+    "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
