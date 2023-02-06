@@ -31,3 +31,33 @@ spec:
           env:
             - name: redis
               value: redis-service
+
+            - name: db_username
+              valueFrom:
+                secretKeyRef:
+                  key: nftytribe-be
+                  name: db_username
+
+            - name: db_password
+              valueFrom:
+                secretKeyRef:
+                  key: nftytribe-be
+                  name: db_password
+
+            - name: db_host
+              valueFrom:
+                secretKeyRef:
+                  key: nftytribe-be
+                  name: db_host
+
+            - name: db_port
+              valueFrom:
+                secretKeyRef:
+                  key: nftytribe-be
+                  name: db_port
+
+            - name: database
+              valueFrom:
+                secretKeyRef:
+                  key: nftytribe-be
+                  name: database
