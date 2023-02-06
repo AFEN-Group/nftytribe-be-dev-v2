@@ -28,3 +28,19 @@ To populate the database with the necessary configs, follow these steps:
 4. Run `yarn update-db` in your terminal to populate the database with the configs.
 
 Note: If you don't have a `.env` file yet, you can use the empty `env.fields` file found in the `root/scripts/db` directory as a starting point. The developer or anyone trying to start the application should already have the necessary env names and values in the file or will be prompted for the database password.
+
+# To create .env file to start the application
+
+1. You need to have a functioning database with the right configurations already in place.
+
+2. Export the variables:
+
+   - db_host
+   - db_username
+   - db_password
+   - db_port
+   - database
+
+3. Run `yarn start:dev` or `npm run start:dev`
+
+4. To start the application casually, run `yarn dev` or `npm run dev`
