@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 const fs = require("fs");
-
+const { spawn } = require("child_process");
 const createENVFile = async () => {
   await new Promise((resolve, reject) => {
     try {
