@@ -24,7 +24,7 @@ To populate the database with the necessary configs, follow these steps:
    - `db_host`: database host
    - `db_username`: database username
    - `db_port`: database port
-   - `database`: database to be used (no default value)
+   - `database`: database to be used (we recommend using `nftytribe`)
 4. Run `yarn update-db` in your terminal to populate the database with the configs.
 
 Note: If you don't have a `.env` file yet, you can use the empty `env.fields` file found in the `root/scripts/db` directory as a starting point. The developer or anyone trying to start the application should already have the necessary env names and values in the file or will be prompted for the database password.
