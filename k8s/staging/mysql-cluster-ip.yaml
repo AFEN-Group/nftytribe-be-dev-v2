@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     component: mysql
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-    - port: 3306
+    - port: 3309
       targetPort: 3306

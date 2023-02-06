@@ -5,4 +5,4 @@ WORKDIR /app
 COPY . .
 RUN yarn
 EXPOSE 4000
-CMD ["yarn", "staging"]
+CMD ["yarn", "start:stging"]

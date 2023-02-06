@@ -35,9 +35,12 @@
     "winston": "^3.8.2"
   },
   "scripts": {
-    "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config server.js",
+    "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config  server.js",
     "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
-    "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh"
+    "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh",
+    "set-env": "node -r dotenv/config ./scripts/db/set_env.js",
+    "start:dev": "npm run set-env & npm run dev",
+    "start:staging": "npm run set-env & npm run staging"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
@@ -50,6 +53,7 @@
     "@abi": "./abi",
     "@middlewares": "./middlewares",
     "@functions": "./functions",
-    "@helpers": "./helpers"
+    "@helpers": "./helpers",
+    "@scripts": "./scripts"
   }
 }
