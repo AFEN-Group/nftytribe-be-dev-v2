@@ -1,6 +1,6 @@
-const { logger } = require("../helpers/logger");
-const { redis } = require("../helpers/redis");
-const db = require("../models");
+const { logger } = require("@helpers/logger");
+const { redis } = require("@helpers/redis");
+const db = require("@models");
 const randomString = require("randomstring");
 
 exports.createPhysicalItems = async (data = {}) => {

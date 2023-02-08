@@ -21,7 +21,7 @@ class Nfts {
     });
 
     const results = nfts.toJSON();
-
+    // console.log(results);
     const listed = await db.nfts.findAll({
       where: {
         tokenId: results.result.map((data) => Number(data.token_id)),
@@ -801,6 +801,8 @@ class Nfts {
           url: listing.url,
           listingType: listing.listingType,
           timeout: listing.timeout,
+          physical: listing.physical,
+          lazyMint: listing.lazyMint,
           createdAt: listing.createdAt,
           usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
           nativePrice: tokenPrice?.toJSON()?.nativePrice
