@@ -488,7 +488,7 @@ class Nfts {
         },
       });
       return {
-        status: "unliked",
+        status: false,
         id: nftId,
       };
     } else {
@@ -498,7 +498,7 @@ class Nfts {
       });
 
       return {
-        status: "liked",
+        status: true,
         id: nftId,
       };
     }

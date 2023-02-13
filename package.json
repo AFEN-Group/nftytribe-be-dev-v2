@@ -55,5 +55,8 @@
     "@functions": "./functions",
     "@helpers": "./helpers",
     "@scripts": "./scripts"
+  },
+  "engines": {
+    "node": "18"
   }
 }
