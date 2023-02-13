@@ -1,3 +1,4 @@
+const { tryGetUser } = require("@middlewares/tryGetUser");
 const {
   getNfts,
   getListings,
@@ -31,8 +32,8 @@ const {
 const nfts = require("express").Router();
 
 nfts.route("/user/:field").get(getNftsValidations, getNfts);
-nfts.route("/listings").get(getListingValidation, getListings);
-nfts.route("/listings/:id").get(getSingleNftListing);
+nfts.route("/listings").get(tryGetUser, getListingValidation, getListings);
+nfts.route("/listings/:id").get(tryGetUser, getSingleNftListing);
 nfts
   .route("/listings/:nftId/watch")
   .get(getWatchersValidations, getWatchers)
@@ -50,8 +51,8 @@ nfts
   .get(userProtect, getTransactionsValidation, getTransactions);
 nfts
   .route("/physical-item")
-  .post(createPhysicalItemValidations, newPhysicalItem);
-nfts.route("/physical-item/:listingId").get(fetchPhysicalItem);
+  .post(userProtect, createPhysicalItemValidations, newPhysicalItem);
+nfts.route("/physical-item/:listingId").get(userProtect, fetchPhysicalItem);
 
 nfts.route("/create-nft").post(userProtect, newNftValidations, newNft);
 module.exports = nfts;

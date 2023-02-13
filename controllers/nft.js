@@ -28,14 +28,16 @@ const getSingleNftListing = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
   const { id } = req.params;
   const { userId } = req.query;
-  res.send(await new Nfts().getSingleListing(id, userId));
+  res.send(await new Nfts().getSingleListing(id, req.user?.id || userId));
 });
-const ListNft = expressAsyncHandler(async (req, res) => {
-  await checkError(req, validationResult);
-});
+// const ListNft = expressAsyncHandler(async (req, res) => {
+//   await checkError(req, validationResult);
+// });
 const getListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
   const options = req.query;
+  options.userId = req.user?.id || req.query.userId;
+  console.log(options.userId);
   const result = await new Nfts().getListings(options);
   res.send(result);
 });
@@ -110,7 +112,7 @@ const fetchPhysicalItem = expressAsyncHandler(async (req, res) => {
 module.exports = {
   getNfts,
   getSingleNftListing,
-  ListNft,
+  // ListNft,
   getListings,
   watchListings,
   bidListings,

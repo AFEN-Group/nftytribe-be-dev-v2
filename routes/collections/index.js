@@ -5,7 +5,6 @@ const {
   favoriteCollection,
   deleteCollection,
   getSingleCollection,
-  updateCollectionBg,
   updateCollectionPhotos,
 } = require("@controllers/collections");
 const userProtect = require("@middlewares/userProtect.middleware");
@@ -17,16 +16,15 @@ const {
   favoriteCollectionValidation,
   deleteCollectionValidations,
   getSingleCollectionValidation,
-  uploadBgValidations,
   genCollectionPhotoValidation,
 } = require("./validations");
-const { tempUploads } = require("@helpers/multer");
+const { tryGetUser } = require("@middlewares/tryGetUser");
 
 const collections = require("express").Router();
 
 collections
   .route("/")
-  .get(getCollectionsValidation, getAllCollections)
+  .get(tryGetUser, getCollectionsValidation, getAllCollections)
   .post(
     userProtect,
     avatarUpload.single("coverImage"),
@@ -45,7 +43,7 @@ collections
 collections
   .route("/:id")
   .delete(userProtect, deleteCollectionValidations, deleteCollection)
-  .get(getSingleCollectionValidation, getSingleCollection);
+  .get(tryGetUser, getSingleCollectionValidation, getSingleCollection);
 
 collections
   .route("/:type/:contractAddress/")

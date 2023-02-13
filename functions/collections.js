@@ -543,7 +543,7 @@ class Collections {
         },
       });
       return {
-        status: "unlike",
+        status: false,
         collectionId,
       };
     } else {
@@ -552,7 +552,7 @@ class Collections {
         collectionId,
       });
       return {
-        status: "liked",
+        status: true,
         collectionId,
       };
     }

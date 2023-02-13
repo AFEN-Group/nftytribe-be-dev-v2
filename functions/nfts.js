@@ -32,7 +32,7 @@ class Nfts {
         },
       },
     });
-    console.log(results);
+    // console.log(results);
     return {
       ...nfts.pagination,
       result:
