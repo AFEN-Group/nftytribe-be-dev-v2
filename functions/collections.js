@@ -655,7 +655,7 @@ class Collections {
       return update;
     }
     const worker = new Worker("./workers/collectionPhotoUpload.js");
-    worker.postMessage({ contractAddress, url: data[0] });
+    worker.postMessage({ contractAddress, url: data[0], userId });
 
     return 1;
   };
