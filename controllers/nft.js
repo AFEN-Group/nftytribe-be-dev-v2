@@ -37,7 +37,7 @@ const getListings = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
   const options = req.query;
   options.userId = req.user?.id || req.query.userId;
-  console.log(options.userId);
+  // console.log(options.userId);
   const result = await new Nfts().getListings(options);
   res.send(result);
 });

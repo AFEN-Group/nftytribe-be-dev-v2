@@ -16,8 +16,8 @@ const getNftsValidations = [
 ];
 
 const getListingValidation = [
-  query("userId").optional({ checkFalsy: true }),
-  query("lazyMint").toBoolean(true).optional(),
+  query("userId").optional({ checkFalsy: true }).toInt(),
+  query("lazyMint").optional().toBoolean(true),
   query("hasCollection").toBoolean(true).optional(),
   query("physical").toBoolean(true).optional(),
   query("owner").optional({ checkFalsy: true }),

@@ -216,7 +216,7 @@ class Nfts {
       physical,
       hasCollection,
     } = inputs;
-
+    console.log(userId);
     const getOrder = () => {
       const orderArr = [];
       switch (order) {
@@ -423,26 +423,35 @@ class Nfts {
             "watchCount",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("nftLikes.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from nftLikes where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
             "isLiked",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("nftFavorites.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from nftFavorites where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
             "isFavorite",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("listingWatchers.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from listingWatchers where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
             "isWatched",
           ],
@@ -459,18 +468,9 @@ class Nfts {
       ],
       order: [getOrder()],
     });
-    return {
-      page,
-      totalPages,
-      limit,
-      results: [...result].map((data) => {
-        const { dataValues: value } = data;
-        value.isLiked = value.isLiked ? true : false;
-        value.isFavorite = value.isFavorite ? true : false;
-        value.isWatched = value.isWatched ? true : false;
-        return value;
-      }),
-    };
+
+    // console.log(result[0].toJSON());
+    return result;
   };
 
   likeUnlike = async (userId, nftId) => {
@@ -562,27 +562,35 @@ class Nfts {
             "watchCount",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("nftLikes.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from nftLikes where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
-
             "isLiked",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("nftFavorites.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from nftFavorites where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
             "isFavorite",
           ],
           userId && [
-            db.Sequelize.where(
-              db.Sequelize.col("listingWatchers.userId"),
-              Op.eq,
-              userId
+            db.Sequelize.cast(
+              db.Sequelize.literal(
+                `
+                ( select id from listingWatchers where userId = ${userId} and nftId = nfts.id )
+              `
+              ),
+              "boolean"
             ),
             "isWatched",
           ],
@@ -629,11 +637,7 @@ class Nfts {
         message: "Listing not found!",
         status: 404,
       };
-    return {
-      ...result.dataValues,
-      isLiked: result.dataValues.isLiked ? true : false,
-      isFavorite: result.dataValues.isFavorite ? true : false,
-    };
+    return result;
   };
 
   newBid = async (params = [], walletAddress) => {

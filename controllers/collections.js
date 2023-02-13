@@ -28,7 +28,7 @@ const importCollection = expressAsyncHandler(async (req, res) => {
 
 const getAllCollections = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
-  console.log(req.user?.id);
+  // console.log(req.user?.id);
   const collections = await new Collections(
     req.user?.id || req.query.userId
   ).getCollections(req.query);

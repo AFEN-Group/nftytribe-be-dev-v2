@@ -160,13 +160,18 @@ class Collections {
       attributes: {
         include: [
           [
-            db.Sequelize.fn("count", db.Sequelize.col("collectionLikes.id")),
+            db.Sequelize.literal(
+              `
+             (select count(id) from collectionLikes where collectionId = collections.id)
+            `
+            ),
             "likeCount",
           ],
           [
-            db.Sequelize.fn(
-              "count",
-              db.Sequelize.col("collectionFavorites.id")
+            db.Sequelize.literal(
+              `
+             (select count(id) from collectionFavorites where collectionId = collections.id)
+            `
             ),
             "favoriteCount",
           ],
@@ -293,10 +298,10 @@ class Collections {
 
           userId && [
             db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("collectionLikes.userId"),
-                Op.eq,
-                userId
+              db.Sequelize.literal(
+                `
+               (select id from collectionLikes where userId = ${userId} and collectionId = collections.id)
+              `
               ),
               "boolean"
             ),
@@ -304,9 +309,10 @@ class Collections {
           ],
           userId && [
             db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("collectionFavorites.userId"),
-                userId
+              db.Sequelize.literal(
+                `
+               (select id from collectionFavorites where userId = ${userId} and collectionId = collections.id)
+              `
               ),
               "boolean"
             ),
@@ -359,13 +365,18 @@ class Collections {
       attributes: {
         include: [
           [
-            db.Sequelize.fn("count", db.Sequelize.col("collectionLikes.id")),
+            db.Sequelize.literal(
+              `
+             (select count(id) from collectionLikes where collectionId = collections.id)
+            `
+            ),
             "likeCount",
           ],
           [
-            db.Sequelize.fn(
-              "count",
-              db.Sequelize.col("collectionFavorites.id")
+            db.Sequelize.literal(
+              `
+             (select count(id) from collectionFavorites where collectionId = collections.id)
+            `
             ),
             "favoriteCount",
           ],
@@ -491,9 +502,10 @@ class Collections {
           ],
           userId && [
             db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("collectionLikes.userId"),
-                userId
+              db.Sequelize.literal(
+                `
+               (select id from collectionLikes where userId = ${userId} and collectionId = collections.id)
+              `
               ),
               "boolean"
             ),
@@ -501,9 +513,10 @@ class Collections {
           ],
           userId && [
             db.Sequelize.cast(
-              db.Sequelize.where(
-                db.Sequelize.col("collectionFavorites.userId"),
-                userId
+              db.Sequelize.literal(
+                `
+               (select id from collectionFavorites where userId = ${userId} and collectionId = collections.id)
+              `
               ),
               "boolean"
             ),
@@ -569,7 +582,7 @@ class Collections {
         },
       });
       return {
-        status: "removed",
+        status: false,
         collectionId,
       };
     } else {
@@ -578,7 +591,7 @@ class Collections {
         collectionId,
       });
       return {
-        status: "added",
+        status: true,
         collectionId,
       };
     }
