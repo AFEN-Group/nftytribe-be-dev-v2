@@ -709,7 +709,7 @@ class Nfts {
 
       return {
         id: isWatching.id,
-        status: "unwatched",
+        status: false,
       };
     } else {
       const res = await db.listingWatchers.create({
@@ -718,7 +718,7 @@ class Nfts {
       });
       return {
         ...res.dataValues,
-        status: "watched",
+        status: true,
       };
     }
   };
