@@ -6,8 +6,9 @@ const {
   deleteCollection,
   getSingleCollection,
   updateCollectionBg,
-} = require("../../controllers/collections");
-const userProtect = require("../../middlewares/userProtect.middleware");
+  updateCollectionPhotos,
+} = require("@controllers/collections");
+const userProtect = require("@middlewares/userProtect.middleware");
 const { avatarUpload } = require("../user/validations");
 const {
   getCollectionsValidation,
@@ -17,6 +18,7 @@ const {
   deleteCollectionValidations,
   getSingleCollectionValidation,
   uploadBgValidations,
+  genCollectionPhotoValidation,
 } = require("./validations");
 const { tempUploads } = require("@helpers/multer");
 
@@ -46,12 +48,16 @@ collections
   .get(getSingleCollectionValidation, getSingleCollection);
 
 collections
-  .route("/:id/bg")
-  .patch(
-    userProtect,
-    tempUploads.single("bg"),
-    uploadBgValidations,
-    updateCollectionBg
-  );
+  .route("/:type/:contractAddress/")
+  .patch(userProtect, genCollectionPhotoValidation, updateCollectionPhotos);
+
+// collections
+//   .route("/:id/bg")
+//   .patch(
+//     userProtect,
+//     tempUploads.single("bg"),
+//     uploadBgValidations,
+//     updateCollectionBg
+//   );
 
 module.exports = collections;

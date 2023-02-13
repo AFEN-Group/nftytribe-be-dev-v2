@@ -1,5 +1,6 @@
 const { body, param, query } = require("express-validator");
 const db = require("@models");
+const { redis } = require("@helpers/redis");
 
 const importCollectionValidations = [
   body("contractAddress")
@@ -70,6 +71,35 @@ const uploadBgValidations = [
   }),
 ];
 
+const genCollectionPhotoValidation = [
+  body("key")
+    .not()
+    .isEmpty()
+    .custom(async (key) => {
+      const img = await redis.get(key);
+      if (!img) throw String("Key not found!");
+      return true;
+    }),
+  param("contractAddress")
+    .not()
+    .isEmpty()
+    .custom(async (contractAddress, { req }) => {
+      const collection = await db.collections.findOne({
+        where: {
+          contractAddress,
+          userId: req.user.id,
+        },
+      });
+      if (!collection) throw String("invalid contractAddress");
+      return true;
+    }),
+  param("type").custom((type) => {
+    console.log(type);
+    if (type === "bg" || type === "coverImage") return true;
+    throw String("Invalid types");
+  }),
+];
+
 module.exports = {
   importCollectionValidations,
   deleteCollectionValidations,
@@ -78,4 +108,5 @@ module.exports = {
   likeCollectionValidation,
   favoriteCollectionValidation,
   uploadBgValidations,
+  genCollectionPhotoValidation,
 };

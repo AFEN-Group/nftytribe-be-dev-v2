@@ -6,6 +6,7 @@ const Moralis = require("./Moralis.sdk");
 const { Sequelize } = require("../models");
 const moment = require("moment");
 const Uploads = require("./uploads");
+const { redis } = require("@helpers/redis");
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -609,6 +610,28 @@ class Collections {
       }
     );
     return { bg: url };
+  };
+
+  static updateCollectionPhotos = async ({
+    contractAddress,
+    type,
+    userId,
+    key,
+  }) => {
+    const data = JSON.parse(await redis.getdel(key));
+    const [update] = await db.collections.update(
+      {
+        [type]: data[0],
+      },
+      {
+        where: {
+          userId,
+          contractAddress,
+        },
+      }
+    );
+
+    return update;
   };
 }
 
