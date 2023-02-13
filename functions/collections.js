@@ -7,6 +7,7 @@ const { Sequelize } = require("../models");
 const moment = require("moment");
 const Uploads = require("./uploads");
 const { redis } = require("@helpers/redis");
+const { Worker } = require("worker_threads");
 class Collections {
   constructor(userId) {
     this.userId = userId;
@@ -631,20 +632,32 @@ class Collections {
     userId,
     key,
   }) => {
-    const data = JSON.parse(await redis.getdel(key));
-    const [update] = await db.collections.update(
-      {
-        [type]: data[0],
+    const collection = await db.collections.findOne({
+      where: {
+        contractAddress,
       },
-      {
-        where: {
-          userId,
-          contractAddress,
-        },
-      }
-    );
+    });
+    const data = JSON.parse(await redis.getdel(key));
 
-    return update;
+    //if collection exists then save else push to worker to retry checking a couple of times in case Moralis takes longer to report
+    if (collection) {
+      const [update] = await db.collections.update(
+        {
+          [type]: data[0],
+        },
+        {
+          where: {
+            userId,
+            contractAddress,
+          },
+        }
+      );
+      return update;
+    }
+    const worker = new Worker("./workers/collectionPhotoUpload.js");
+    worker.postMessage({ contractAddress, url: data[0] });
+
+    return 1;
   };
 }
 

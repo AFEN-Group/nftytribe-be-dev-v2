@@ -80,9 +80,7 @@ const genCollectionPhotoValidation = [
       if (!img) throw String("Key not found!");
       return true;
     }),
-  param("contractAddress")
-    .not()
-    .isEmpty()
+  param("contractAddress").not().isEmpty() /*
     .custom(async (contractAddress, { req }) => {
       const collection = await db.collections.findOne({
         where: {
@@ -92,7 +90,7 @@ const genCollectionPhotoValidation = [
       });
       if (!collection) throw String("invalid contractAddress");
       return true;
-    }),
+    })*/,
   param("type").custom((type) => {
     console.log(type);
     if (type === "bg" || type === "coverImage") return true;
