@@ -1,3 +1,11 @@
+const { DataTypes, Sequelize } = require("sequelize");
+
+/**
+ *
+ * @param {Sequelize} sequelize
+ * @param {DataTypes} dataTypes
+ * @returns
+ */
 const nfts = (sequelize, dataTypes) => {
   const nfts = sequelize.define("nfts", {
     name: {

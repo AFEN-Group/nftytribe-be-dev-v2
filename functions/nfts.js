@@ -32,7 +32,7 @@ class Nfts {
         },
       },
     });
-    // console.log(results);
+    console.log(results);
     return {
       ...nfts.pagination,
       result:
@@ -519,7 +519,7 @@ class Nfts {
         },
       });
       return {
-        status: "unFavorite",
+        status: false,
         id: nftId,
       };
     } else {
@@ -529,7 +529,7 @@ class Nfts {
       });
 
       return {
-        status: "favorite",
+        status: true,
         id: nftId,
       };
     }

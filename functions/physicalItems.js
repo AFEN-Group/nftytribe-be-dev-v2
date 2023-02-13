@@ -3,7 +3,12 @@ const { redis } = require("@helpers/redis");
 const db = require("@models");
 const randomString = require("randomstring");
 
-exports.createPhysicalItems = async (data = {}) => {
+/**
+ *
+ * @param {CreatePhysicalItem} data
+ * @returns
+ */
+exports.createPhysicalItems = async (data) => {
   const key = randomString.generate({ length: 6 });
 
   //get images if any
@@ -17,6 +22,11 @@ exports.createPhysicalItems = async (data = {}) => {
   return { ...data, key };
 };
 
+/**
+ *
+ * @param {createPhysicalItems} key a key gotten when physical item was created temporarily
+ * @param {number | string} listingId an id belonging to the listed item which will be linked to a physical item
+ */
 exports.linkPhysicalItems = async (key, listingId) => {
   //delete key once gotten as its useless retaining the data
   const data = JSON.parse(await redis.getdel(key));
@@ -35,6 +45,7 @@ exports.linkPhysicalItems = async (key, listingId) => {
         },
       }
     );
+
     //link uploaded images with
     data.images &&
       (await db.uploads.bulkCreate(
@@ -54,6 +65,12 @@ exports.linkPhysicalItems = async (key, listingId) => {
     );
   }
 };
+
+/**
+ *
+ * @param {string | number} listingId a valid listing id for nfts
+ * @returns physical item
+ */
 exports.getPhysicalItem = async (listingId) => {
   const item = await db.physicalItems.findOne({
     where: {

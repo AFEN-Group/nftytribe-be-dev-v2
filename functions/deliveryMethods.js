@@ -43,7 +43,11 @@ class DeliveryMethods {
       });
       return data.data;
     },
-    getDeliveryFee: async function (listingId, senderDetails = {}) {
+    getDeliveryFee: async function (
+      listingId,
+      senderDetails = {},
+      noFee = false
+    ) {
       const item = await db.physicalItems.findOne({
         where: {
           nftId: listingId,
@@ -67,10 +71,23 @@ class DeliveryMethods {
         },
       });
       const result = data.data[0];
-      const addedPercentage =
-        result.cost * (Number(process.env.delivery_percentage) / 100) +
-        result.cost;
+      const addedPercentage = !noFee
+        ? result.cost * (Number(process.env.delivery_percentage) / 100) +
+          result.cost
+        : result.cost;
       return { ...result, cost: addedPercentage };
+    },
+    book: async (buyer) => {
+      //fix - category(Others)
+      //fix - description(any)
+      //fix - quantity(1)
+      //fix - value(convert nft price to get this value)
+      //fix - pricingTier(Express)
+      //fix - itemCollectionMode(DropOff)
+      //fix - insuranceType(None)
+      //fix - shipmentCharge(Express) -- > make a fresh request for the actual charge with no fee set to true
+      //fix - sellers phone number --> seller must have gone through verification so phone number must be available
+      //fix - address --> seller must have gone through verification so we'd have his address
     },
   };
 }

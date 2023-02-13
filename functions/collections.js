@@ -329,7 +329,7 @@ class Collections {
       }),
     };
   };
-  getSingleCollection = async (field, userId = this.userId, includeNfts) => {
+  getSingleCollection = async (field, userId = this.userId) => {
     const collection = await db.collections.findOne({
       subQuery: false,
       where: {
@@ -370,7 +370,7 @@ class Collections {
           ],
           [
             Sequelize.literal(`(
-              select sum(listingInfo->>"$.nativePrice.value") 
+              select IFNULL(sum(listingInfo->>"$.nativePrice.value"), 0)
               from 
                 transactions 
               where 
@@ -380,7 +380,7 @@ class Collections {
           ],
           [
             Sequelize.literal(`(
-              select min(listingInfo->>"$.nativePrice.value") 
+              select IFNULL(min(listingInfo->>"$.nativePrice.value"), 0)
               from 
                 transactions 
               where 
@@ -517,6 +517,17 @@ class Collections {
         // "nfts.id",
       ],
     });
+
+    const { chain } = await db.chains.findOne({
+      where: { id: collection.chainId },
+    });
+
+    // getting metadata from moralis
+    // const metadata = await Moralis.EvmApi.nft.getNFTContractMetadata({
+    //   chain,
+    //   address: collection.contractAddress,
+    // });
+    // console.log(metadata.toJSON());
     return this.formatCollectionData(collection);
   };
   likeUnlikeCollection = async (collectionId, userId = this.userId) => {
