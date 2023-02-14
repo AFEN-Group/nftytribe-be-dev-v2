@@ -6,7 +6,6 @@ const { linkPhysicalItems } = require("./physicalItems");
 const Uploads = require("./uploads");
 const { redis } = require("@helpers/redis");
 const Users = require("./users");
-const { default: axios } = require("axios");
 const { Worker } = require("worker_threads");
 const { logger } = require("@helpers/logger");
 
@@ -92,7 +91,7 @@ class Nfts {
     }
     if (chainId) {
       const data = this.getFields(params);
-      console.log(data);
+      // console.log(data);
       const collection = await db.collections.findOne({
         where: {
           contractAddress: data.erc721,
@@ -109,14 +108,12 @@ class Nfts {
         nftMetadata.metadata?.image ||
         nftMetadata.metadata?.file ||
         nftMetadata.metadata?.video;
+
+      // get extension name
       const split = file.split(".");
       const ext = split[split.length - 1];
-      const fileBuffer = await axios({
-        url: file.replace("ipfs://", "https://ipfs.moralis.io:2053/ipfs/"),
-        responseType: "arraybuffer",
-      });
-      const buffer = Buffer.from(fileBuffer.data, "binary");
-      const url = await new Uploads().upload(buffer, "listing", ext); // private url
+
+      // const url = await new Uploads().upload(buffer, "listing", ext); // private url
       // console.log(url);
       // building data
       const values = {
@@ -136,7 +133,7 @@ class Nfts {
           nftContractType: nftMetadata.contractType,
           symbol: nftMetadata.symbol,
           contractAddress: nftMetadata.tokenAddress,
-          pUrl: url, //private url
+          // pUrl: url, //private url
         },
         collectionId: collection?.id,
         chainId: chainId.id,
@@ -151,7 +148,7 @@ class Nfts {
       if (ext === "jpg" || ext === "png" || ext === "jpeg" || ext === "gif") {
         //compress
         const worker = new Worker("./workers/compressNft.js");
-        worker.postMessage({ buffer, file });
+        worker.postMessage({ file });
         worker.on("error", (err) => {
           logger(err, undefined, "error");
         });
@@ -215,7 +212,7 @@ class Nfts {
       user &&
       (await db.nfts.destroy({
         where: {
-          userId: user.id,
+          // userId: user.id,
           tokenId,
           moreInfo: {
             contractAddress,
