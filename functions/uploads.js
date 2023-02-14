@@ -21,11 +21,18 @@ class Uploads {
     this.compressed = compressed;
     return compressed;
   };
-  upload = async (image, path) => {
+  /**
+   *
+   * @param {Buffer} image - the image to be uploaded as buffer
+   * @param {string} path - path to be stored on bucket
+   * @param {string} ext - extension name
+   * @returns {Promise<string>} - url to file
+   */
+  upload = async (image, path, ext = "jpeg") => {
     const upload = await s3
       .upload({
         Bucket: config.spaces_name,
-        Key: `${path}/${rm.generate(16)}.jpeg`,
+        Key: `${path}/${rm.generate(16)}.${ext}`,
         ACL: "public-read",
         Body: image,
       })

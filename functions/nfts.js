@@ -4,7 +4,9 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const { linkPhysicalItems } = require("./physicalItems");
 const Uploads = require("./uploads");
-const { redis } = require("../helpers/redis");
+const { redis } = require("@helpers/redis");
+const Users = require("./users");
+const { default: axios } = require("axios");
 
 class Nfts {
   getNfts = async (options, walletAddress) => {
@@ -71,7 +73,7 @@ class Nfts {
   putOnSale = async (params = [], walletAddress, chain) => {
     //const validate chain, collection and userId
 
-    const [user, chainId] = await Promise.all([
+    let [user, chainId] = await Promise.all([
       await db.users.findOne({ where: { walletAddress } }),
       await db.chains.findOne({
         where: {
@@ -79,8 +81,10 @@ class Nfts {
         },
       }),
     ]);
-
-    if (chainId && user) {
+    if (!user) {
+      user = await new Users().createAccount({ walletAddress });
+    }
+    if (chainId) {
       const data = this.getFields(params);
       console.log(data);
       const collection = await db.collections.findOne({
@@ -92,19 +96,29 @@ class Nfts {
         await this.getNftMetaData(data.tokenId, data.erc721, chain),
         await this.getTokenData(data.erc20Token, chain),
       ]);
-
-      // console.log(tokenData);
-
+      /**
+       * @type {string}
+       */
+      const file =
+        nftMetadata.metadata?.image ||
+        nftMetadata.metadata?.file ||
+        nftMetadata.metadata?.video;
+      const split = file.split(".");
+      const ext = split[split.length - 1];
+      const fileBuffer = await axios({
+        url: file.replace("ipfs://", "https://ipfs.moralis.io:2053/ipfs/"),
+        responseType: "arraybuffer",
+      });
+      const buffer = Buffer.from(fileBuffer.data, "binary");
+      const url = await new Uploads().upload(buffer, "listing", ext);
+      console.log(url);
       // building data
       const values = {
         name: nftMetadata.name,
         tokenId: data.tokenId,
         description: nftMetadata.metadata?.description,
         categoryId: Number(data.category) || undefined,
-        url:
-          nftMetadata.metadata?.image ||
-          nftMetadata.metadata?.file ||
-          nftMetadata.metadata?.video,
+        url,
         price: data.startPrice / 10 ** tokenData.decimals,
         listingType: data.auctionType === "1" ? "NORMAL" : "AUCTION",
         timeout: moment.unix(data.endTime),
@@ -423,35 +437,44 @@ class Nfts {
             "watchCount",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.literal(
-                `
-                ( select id from nftLikes where userId = ${userId} and nftId = nfts.id )
+            db.Sequelize.literal(
               `
-              ),
-              "boolean"
+              (
+                SELECT IF(
+                  (SELECT id FROM nftLikes WHERE userId = ${userId} AND nftId = nfts.id) IS NOT NULL,
+                  TRUE,
+                  FALSE
+                )
+              )
+              `
             ),
             "isLiked",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.literal(
-                `
-                ( select id from nftFavorites where userId = ${userId} and nftId = nfts.id )
+            db.Sequelize.literal(
               `
-              ),
-              "boolean"
+              (
+                SELECT IF(
+                  (SELECT id FROM nftFavorites WHERE userId = ${userId} AND nftId = nfts.id) IS NOT NULL,
+                  TRUE,
+                  FALSE
+                )
+              )
+              `
             ),
             "isFavorite",
           ],
           userId && [
-            db.Sequelize.cast(
-              db.Sequelize.literal(
-                `
-                ( select id from listingWatchers where userId = ${userId} and nftId = nfts.id )
+            db.Sequelize.literal(
               `
-              ),
-              "boolean"
+              (
+                SELECT IF(
+                  (SELECT id FROM listingWatchers WHERE userId = ${userId} AND nftId = nfts.id) IS NOT NULL,
+                  TRUE,
+                  FALSE
+                )
+              )
+              `
             ),
             "isWatched",
           ],
@@ -470,7 +493,16 @@ class Nfts {
     });
 
     // console.log(result[0].toJSON());
-    return result;
+
+    return [...result].map((data) => {
+      const listing = data.toJSON();
+      return {
+        ...listing,
+        isLiked: listing.isLiked ? true : false,
+        isFavorite: listing.isFavorite ? true : false,
+        isWatched: listing.isWatched ? true : false,
+      };
+    });
   };
 
   likeUnlike = async (userId, nftId) => {
@@ -637,7 +669,13 @@ class Nfts {
         message: "Listing not found!",
         status: 404,
       };
-    return result;
+    const listing = result.toJSON();
+    return {
+      ...listing,
+      isLiked: listing.isLiked ? true : false,
+      isFavorite: listing.isFavorite ? true : false,
+      isWatched: listing.isWatched ? true : false,
+    };
   };
 
   newBid = async (params = [], walletAddress) => {
@@ -754,11 +792,16 @@ class Nfts {
 
     const { tokenId, erc721 } = data;
 
-    const buyer = await db.users.findOne({
+    let buyer = await db.users.findOne({
       where: {
         walletAddress: from,
       },
     });
+
+    if (!buyer) {
+      buyer = await new Users().createAccount({ walletAddress: from });
+    }
+
     const listing = await db.nfts.findOne({
       where: {
         tokenId,
@@ -768,7 +811,7 @@ class Nfts {
         model: db.chains,
       },
     });
-    if (listing && buyer) {
+    if (listing) {
       //create transaction
       //use sequelize transaction on this section later
       let tokenPrice;
@@ -983,3 +1026,19 @@ module.exports = Nfts;
 //     decimals: 18,
 //   },
 // };
+
+// let testUrl =
+//   "https://ipfs.moralis.io:2053/ipfs/QmYkmN4kX4C79H4rQvWYHNhSw8kUCGEEsqjEHWkJRtvht6/24.png";
+
+// axios({
+//   url: testUrl,
+//   responseType: "arraybuffer",
+//   method: "get",
+// })
+//   .then(async (response) => {
+//     console.log(response.data);
+//     const buffer = Buffer.from(response.data, "binary");
+//     const url = await new Uploads().upload(buffer, "listing", "jpeg");
+//     console.log(url);
+//   })
+//   .catch((err) => console.log(err));
