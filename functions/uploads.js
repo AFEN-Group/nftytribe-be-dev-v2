@@ -93,7 +93,7 @@ class Uploads {
     const upload = await Moralis.EvmApi.ipfs.uploadFolder({
       abi: [
         {
-          path: `image/${username}-${rm.generate(6)}.${mime}`,
+          path: `${username}-${rm.generate(6)}.${mime}`,
           content: image,
         },
       ],

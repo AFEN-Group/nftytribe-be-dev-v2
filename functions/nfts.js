@@ -111,7 +111,7 @@ class Nfts {
       });
       const buffer = Buffer.from(fileBuffer.data, "binary");
       const url = await new Uploads().upload(buffer, "listing", ext);
-      console.log(url);
+      // console.log(url);
       // building data
       const values = {
         name: nftMetadata.name,
@@ -138,7 +138,7 @@ class Nfts {
       };
 
       // store to db
-      console.log(values);
+      // console.log(values);
       const newListing = await db.nfts.create(values);
 
       //check for physical item
