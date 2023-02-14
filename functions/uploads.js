@@ -12,10 +12,16 @@ const s3 = new AWS.S3({
   endpoint: config.spaces_endpoint,
 });
 class Uploads {
-  compressImages = async (images = []) => {
+  /**
+   *
+   * @param {Array<Buffer>} images - images as buffers
+   * @param {number} quality - quality of compression 10 - 100
+   * @returns
+   */
+  compressImages = async (images = [], quality = 20) => {
     const compressed = await Promise.all(
       images.map(async (image) => {
-        return await sharp(image).jpeg({ quality: 20 }).toBuffer();
+        return await sharp(image).jpeg({ quality }).toBuffer();
       })
     );
     this.compressed = compressed;

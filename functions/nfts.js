@@ -7,6 +7,8 @@ const Uploads = require("./uploads");
 const { redis } = require("@helpers/redis");
 const Users = require("./users");
 const { default: axios } = require("axios");
+const { Worker } = require("worker_threads");
+const { logger } = require("@helpers/logger");
 
 class Nfts {
   getNfts = async (options, walletAddress) => {
@@ -37,8 +39,8 @@ class Nfts {
     // console.log(results);
     return {
       ...nfts.pagination,
-      result:
-        results.result?.map((data) => {
+      result: await Promise.all(
+        results.result?.map(async (data) => {
           return {
             ...data,
             metadata: data.metadata ? JSON.parse(data.metadata) : {},
@@ -51,8 +53,12 @@ class Nfts {
                 .includes(data.token_address)
                 ? true
                 : false,
+            sImg: data.metadata
+              ? await redis.get(JSON.parse(data.metadata).image)
+              : null,
           };
-        }) || results,
+        }) || results
+      ),
     };
   };
 
@@ -110,7 +116,7 @@ class Nfts {
         responseType: "arraybuffer",
       });
       const buffer = Buffer.from(fileBuffer.data, "binary");
-      const url = await new Uploads().upload(buffer, "listing", ext);
+      const url = await new Uploads().upload(buffer, "listing", ext); // private url
       // console.log(url);
       // building data
       const values = {
@@ -118,7 +124,7 @@ class Nfts {
         tokenId: data.tokenId,
         description: nftMetadata.metadata?.description,
         categoryId: Number(data.category) || undefined,
-        url,
+        url: file, // original url
         price: data.startPrice / 10 ** tokenData.decimals,
         listingType: data.auctionType === "1" ? "NORMAL" : "AUCTION",
         timeout: moment.unix(data.endTime),
@@ -130,6 +136,7 @@ class Nfts {
           nftContractType: nftMetadata.contractType,
           symbol: nftMetadata.symbol,
           contractAddress: nftMetadata.tokenAddress,
+          pUrl: url, //private url
         },
         collectionId: collection?.id,
         chainId: chainId.id,
@@ -140,6 +147,15 @@ class Nfts {
       // store to db
       // console.log(values);
       const newListing = await db.nfts.create(values);
+
+      if (ext === "jpg" || ext === "png" || ext === "jpeg" || ext === "gif") {
+        //compress
+        const worker = new Worker("./workers/compressNft.js");
+        worker.postMessage({ buffer, file });
+        worker.on("error", (err) => {
+          logger(err, undefined, "error");
+        });
+      }
 
       //check for physical item
       if (data.physical?.trim() !== "") {
@@ -494,15 +510,23 @@ class Nfts {
 
     // console.log(result[0].toJSON());
 
-    return [...result].map((data) => {
-      const listing = data.toJSON();
-      return {
-        ...listing,
-        isLiked: listing.isLiked ? true : false,
-        isFavorite: listing.isFavorite ? true : false,
-        isWatched: listing.isWatched ? true : false,
-      };
-    });
+    return {
+      totalPages,
+      page,
+      limit,
+      results: await Promise.all(
+        [...result].map(async (data) => {
+          const listing = data.toJSON();
+          return {
+            ...listing,
+            isLiked: listing.isLiked ? true : false,
+            isFavorite: listing.isFavorite ? true : false,
+            isWatched: listing.isWatched ? true : false,
+            sImg: await redis.get(listing.url),
+          };
+        })
+      ),
+    };
   };
 
   likeUnlike = async (userId, nftId) => {
@@ -675,6 +699,7 @@ class Nfts {
       isLiked: listing.isLiked ? true : false,
       isFavorite: listing.isFavorite ? true : false,
       isWatched: listing.isWatched ? true : false,
+      sImg: await redis.get(listing.url),
     };
   };
 
@@ -787,7 +812,7 @@ class Nfts {
 
   buyNft = async (params = [], from) => {
     //verify and remove listing
-    console.log(params); //testing purposes
+    // console.log(params); //testing purposes
     const data = this.getFields(params);
 
     const { tokenId, erc721 } = data;
@@ -821,7 +846,7 @@ class Nfts {
           chain: listing.chain.chain,
         });
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
 
       const newTransaction = await db.transactions.create({
