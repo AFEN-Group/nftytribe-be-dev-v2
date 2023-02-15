@@ -10,5 +10,5 @@ parentPort.on("message", async ({ file }) => {
   });
   const buffer = Buffer.from(fileBuffer.data, "binary");
   const [compressed] = await new Uploads().compressImages([buffer], 10);
-  await redis.setex(file, 2.628e6, compressed);
+  await redis.setex(file, 2.628e6, compressed.toString("base64"));
 });

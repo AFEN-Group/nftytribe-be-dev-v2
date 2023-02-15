@@ -16,7 +16,7 @@ class Uploads {
    *
    * @param {Array<Buffer>} images - images as buffers
    * @param {number} quality - quality of compression 10 - 100
-   * @returns
+   * @returns {Promise<Array<Buffer>>} - an array of buffer
    */
   compressImages = async (images = [], quality = 20) => {
     const compressed = await Promise.all(
