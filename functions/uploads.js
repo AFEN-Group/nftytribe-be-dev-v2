@@ -16,12 +16,13 @@ class Uploads {
    *
    * @param {Array<Buffer>} images - images as buffers
    * @param {number} quality - quality of compression 10 - 100
+   * @param {number} width - width in pixels to be resized
    * @returns {Promise<Array<Buffer>>} - an array of buffer
    */
-  compressImages = async (images = [], quality = 20) => {
+  compressImages = async (images = [], quality = 20, width = 1000) => {
     const compressed = await Promise.all(
       images.map(async (image) => {
-        return await sharp(image).jpeg({ quality }).toBuffer();
+        return await sharp(image).resize(width).jpeg({ quality }).toBuffer();
       })
     );
     this.compressed = compressed;
