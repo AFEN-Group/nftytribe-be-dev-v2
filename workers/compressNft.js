@@ -9,6 +9,6 @@ parentPort.on("message", async ({ file }) => {
     responseType: "arraybuffer",
   });
   const buffer = Buffer.from(fileBuffer.data, "binary");
-  const [compressed] = await new Uploads().compressImages([buffer], 10);
+  const [compressed] = await new Uploads().compressImages([buffer], 5);
   await redis.setex(file, 2.628e6, compressed.toString("base64"));
 });
