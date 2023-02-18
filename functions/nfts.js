@@ -242,8 +242,10 @@ class Nfts {
       direction,
       physical,
       hasCollection,
+      isFavorite,
+      isLiked,
+      isWatched,
     } = inputs;
-    console.log(userId);
     const getOrder = () => {
       const orderArr = [];
       switch (order) {
@@ -265,9 +267,7 @@ class Nfts {
 
       return orderArr;
     };
-
     const offset = (page - 1) * limit;
-
     // building out options for query
     const options = {
       ...(hasCollection !== undefined && {
@@ -378,12 +378,6 @@ class Nfts {
           },
         }),
     };
-
-    // console.log(inputs);
-    const count = await db.nfts.count({
-      where: options,
-    });
-
     const includeOptions = [
       {
         model: db.users,
@@ -403,14 +397,32 @@ class Nfts {
       {
         model: db.nftLikes,
         attributes: [],
+        ...(isLiked && {
+          required: true,
+          where: {
+            userId,
+          },
+        }),
       },
       {
         model: db.nftFavorites,
         attributes: [],
+        ...(isFavorite && {
+          required: true,
+          where: {
+            userId,
+          },
+        }),
       },
       {
         model: db.listingWatchers,
         attributes: [],
+        ...(isWatched && {
+          required: true,
+          where: {
+            userId,
+          },
+        }),
       },
       {
         model: db.users,
@@ -421,6 +433,12 @@ class Nfts {
         },
       },
     ];
+    // console.log(inputs);
+    const count = await db.nfts.count({
+      where: options,
+      include: includeOptions,
+    });
+
     const totalPages = Math.ceil(count / limit);
 
     const result = await db.nfts.findAll({
@@ -471,8 +489,8 @@ class Nfts {
                   (SELECT id FROM nftFavorites WHERE userId = ${userId} AND nftId = nfts.id) IS NOT NULL,
                   TRUE,
                   FALSE
-                )
-              )
+                ) 
+              ) 
               `
             ),
             "isFavorite",
@@ -485,8 +503,8 @@ class Nfts {
                   (SELECT id FROM listingWatchers WHERE userId = ${userId} AND nftId = nfts.id) IS NOT NULL,
                   TRUE,
                   FALSE
-                )
-              )
+                ) as isWatched
+              ) 
               `
             ),
             "isWatched",
@@ -504,8 +522,6 @@ class Nfts {
       ],
       order: [getOrder()],
     });
-
-    // console.log(result[0].toJSON());
 
     return {
       totalPages,

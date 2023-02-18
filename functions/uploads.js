@@ -28,6 +28,7 @@ class Uploads {
     this.compressed = compressed;
     return compressed;
   };
+
   /**
    *
    * @param {Buffer} image - the image to be uploaded as buffer

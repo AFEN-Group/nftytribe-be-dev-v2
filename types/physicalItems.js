@@ -5,6 +5,6 @@ const { Model, Sequelize } = require("sequelize");
  */
 
 /**
- * @typedef { Record<string, typeof Model> } DB sequelize db object
+ * @typedef { {[key: string]: typeof Model, Sequelize: Sequelize}} DB sequelize db object
  *
  */
