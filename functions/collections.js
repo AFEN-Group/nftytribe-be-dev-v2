@@ -22,21 +22,29 @@ class Collections {
 
     const syncing = await new Promise((resolve, reject) => {
       setTimeout(async () => {
-        const sync = await Moralis.EvmApi.nft.syncNFTContract({
-          address: contractAddress,
-          chain: chainId,
-        });
-        return resolve(sync?.toJSON());
+        try {
+          const sync = await Moralis.EvmApi.nft.syncNFTContract({
+            address: contractAddress,
+            chain: chainId,
+          });
+          resolve(sync?.toJSON());
+        } catch (err) {
+          reject(err);
+        }
       }, 1000);
     });
 
     const result = await new Promise((resolve, reject) => {
       setTimeout(async () => {
-        const data = await Moralis.EvmApi.nft.getNFTContractMetadata({
-          address: contractAddress,
-          chain: chainId,
-        });
-        resolve(data);
+        try {
+          const data = await Moralis.EvmApi.nft.getNFTContractMetadata({
+            address: contractAddress,
+            chain: chainId,
+          });
+          resolve(data);
+        } catch (err) {
+          reject(err);
+        }
       }, 500);
     });
 
