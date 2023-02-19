@@ -451,19 +451,19 @@ class Nfts {
         include: [
           [
             db.Sequelize.literal(
-              "(select count(*) from nftLikes where id = nftLikes.id)"
+              "(select count(*) from nftLikes where nftId = nfts.id)"
             ),
             "likeCount",
           ],
           [
             db.Sequelize.literal(
-              "(select count(*) from nftFavorites where id = nftFavorites.id)"
+              "(select count(*) from nftFavorites where nftId = nfts.id)"
             ),
             "favoriteCount",
           ],
           [
             db.Sequelize.literal(
-              "(select count(*) from listingWatchers where id = listingWatchers.id)"
+              "(select count(*) from listingWatchers where nftId = nfts.id)"
             ),
             "watchCount",
           ],
@@ -614,19 +614,19 @@ class Nfts {
         include: [
           [
             db.Sequelize.literal(
-              "(select count(*) from nftLikes where id = nftLikes.id)"
+              "(select count(*) from nftLikes where nftId = nfts.id)"
             ),
             "likeCount",
           ],
           [
             db.Sequelize.literal(
-              "(select count(*) from nftFavorites where id = nftFavorites.id)"
+              "(select count(*) from nftFavorites where nftId = nfts.id)"
             ),
             "favoriteCount",
           ],
           [
             db.Sequelize.literal(
-              "(select count(*) from listingWatchers where id = listingWatchers.id)"
+              "(select count(*) from listingWatchers where nftId = nfts.id)"
             ),
             "watchCount",
           ],
