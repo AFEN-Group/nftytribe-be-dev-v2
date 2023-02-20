@@ -4,6 +4,7 @@ const { Sequelize } = require("../models");
 const moment = require("moment");
 class Stats {
   getCollectionStats = async (data = {}) => {
+    console.log(data);
     const { startDate, endDate, limit, page, chain } = data;
     const offset = (page - 1) * limit;
     //get collection with highest buy based on date
