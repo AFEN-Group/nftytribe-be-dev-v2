@@ -3,10 +3,10 @@ kind: Ingress
 metadata:
   name: nftytribe-v2-be-networks
   annotations:
-    kubernetes.io/ingress.class: traefik
     # cert-manager.io/cluster-issuer: nftytribe-v2-be-cert
     traefik.ingress.kubernetes.io/proxy-body-size: 5m
 spec:
+  ingressClassName: traefik
   # tls:
   #   - hosts:
   #       - dev.api.v2.nftytribe.io
