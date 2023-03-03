@@ -66,6 +66,7 @@ const kycV1 = asyncHandler(async (req, res) => {
   if (!email)
     throw {
       message: "Email not verified!",
+      status: 400,
     };
   //uploaded files
   const { files } = req;
@@ -75,6 +76,7 @@ const kycV1 = asyncHandler(async (req, res) => {
   if (!selfie || !id)
     throw {
       message: "Please upload every necessary document!",
+      status: 400,
     };
 
   //mail sender
