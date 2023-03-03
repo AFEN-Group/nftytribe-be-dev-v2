@@ -58,6 +58,7 @@ const userUpdateValidation = [
 const addEmailValidation = [
   body("email")
     .isEmail()
+    .normalizeEmail()
     .custom(async (email) => {
       const user = await db.users.findOne({ where: { email } });
       if (user) throw "Email is already associated with a user";
@@ -74,14 +75,33 @@ const avatarUpload = multer({
   },
 });
 
-const userVerificationValidation = [
-  body(["fullName", "email", "phoneNumber"]).not().isEmpty().isString(),
+const userVerificationValidationV1 = [
+  body(["fullName", "phoneNumber"]).not().isEmpty(),
   body("phoneNumber").isMobilePhone(),
-  body("email").isEmail().normalizeEmail(),
   body(["professionalName", "referralCode"])
     .optional({ checkFalsy: true })
     .isString(),
-  body("socialMediaLinks").optional().isArray({ min: 0, max: 3 }),
+  body("socialLinks")
+    .optional()
+    .custom((arr) => {
+      const data = JSON.parse(arr);
+      //if array contains data
+      if (!data.length) throw "add at least one social links";
+      //if content of array is string
+      const regex = new RegExp(
+        "^(?:https?://)?(?:www.)?(?:[a-zA-Z0-9-]+.)+[a-zA-Z]{2,}(?:/[^s]*)?$"
+      );
+      for (x of data) {
+        if (!regex.test(x)) {
+          throw `${x} is not a url`;
+        }
+      }
+      return true;
+    })
+    .customSanitizer((arr) => {
+      console.log(arr);
+      return JSON.parse(arr);
+    }),
 ];
 
 module.exports = {
@@ -91,5 +111,5 @@ module.exports = {
   verifyEmailValidation,
   userUpdateValidation,
   avatarUpload,
-  userVerificationValidation,
+  userVerificationValidationV1,
 };

@@ -3,6 +3,8 @@ const { validationResult, matchedData } = require("express-validator");
 const checkError = require("@functions/checkError");
 const Uploads = require("@functions/uploads");
 const Users = require("@functions/users");
+const Mailer = require("@functions/mailer");
+const db = require("@models");
 
 const register = asyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -48,6 +50,73 @@ const getUser = asyncHandler(async (req, res) => {
   res.send(user);
 });
 
+const kycV1 = asyncHandler(async (req, res) => {
+  const data = await checkError(req, validationResult, {
+    locations: ["body"],
+    matchedData,
+  });
+  const { id: userId } = req.user;
+
+  //checking if user has email updated
+  const { email, username } = await db.users.findOne({
+    where: {
+      id: userId,
+    },
+  });
+  if (!email)
+    throw {
+      message: "Email not verified!",
+    };
+  //uploaded files
+  const { files } = req;
+  const { id, selfie } = files;
+
+  //throw error to be returned when files required not uploaded
+  if (!selfie || !id)
+    throw {
+      message: "Please upload every necessary document!",
+    };
+
+  //mail sender
+  const mailer = new Mailer("Request", "Verification Request");
+
+  //mail to be sent data
+  const subject = `verification request from ${username}`;
+  const to = [process.env.verification_email_address];
+
+  /**
+   * @type {import("@types/mailTypes").MailAttachment}
+   */
+  const attachment = [
+    ...id.map((data) => {
+      return {
+        name: "identification." + data.mimetype.split("/")[1],
+        type: data.mimetype,
+        content: data.buffer.toString("base64"),
+      };
+    }),
+    ...selfie.map((data) => {
+      return {
+        name: "selfie." + data.mimetype.split("/")[1],
+        type: data.mimetype,
+        content: data.buffer.toString("base64"),
+      };
+    }),
+  ];
+  await mailer.sendEmail(
+    {
+      subject,
+      html: `
+      ${JSON.stringify({ ...data, email, userId })}
+    `,
+      to,
+    },
+    attachment
+  );
+  res.send({
+    message: "Your request for verification has been sent!",
+  });
+});
 module.exports = {
   register,
   login,
@@ -55,4 +124,5 @@ module.exports = {
   getUser,
   verifyEmail,
   updateUser,
+  kycV1,
 };
