@@ -9,8 +9,15 @@ class Mailer {
     this.sender = `${user}@nftytribe.io`;
     this.name = name || user;
   }
+
   mailchimp = Mailchimp(config.mailchimp_transactional_key);
-  sendEmail = async ({ subject, html, to = [] }) => {
+  /**
+   *
+   * @param {{html: string, subject: string, to: string[]}} param0
+   * @param {Mailchimp.MessageAttachment[]} attachments
+   * @returns
+   */
+  sendEmail = async ({ subject, html, to = [] }, attachments = []) => {
     const response = await this.mailchimp.messages.send({
       message: {
         subject,
@@ -21,6 +28,7 @@ class Mailer {
         from_email: this.sender,
         from_name: this.name,
         html,
+        attachments,
       },
     });
     // console.log(response);

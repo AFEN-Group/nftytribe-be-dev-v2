@@ -73,6 +73,17 @@ const avatarUpload = multer({
     fileSize: 8e6,
   },
 });
+
+const userVerificationValidation = [
+  body(["fullName", "email", "phoneNumber"]).not().isEmpty().isString(),
+  body("phoneNumber").isMobilePhone(),
+  body("email").isEmail().normalizeEmail(),
+  body(["professionalName", "referralCode"])
+    .optional({ checkFalsy: true })
+    .isString(),
+  body("socialMediaLinks").optional().isArray({ min: 0, max: 3 }),
+];
+
 module.exports = {
   createUserValidation,
   loginValidation,
@@ -80,4 +91,5 @@ module.exports = {
   verifyEmailValidation,
   userUpdateValidation,
   avatarUpload,
+  userVerificationValidation,
 };

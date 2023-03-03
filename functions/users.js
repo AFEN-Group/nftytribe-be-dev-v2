@@ -2,8 +2,8 @@ const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const rs = require("randomstring");
 const Mailer = require("./mailer");
-const otpVerification = require("../email_templates/emailVerification");
 const db = require("../models");
+const { redis } = require("@helpers/redis");
 
 class Users {
   constructor(userId) {
@@ -90,20 +90,31 @@ class Users {
       throw err;
     }
   };
-
   addEmail = async (email) => {
     const token = rs.generate(6);
-    await db.emailVerifications.upsert({
-      token,
-      email,
-      userId: this.userId,
-    });
+    const exp = process.env.email_ver_exp || 1200;
+    await redis.setex(
+      this.userId + "-email-verification",
+      exp,
+      JSON.stringify({ token, email })
+    );
+
+    // await db.emailVerifications.upsert({
+    //   token,
+    //   email,
+    //   userId: this.userId,
+    // });
+
+    const htmlEmail = await db.emailTemplates.getAndSetValues(
+      "emailVerification",
+      { code: token }
+    );
     const response = await new Mailer("verify", "Nftytribe.io").sendEmail({
       subject: "Email Verification",
-      html: otpVerification(token),
+      html: htmlEmail,
       to: [email],
     });
-    console.log(response[0]);
+    // console.log(response[0]);
     return {
       message: "An otp has been sent to email for verification",
       email,
@@ -112,33 +123,21 @@ class Users {
   };
 
   verifyEmail = async (token) => {
-    const email = await db.emailVerifications.findOne({
-      where: {
-        userId: this.userId,
-        token,
-      },
-    });
+    let email = await redis.get(this.userId + "-email-verification");
     if (!email)
       throw {
         message: "email not found",
       };
-    const { updatedAt } = email;
-    const expiry = new Date(updatedAt).setMinutes(
-      new Date(updatedAt).getMinutes() +
-        Number(process.env.email_verification_expiry)
-    );
-    if (Date.now() > expiry)
+
+    email = JSON.parse(email);
+
+    if (email.token !== token)
       throw {
-        message: "token expired",
-        status: 401,
+        message: "Invalid or expired token!",
       };
-    await db.emailVerifications.destroy({
-      where: {
-        token,
-        userId: this.userId,
-      },
-    });
+    await redis.del(this.userId + "-email-verification");
     const updated = await this.updateUser({ email: email.email });
+
     return updated;
   };
 }
