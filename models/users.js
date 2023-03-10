@@ -110,6 +110,9 @@ const users = (sequelize, dataTypes) => {
     users.hasMany(models.physicalItemBuyers, {
       onDelete: "cascade",
     });
+    users.hasMany(models.notifications, {
+      onDelete: "cascade",
+    });
   };
   return users;
 };
