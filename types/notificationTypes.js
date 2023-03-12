@@ -1,0 +1,9 @@
+const NotificationTypes = {
+  BID_PLACED: "BID_PLACED",
+  BID_PLACED_WATCH: "BID_PLACED_WATCH",
+  SOLD: "SOLD",
+  SOLD_WATCH: "SOLD_WATCH",
+  NEW_LISTING: "NEW_LISTING",
+  NEW_LISTING_COLLECTION: "NEW_LISTING_COLLECTION",
+};
+module.exports = NotificationTypes;

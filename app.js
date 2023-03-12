@@ -7,8 +7,9 @@ const cors = require("cors");
 const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
 const { startSocket } = require("./helpers/socket");
-const logger = require("morgan");
+// const logger = require("morgan");
 const t = require("@functions/physicalItems");
+const test = require("@routes/test");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 100,
@@ -24,7 +25,7 @@ app.disable("x-powered-by");
 
 app.use("/api", route);
 app.use("/hook", hooks);
-
+app.use("/test", test);
 //error handler
 app.use(errorHandler);
 
