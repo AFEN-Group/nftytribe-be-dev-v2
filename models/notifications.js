@@ -42,9 +42,9 @@ const notifications = (sequelize, dataTypes, db) => {
    *
    * @param {string} name - name of the notification type
    * @param {number} id - id to either collection or listing
-   * @param {number} userId - id to owner of generated notification
+   * @param {number} extraData - extra data only if name is of type sold
    */
-  notifications.generateNotification = async (name, id) => {
+  notifications.generateNotification = async (name, id, extraData) => {
     const [listing, collection] = await Promise.all([
       await db.nfts.findOne({
         where: {
@@ -65,7 +65,9 @@ const notifications = (sequelize, dataTypes, db) => {
         }`;
         break;
       case NotificationTypes["SOLD"]:
-        text = `Your Nft ${listing.name}${listing.tokenId ?? ""} has been sold`;
+        text = `Your Nft ${extraData.name}${
+          extraData.tokenId ?? ""
+        } has been sold`;
         break;
       case NotificationTypes["NEW_LISTING"]:
         text = `Your nft ${listing.name}${
@@ -78,12 +80,12 @@ const notifications = (sequelize, dataTypes, db) => {
     const newNotification = await notifications.create({
       type: name,
       text,
-      data: {
+      data: extraData ?? {
         listingId: listing.id,
         name: listing.name,
         tokenId: listing.tokenId ?? "",
       },
-      userId: listing.userId,
+      userId: extraData.userId ?? listing.userId,
     });
     return newNotification;
   };
@@ -154,6 +156,7 @@ const notifications = (sequelize, dataTypes, db) => {
   notifications.generateWatchedNotifications = async (
     type,
     listingId,
+    extraData = {},
     socket,
     batchLimit = 1000
   ) => {
@@ -191,11 +194,13 @@ const notifications = (sequelize, dataTypes, db) => {
       const notification = watchers.map(({ userId }) => ({
         userId,
         type,
-        data: {
-          name: listing.name,
-          id: listingId,
-          tokenId: listing.tokenId,
-        },
+        data: NotificationTypes.SOLD_WATCH
+          ? extraData
+          : {
+              name: listing.name,
+              id: listingId,
+              tokenId: listing.tokenId,
+            },
         text,
       }));
       await notifications.bulkCreate(notification);

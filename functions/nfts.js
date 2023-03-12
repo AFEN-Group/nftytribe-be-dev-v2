@@ -889,6 +889,7 @@ class Nfts {
           physical: listing.physical,
           lazyMint: listing.lazyMint,
           createdAt: listing.createdAt,
+          userId: listing.userId,
           usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
           nativePrice: tokenPrice?.toJSON()?.nativePrice
             ? {
