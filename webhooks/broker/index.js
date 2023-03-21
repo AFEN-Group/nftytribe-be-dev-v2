@@ -4,6 +4,7 @@ const broker = require("express").Router();
 const { Worker } = require("worker_threads");
 const abiDecoder = require("abi-decoder");
 const Nfts = require("@functions/nfts");
+const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
 abiDecoder.addABI(brokerV2.brokerV2);
 
@@ -11,14 +12,12 @@ broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
     // console.log(req.body);
     const { txs, chainId, confirmed } = req.body;
+    console.log(chainId);
     const [txsData] = txs;
     if (txsData && !confirmed) {
       const { fromAddress, input } = txsData;
       const data = abiDecoder.decodeMethod(input);
       const nfts = new Nfts();
-      console.log(data);
-      // WORKER FOR NOTIFICATION PROCESSING
-      const workerWatch = new Worker("./workers/watchNotification.js");
 
       if (data.name.toLowerCase() === "putsaleoff") {
         //handle putting sale off
@@ -37,38 +36,44 @@ broker.route("/").post(
           fromAddress,
           chainId
         );
+        const multiNotificationWorker = new Worker(
+          "./workers/multiNotifications.js"
+        );
 
-        //
+        newListing.collectionId &&
+          multiNotificationWorker.postMessage({
+            type: NotificationTypes.NEW_LISTING_COLLECTION,
+            nftId: newBid.listing.id,
+            collectionId: newListing.collectionId,
+            name: "favorite",
+          });
       }
 
       if (data.name.toLowerCase() === "bid") {
         const newBid = await nfts.newBid(data.params, fromAddress);
-        workerWatch.postMessage("message", {
-          type: NotificationTypes.BID_PLACED_WATCH,
-          listingId: newBid.nftId,
-          socket: undefined,
+        // notifications
+        const worker = new Worker("./workers/singleNotifications.js");
+        worker.postMessage({
+          nftId: newBid.listing.id,
+          title: newBid.listing.name,
+          tokenId: newBid.listing.tokenId,
+          type: NotificationTypes.BID_PLACED,
+          userId: newBid.listing.userId,
         });
-
-        // db.notifications.
       }
       if (data.name.toLowerCase() === "buy") {
         const newSales = await nfts.buyNft(data.params, fromAddress);
-        workerWatch.postMessage("message", {
-          type: NotificationTypes.SOLD_WATCH,
-          listingId: newSales.nftId,
-          extraData: {
-            ...newSales.listingInfo,
-          },
-          socket: undefined,
-        });
-
-        await db.notifications.generateNotification(
-          NotificationTypes.SOLD,
-          null,
-          newSales.listingInfo
-        );
-
-        //push via socket
+        // ..notifcations
+        const worker = new Worker("./workers/singleNotifications.js");
+        const notificationData = {
+          transactionId: newSales.id,
+          title: newSales.listingInfo.name,
+          tokenId: newSales.listingInfo.tokenId,
+          type: NotificationTypes.SOLD,
+          userId: newSales.sellerId,
+          // buyerId: newSales.buyerId,
+        };
+        worker.postMessage(notificationData);
       }
     } else if (txsData && confirmed) {
       //changed confirmed to true

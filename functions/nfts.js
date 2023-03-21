@@ -738,7 +738,7 @@ class Nfts {
         userId: bidder.id,
         amount: data.amount / 10 ** listing.moreInfo.erc20TokenDecimals,
       });
-      return bid;
+      return { bid, listing };
     }
   };
 

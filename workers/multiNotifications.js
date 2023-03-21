@@ -3,15 +3,9 @@ const { logger } = require("@helpers/logger");
 const db = require("@models");
 const { parentPort } = require("worker_threads");
 
-parentPort.on("message", async ({ type, socket, extraData, listingId }) => {
+parentPort.on("message", async (data) => {
   try {
-    await db.notifications.generateWatchedNotifications(
-      type,
-      listingId,
-      extraData,
-      socket
-    );
-    return true;
+    return await db.notifications.generateWatchedNotifications(data);
   } catch (err) {
     logger(JSON.stringify(err), "listing-notification", "error");
     console.log(err);

@@ -23,126 +23,140 @@ const notifications = (sequelize, dataTypes, db) => {
       allowNull: false,
       defaultValue: false,
     },
-    data: {
-      type: dataTypes.JSON,
-      allowNull: true,
-    },
   });
 
   notifications.associate = (model) => {
-    notifications.belongsTo(model.users, {
-      foreignKey: {
-        allowNull: false,
-      },
-      onDelete: "cascade",
+    notifications.belongsToMany(model.users, {
+      through: model.userNotifications,
     });
+    notifications.belongsTo(model.collections);
+    notifications.belongsTo(model.nfts);
+    notifications.belongsTo(model.transactions);
   };
 
-  /**
-   *
-   * @param {string} name - name of the notification type
-   * @param {number} id - id to either collection or listing
-   * @param {number} extraData - extra data only if name is of type sold
-   */
-  notifications.generateNotification = async (name, id, extraData) => {
-    const [listing, collection] = await Promise.all([
-      await db.nfts.findOne({
-        where: {
-          id,
-        },
-      }),
-      await db.collections.findOne({
-        where: {
-          id,
-        },
-      }),
-    ]);
+  //all single
+
+  notifications.generateSingleNotification = async ({
+    type,
+    title,
+    tokenId,
+    collectionId,
+    transactionId,
+    nftId,
+    socket,
+    userId,
+  }) => {
     let text = "";
-    switch (name) {
+    switch (type) {
       case NotificationTypes["BID_PLACED"]:
-        text = `A bid was placed on your item ${listing.name} ${
-          listing.tokenId ?? ""
-        }`;
+        text = `A bid was placed on your item ${title}-${tokenId ?? ""}`;
         break;
       case NotificationTypes["SOLD"]:
-        text = `Your Nft ${extraData.name}${
-          extraData.tokenId ?? ""
-        } has been sold`;
+        text = `Your Nft ${title}-${tokenId ?? ""} has been sold`;
         break;
       case NotificationTypes["NEW_LISTING"]:
-        text = `Your nft ${listing.name}${
-          listing.tokenId ?? ""
-        } has been listed! `;
+        text = `Your nft ${title}-${tokenId ?? ""} has been listed! `;
         break;
       default:
         break;
     }
     const newNotification = await notifications.create({
-      type: name,
+      type,
       text,
-      data: extraData ?? {
-        listingId: listing.id,
-        name: listing.name,
-        tokenId: listing.tokenId ?? "",
-      },
-      userId: extraData.userId ?? listing.userId,
+      collectionId,
+      nftId,
+      transactionId,
     });
+    await newNotification.addUsers([userId]);
     return newNotification;
   };
-  /**
-   *
-   * @param {number} collectionId id of collection
-   * @param {Socket} socket an initiated socket instance
-   * @param {number} batchLimit how may data to be created at a time
-   */
-  notifications.newListingCollection = async (
+
+  // all multiple
+
+  notifications.generateMultipleNotification = async ({
     collectionId,
+    nftId,
+    transactionId,
     socket,
-    batchLimit = 1000
-  ) => {
+    batchLimit = 1000,
+    type,
+    name,
+    nftName,
+    tokenId,
+  }) => {
     let page = 1;
     //get total count of users with this collection as favorite
-    const [collection, count] = await Promise.all([
-      await db.collections.findOne({
+    let data;
+    let count;
+    let text;
+    if (name === "watch" && type === NotificationTypes.SOLD_WATCH) {
+      data = await db.transactions.findOne({
+        where: {
+          id: transactionId,
+        },
+      });
+      count = await db.listingWatchers.count({
+        where: {
+          nftId,
+        },
+      });
+      text = `nft ${nftName}-${tokenId} you were watching has been sold `;
+    } else if (
+      name === "favorite" &&
+      type === NotificationTypes.NEW_LISTING_COLLECTION
+    ) {
+      data = await db.collections.findOne({
         where: {
           id: collectionId,
         },
-      }),
-      await db.collectionFavorites.count({
+      });
+      count = await db.collectionFavorites.count({
         where: {
           collectionId,
         },
-      }),
-    ]);
+      });
+      text = `A new nft has been listed from the collection ${data.name}`;
+    }
 
     const totalPages = Math.ceil(count / batchLimit);
     const offset = (page - 1) * batchLimit;
-    const text = `A new nft has been listed from the collection ${collection.name}`;
 
+    const newNotification = await notifications.create({
+      type,
+      text,
+      transactionId,
+      collectionId,
+      nftId,
+    });
     //process items in batches
     while (page <= totalPages) {
       console.log(totalPages, page, count);
-      const allFavorites = await db.collectionFavorites.findAll({
-        where: {
-          collectionId,
-        },
-        limit: batchLimit,
-        offset,
-      });
-      const newNotificationArray = allFavorites.map(({ userId }) => ({
-        userId,
-        text,
-        type: NotificationTypes.NEW_LISTING_COLLECTION,
-        data: {
-          name: collection.name,
-          id: collectionId,
-        },
-      }));
-      await notifications.bulkCreate(newNotificationArray);
-      if (socket) {
-        //do the socket thing
-        console.log("the socket thing");
+      let users = [];
+
+      if (name === "watch" && type === NotificationTypes.SOLD_WATCH) {
+        // const watchers = await db.listingWatchers.findAll({
+        //   where: {
+        //   }
+        // })
+      } else if (
+        name === "favorite" &&
+        type === NotificationTypes.NEW_LISTING_COLLECTION
+      ) {
+        const allFavorites = await db.collectionFavorites.findAll({
+          where: {
+            collectionId,
+          },
+          limit: batchLimit,
+          offset,
+        });
+        users = allFavorites.map((data) => data.userId);
       }
+      await newNotification.addUsers(users);
+      // await notifications.bulkCreate(newNotificationArray);
+      // if (socket) {
+      //do the socket thing
+      // console.log("the socket thing");
+      // }
       page++;
     }
   };
