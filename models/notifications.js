@@ -1,4 +1,5 @@
 // const db = require("@models");
+const { socketEmitter } = require("@helpers/socket");
 const NotificationTypes = require("../types/notificationTypes");
 const { Sequelize, DataTypes } = require("sequelize");
 const { Socket } = require("socket.io");
@@ -68,6 +69,7 @@ const notifications = (sequelize, dataTypes, db) => {
       transactionId,
     });
     await newNotification.addUsers([userId]);
+    socketEmitter.to(String(userId)).emit("notification", newNotification);
     return newNotification;
   };
 
@@ -153,10 +155,10 @@ const notifications = (sequelize, dataTypes, db) => {
       }
       await newNotification.addUsers(users);
       // await notifications.bulkCreate(newNotificationArray);
-      // if (socket) {
-      //do the socket thing
-      // console.log("the socket thing");
-      // }
+
+      for (let id of users) {
+        socketEmitter.to(String(id)).emit("notification", newNotification);
+      }
       page++;
     }
   };
