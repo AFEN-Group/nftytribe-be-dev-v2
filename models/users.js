@@ -1,3 +1,11 @@
+const { Sequelize, DataTypes } = require("sequelize");
+/**
+ *
+ * @param {Sequelize} sequelize
+ * @param {DataTypes} dataTypes
+ * @param {import("@types/physicalItems").DB} db
+ */
+
 const users = (sequelize, dataTypes) => {
   const users = sequelize.define("users", {
     email: {
@@ -110,8 +118,8 @@ const users = (sequelize, dataTypes) => {
     users.hasMany(models.physicalItemBuyers, {
       onDelete: "cascade",
     });
-    users.hasMany(models.notifications, {
-      onDelete: "cascade",
+    users.belongsToMany(models.notifications, {
+      through: models.userNotifications,
     });
   };
   return users;

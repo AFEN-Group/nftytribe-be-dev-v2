@@ -738,7 +738,7 @@ class Nfts {
         userId: bidder.id,
         amount: data.amount / 10 ** listing.moreInfo.erc20TokenDecimals,
       });
-      return bid;
+      return { bid, listing };
     }
   };
 
@@ -889,6 +889,7 @@ class Nfts {
           physical: listing.physical,
           lazyMint: listing.lazyMint,
           createdAt: listing.createdAt,
+          userId: listing.userId,
           usd: tokenPrice?.toJSON().usdPrice * listing.price || 0,
           nativePrice: tokenPrice?.toJSON()?.nativePrice
             ? {

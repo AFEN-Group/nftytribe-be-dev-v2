@@ -54,7 +54,9 @@
     "@middlewares": "./middlewares",
     "@functions": "./functions",
     "@helpers": "./helpers",
-    "@scripts": "./scripts"
+    "@scripts": "./scripts",
+    "@routes": "./routes",
+    "@types": "./types"
   },
   "engines": {
     "node": "18"

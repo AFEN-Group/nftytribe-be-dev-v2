@@ -1,5 +1,5 @@
 const { request } = require("express");
-const { validationResult, matchedData } = require("express-validator");
+const { validationResult: vResult, matchedData } = require("express-validator");
 
 /**
  * @typedef {Object} GetResult
@@ -9,13 +9,13 @@ const { validationResult, matchedData } = require("express-validator");
 /**
  *
  * @param {request} req - express request object
- * @param {typeof validationResult} validationResult - express validation result
+ * @param {typeof vResult} validationResult - express validation result
  * @param {GetResult} getResult
  * @returns
  */
 const checkError = async (req, validationResult, getResult = {}) => {
   const { matchedData, locations } = getResult;
-  const errors = validationResult(req);
+  const errors = validationResult ? validationResult(req) : vResult(req);
   if (!errors.isEmpty())
     throw {
       error: errors.array({ stripUnknown: true }),
