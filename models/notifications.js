@@ -234,29 +234,6 @@ const notifications = (sequelize, dataTypes, db) => {
    *
    * }} param0
    */
-  notifications.getNotifications = async ({ userId, limit, page }) => {
-    const offset = (page - 1) * limit;
-    const [total, notification] = await Promise.all([
-      await notifications.count({
-        where: {
-          userId,
-        },
-      }),
-      await notifications.findAll({
-        where: {
-          userId,
-        },
-        limit,
-        offset,
-      }),
-    ]);
-    return {
-      results: notification,
-      totalPages: Math.ceil(total / limit),
-      limit,
-      page,
-    };
-  };
 
   /**
    *
