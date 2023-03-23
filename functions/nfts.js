@@ -998,7 +998,7 @@ class Nfts {
     const upload = await Uploads.uploadFileToIpfs(
       image.base64,
       image.mime,
-      username
+      username ?? "nfty"
     );
 
     //include data
