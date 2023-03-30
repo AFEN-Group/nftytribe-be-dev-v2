@@ -39,11 +39,11 @@ broker.route("/").post(
         const multiNotificationWorker = new Worker(
           "./workers/multiNotifications.js"
         );
-
+        console.log(newListing.id);
         newListing.collectionId &&
           multiNotificationWorker.postMessage({
             type: NotificationTypes.NEW_LISTING_COLLECTION,
-            nftId: newBid.listing.id,
+            nftId: newListing.id,
             collectionId: newListing.collectionId,
             name: "favorite",
           });

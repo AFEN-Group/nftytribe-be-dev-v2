@@ -169,13 +169,13 @@ const notifications = (sequelize, dataTypes, db) => {
    * @param {number} batchLimit number to be updated at a time
    * @returns
    */
-  notifications.generateWatchedNotifications = async (
+  notifications.generateWatchedNotifications = async ({
     type,
     listingId,
     extraData = {},
     socket,
-    batchLimit = 1000
-  ) => {
+    batchLimit = 1000,
+  }) => {
     let page = 1;
     //listing data and watchers count
     const [listing, count] = await Promise.all([
