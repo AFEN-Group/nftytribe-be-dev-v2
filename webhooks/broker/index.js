@@ -44,6 +44,7 @@ broker.route("/").post(
           multiNotificationWorker.postMessage({
             type: NotificationTypes.NEW_LISTING_COLLECTION,
             nftId: newListing.id,
+            listingId: newListing.id,
             collectionId: newListing.collectionId,
             name: "favorite",
           });
