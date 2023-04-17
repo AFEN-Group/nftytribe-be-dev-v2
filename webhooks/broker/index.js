@@ -64,6 +64,8 @@ broker.route("/").post(
       }
       if (data.name.toLowerCase() === "buy") {
         const newSales = await nfts.buyNft(data.params, fromAddress);
+
+        console.log(newSales, "newSale");
         // ..notifcations
         const worker = new Worker("./workers/singleNotifications.js");
         const notificationData = {
