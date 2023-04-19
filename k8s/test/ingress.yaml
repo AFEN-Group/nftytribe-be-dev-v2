@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: test
+  name: nftytribe-v2-be-networks
+  annotations:
+    cert-manager.io/cluster-issuer: cert-issuer
+    # traefik.ingress.kubernetes.io/proxy-body-size: 5m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - test.nftytribe.io
+      secretName: dev-test-tls
+  rules:
+    - host: test.nftytribe.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nftytribe-v2-be-cluster-ip-service
+                port:
+                  number: 4000
