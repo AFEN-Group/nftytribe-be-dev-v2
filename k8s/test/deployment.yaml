@@ -25,3 +25,7 @@ spec:
           envFrom:
             - secretRef:
                 name: nfty-be-test
+          command:
+            - "env"
+            # - "y"
+            # - "env"
