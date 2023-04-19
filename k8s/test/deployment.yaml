@@ -26,4 +26,5 @@ spec:
             - secretRef:
                 name: nfty-be-test
           command:
-            - "yarn start"
+            - "yarn"
+            - "start"
