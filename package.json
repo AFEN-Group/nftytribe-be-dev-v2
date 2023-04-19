@@ -36,6 +36,7 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development nodemon -r module-alias/register -r dotenv/config  server.js",
+    "start": "NODE_ENV=production nodemon -r module-alias/register -r dotenv/config  server.js",
     "staging": "NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
     "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh",
     "set-env": "node -r dotenv/config ./scripts/db/set_env.js",
