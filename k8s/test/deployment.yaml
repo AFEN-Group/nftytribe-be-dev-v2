@@ -27,4 +27,4 @@ spec:
                 name: nfty-be-test
           command:
             - "yarn"
-            - "start"
+            - "start:production"
