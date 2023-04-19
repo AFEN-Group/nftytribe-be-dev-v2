@@ -11,9 +11,10 @@ spec:
   tls:
     - hosts:
         - test.nftytribe.io
+        - test-api.nftytribe.io
       secretName: dev-test-tls
   rules:
-    - host: test.nftytribe.io
+    - host: test-api.nftytribe.io
       http:
         paths:
           - path: /
