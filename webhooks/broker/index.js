@@ -6,13 +6,16 @@ const abiDecoder = require("abi-decoder");
 const Nfts = require("@functions/nfts");
 const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
+const physicalItemAbi = require("../../abi/piProxy.json");
 abiDecoder.addABI(brokerV2.brokerV2);
+abiDecoder.addABI(physicalItemAbi);
 
+const testData = require("./demo.json");
 broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
     // console.log(req.body);
-    const { txs, chainId, confirmed } = req.body;
-    console.log(chainId);
+    const { txs, chainId, confirmed } = testData ?? req.body;
+    // console.log(chainId);
     const [txsData] = txs;
     if (txsData && !confirmed) {
       const { fromAddress, input } = txsData;
@@ -39,7 +42,7 @@ broker.route("/").post(
         const multiNotificationWorker = new Worker(
           "./workers/multiNotifications.js"
         );
-        console.log(newListing.id);
+
         newListing.collectionId &&
           multiNotificationWorker.postMessage({
             type: NotificationTypes.NEW_LISTING_COLLECTION,
@@ -86,4 +89,14 @@ broker.route("/").post(
   })
 );
 
+// broker.route("/physical-item").post((req, res) => {
+//   const { txs, chainId, confirmed } = testData;
+//   const { input, fromAddress } = txs[0];
+//   if (!confirmed && txs.length) {
+//     const data = abiDecoder.decodeMethod(input);
+
+//   }
+
+//   // res.send()
+// });
 module.exports = broker;

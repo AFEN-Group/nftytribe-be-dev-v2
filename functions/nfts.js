@@ -8,7 +8,7 @@ const { redis } = require("@helpers/redis");
 const Users = require("./users");
 const { Worker } = require("worker_threads");
 const { logger } = require("@helpers/logger");
-
+const web3 = require("web3");
 class Nfts {
   getNfts = async (options, walletAddress) => {
     const { limit, page: cursor, chain } = options;
@@ -91,7 +91,7 @@ class Nfts {
     }
     if (chainId) {
       const data = this.getFields(params);
-      // console.log(data);
+      console.log(data);
       const collection = await db.collections.findOne({
         where: {
           contractAddress: data.erc721,
@@ -155,8 +155,10 @@ class Nfts {
       }
 
       //check for physical item
-      if (data.physical?.trim() !== "") {
-        await linkPhysicalItems(data.physical, newListing.id);
+      if (data.meta) {
+        const physicalId = web3.utils.hexToAscii(data.meta);
+        await linkPhysicalItems(physicalId, newListing.id);
+        console.log(physicalId);
       }
 
       return newListing;
