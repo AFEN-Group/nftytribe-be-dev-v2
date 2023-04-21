@@ -6,15 +6,16 @@ const abiDecoder = require("abi-decoder");
 const Nfts = require("@functions/nfts");
 const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
-const physicalItemAbi = require("../../abi/piProxy.json");
+const physicalItemAbi = require("../../abi/physicalItemsBroker.json");
+const PIProxyAbi = require("../../abi/piProxy.json");
 abiDecoder.addABI(brokerV2.brokerV2);
 abiDecoder.addABI(physicalItemAbi);
+abiDecoder.addABI(PIProxyAbi);
 
-const testData = require("./demo.json");
 broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
     // console.log(req.body);
-    const { txs, chainId, confirmed } = testData ?? req.body;
+    const { txs, chainId, confirmed } = req.body;
     // console.log(chainId);
     const [txsData] = txs;
     if (txsData && !confirmed) {
@@ -39,6 +40,7 @@ broker.route("/").post(
           fromAddress,
           chainId
         );
+
         const multiNotificationWorker = new Worker(
           "./workers/multiNotifications.js"
         );
@@ -89,14 +91,41 @@ broker.route("/").post(
   })
 );
 
-// broker.route("/physical-item").post((req, res) => {
-//   const { txs, chainId, confirmed } = testData;
-//   const { input, fromAddress } = txs[0];
-//   if (!confirmed && txs.length) {
-//     const data = abiDecoder.decodeMethod(input);
+const testData = require("./demoPhysicalProxy.json");
+const { Op } = require("sequelize");
+broker.route("/physical-item").post(async (req, res) => {
+  const { txs, chainId, confirmed } = testData;
+  const { input, fromAddress } = txs[0];
+  if (confirmed && txs.length) {
+    const { name, params } = abiDecoder.decodeMethod(input);
+    if (name.toLowerCase() === "buy") {
+      const nft = new Nfts();
+      //get arrange fields
+      const { tokenId, erc721, price } = nft.getFields(params);
+      //get listing
+      const listing = await db.nfts.findOne({
+        where: {
+          tokenId,
+          moreInfo: {
+            contractAddress: erc721,
+          },
+        },
+        include: [
+          {
+            model: db.physicalItems,
+            required: true,
+          },
+        ],
+      });
 
-//   }
+      if (!listing) {
+        //register an error, an attempt to purchase something that does not exist
+        return;
+      }
+      const listingPrice = listing.price;
+    }
+  }
 
-//   // res.send()
-// });
+  res.send();
+});
 module.exports = broker;

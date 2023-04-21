@@ -156,9 +156,10 @@ class Nfts {
 
       //check for physical item
       if (data.meta) {
-        const physicalId = web3.utils.hexToAscii(data.meta);
+        const physicalId = web3.utils
+          .hexToAscii(data.meta)
+          .replace(/\u0000/g, "");
         await linkPhysicalItems(physicalId, newListing.id);
-        console.log(physicalId);
       }
 
       return newListing;
@@ -956,6 +957,7 @@ class Nfts {
       results: sold,
     };
   };
+
   getCollected = async (data = {}, userId) => {
     const { limit, page } = data;
     const offset = (page - 1) * limit;
