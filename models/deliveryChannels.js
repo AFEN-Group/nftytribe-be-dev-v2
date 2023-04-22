@@ -8,7 +8,7 @@ const deliveryChannels = (sequelize, dataTypes) => {
   });
 
   deliveryChannels.associate = (models) => {
-    deliveryChannels.hasMany(models.deliveries, { allowNull: true });
+    // deliveryChannels.hasMany(models.deliveries, { allowNull: true });
   };
 
   return deliveryChannels;

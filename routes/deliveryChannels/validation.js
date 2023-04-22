@@ -31,7 +31,7 @@ exports.getStatesOrCitiesValidations = [
 ];
 
 exports.deliveryFeeValidation = [
-  body(["city", "countryCode"]).not().isEmpty(),
+  body(["city", "countryCode", "name", "address"]).not().isEmpty(),
   body("countryCode").isISO31661Alpha2(),
   param("methodName")
     .not()

@@ -8,9 +8,13 @@ const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
 const physicalItemAbi = require("../../abi/physicalItemsBroker.json");
 const PIProxyAbi = require("../../abi/piProxy.json");
+const web3 = require("web3");
 abiDecoder.addABI(brokerV2.brokerV2);
 abiDecoder.addABI(physicalItemAbi);
 abiDecoder.addABI(PIProxyAbi);
+const Moralis = require("@functions/Moralis.sdk");
+const { EvmChain } = require("@moralisweb3/common-evm-utils");
+const env = process.env.NODE_ENV;
 
 broker.route("/").post(
   expressAsyncHandler(async (req, res) => {
@@ -92,11 +96,14 @@ broker.route("/").post(
 );
 
 const testData = require("./demoPhysicalProxy.json");
-const { Op } = require("sequelize");
+const { redis } = require("@helpers/redis");
+const getPair = require("@helpers/pairs");
+const DeliveryMethods = require("@functions/deliveryMethods");
+
 broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed } = testData;
   const { input, fromAddress } = txs[0];
-  if (confirmed && txs.length) {
+  if (!confirmed && txs.length) {
     const { name, params } = abiDecoder.decodeMethod(input);
     if (name.toLowerCase() === "buy") {
       const nft = new Nfts();
@@ -122,7 +129,67 @@ broker.route("/physical-item").post(async (req, res) => {
         //register an error, an attempt to purchase something that does not exist
         return;
       }
-      const listingPrice = listing.price;
+      const listingPrice = Number(listing.price);
+
+      const paidPrice =
+        Number(price) / 10 ** Number(listing.moreInfo.erc20TokenDecimals);
+
+      const buyerDetailJson = await redis.get(
+        fromAddress + process.env.physical_item_buyer_marker
+      );
+
+      if (!buyerDetailJson) {
+        //a refund maybe
+        return;
+      }
+      const buyerInfo = JSON.parse(buyerDetailJson);
+      if (buyerInfo.methodName === "topship") {
+        //CACHE THIS PAIR LATER
+        const { USDTNGN } = await getPair();
+        // shipping cost in usd from naira
+        const shippingCostUSD = buyerInfo.cost / 100 / Number(USDTNGN);
+        const erc20Token =
+          env === "production"
+            ? listing.dataValues.moreInfo.erc20TokenAddress
+            : "0xbA2aE424d960c26247Dd6c32edC70B295c744C43";
+
+        const priceData = await Moralis.EvmApi.token
+          .getTokenPrice({
+            address: erc20Token,
+            chain: env === "production" ? chainId : EvmChain.BSC,
+          })
+          .catch(console.error);
+
+        const { usdPrice } = priceData.toJSON();
+        const shippingCostUSDToChargedToken = shippingCostUSD / usdPrice;
+
+        //adding nft price to generated equivalent
+        const totalCharge = shippingCostUSDToChargedToken + listingPrice;
+
+        // console.log(paidPrice, listingPrice, totalCharge);
+        if (paidPrice >= totalCharge) {
+          //positive -- process release of nft and shipping
+
+          const book = await DeliveryMethods.topship.book(
+            listing.physicalItem,
+            buyerInfo,
+            listing.userId,
+            fromAddress
+          );
+          console.log(book);
+        } else {
+          //underpayment --refund user and possibly email user of failed purchase attempt
+          console.log("underpriced");
+          const book = await DeliveryMethods.topship
+            .book(listing.physicalItem, buyerInfo, listing.userId, fromAddress)
+            .catch((err) => console.log(Object.keys(err), err.response));
+          console.log(book);
+        }
+      }
+
+      //convert shipping cost to dollar
+      //convert listing price to dollar
+      //convert paid price to dollar
     }
   }
 

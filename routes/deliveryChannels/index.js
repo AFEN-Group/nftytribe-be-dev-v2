@@ -28,6 +28,6 @@ deliveryChannels
 
 deliveryChannels
   .route("/get-fee/:methodName/:listingId")
-  .get(userProtect, deliveryFeeValidation, getFee);
+  .post(userProtect, deliveryFeeValidation, getFee);
 
 module.exports = deliveryChannels;

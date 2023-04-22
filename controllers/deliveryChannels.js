@@ -7,6 +7,7 @@ const {
   deleteChannel,
 } = require("../functions/deliveryChannels");
 const DeliveryMethods = require("../functions/deliveryMethods");
+const { redis } = require("@helpers/redis");
 
 exports.createDeliveryChannels = expressAsyncHandler(async (req, res) => {
   const data = await checkError(req, validationResult, {
@@ -57,5 +58,12 @@ exports.getFee = expressAsyncHandler(async (req, res) => {
   const fee = await DeliveryMethods[
     data.methodName.toLowerCase()
   ].getDeliveryFee(data.listingId, data);
+
+  //temporarily store the last check a user used in getting delivery cost for future ref
+  await redis.setex(
+    req.user.walletAddress + process.env.physical_item_buyer_marker,
+    60 * 30,
+    JSON.stringify({ ...data, ...fee })
+  );
   res.send(fee);
 });

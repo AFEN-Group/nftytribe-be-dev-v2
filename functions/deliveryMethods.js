@@ -71,13 +71,19 @@ class DeliveryMethods {
         },
       });
       const result = data.data[0];
+      //fee controls whether to include service charges from nftytribe or not
       const addedPercentage = !noFee
         ? result.cost * (Number(process.env.delivery_percentage) / 100) +
           result.cost
         : result.cost;
       return { ...result, cost: addedPercentage };
     },
-    book: async (buyer) => {
+    getCategories: () => {
+      const cat =
+        "Appliance || BeautyProducts || Jewelry || ComputerSupplies || HomeDecor || BabySupplies || TelevisionAndEntertainment || KitchenAccessories || Furniture || Gadgets || SolarPanelsAndInverter || VehicleParts || ClothingAndTextile || SportAccessories || GymEquipment || Fashion || Furniture || Education || Drones || Document || Others";
+      return cat.split("||").map((cat) => cat.trim());
+    },
+    book: async (physicalItem, buyerInfo, userId, buyerAddress) => {
       //fix - category(Others)
       //fix - description(any)
       //fix - quantity(1)
@@ -88,6 +94,72 @@ class DeliveryMethods {
       //fix - shipmentCharge(Express) -- > make a fresh request for the actual charge with no fee set to true
       //fix - sellers phone number --> seller must have gone through verification so phone number must be available
       //fix - address --> seller must have gone through verification so we'd have his address
+      const [sender, receiver] = await Promise.all([
+        await db.users.findOne({
+          where: {
+            id: userId,
+          },
+        }),
+        await db.users.findOne({
+          where: {
+            walletAddress: buyerAddress,
+          },
+        }),
+      ]);
+
+      return await fetchTopShip({
+        url: "/save-shipment/",
+        method: "post",
+        data: {
+          shipment: [
+            {
+              items: [
+                {
+                  // category: physicalItem.category,
+                  // description: "string",
+                  weight: physicalItem.weight,
+                  quantity: 1,
+                  // value: "number",
+                },
+              ],
+              itemCollectionMode: "PickUp" /*"DropOff || PickUp"*/,
+              // pricingTier: "Budget || Express || Standard || Premium",
+              // insuranceType: "None || Premium",
+              // insuranceCharge: "number",
+              // discount: "number",
+              // shipmentRoute: "Import || Export || Domestic",
+              // shipmentCharge: "number",
+              // pickupCharge: 50000 || 0,
+              senderDetail: {
+                name: physicalItem.name ?? "Nftytribe-buyer",
+                email: sender.email ?? "radiancegeorge@gmail.com",
+                // phoneNumber: "string",
+                addressLine1: physicalItem.address ?? "some address",
+                // addressLine2: "string",
+                // addressLine3: "string",
+                // country: physicalItem.country,
+                state: physicalItem.state,
+                city: physicalItem.city,
+                countryCode: physicalItem.country,
+                postalCode: physicalItem.postalCode ?? 343533,
+              },
+              receiverDetail: {
+                name: buyerInfo.name ?? "Nftytribe-receiver",
+                email: receiver.email ?? "radiancegeorge@gmail.com",
+                // phoneNumber: "string",
+                addressLine1: buyerInfo.address ?? "some street address",
+                // addressLine2: "string",
+                // addressLine3: "string",
+                // country: "string",
+                state: buyerInfo.state,
+                city: buyerInfo.city,
+                countryCode: buyerInfo.countryCode ?? "NG",
+                postalCode: buyerInfo.postalCode ?? 23453,
+              },
+            },
+          ],
+        },
+      });
     },
   };
 }

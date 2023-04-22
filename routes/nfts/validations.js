@@ -78,7 +78,9 @@ const getTransactionsValidation = [
 ];
 
 const createPhysicalItemValidations = [
-  body(["address", "state", "country", "weight"]).not().isEmpty(),
+  body(["address", "state", "country", "weight", "name", "postalCode"])
+    .not()
+    .isEmpty(),
   NODE_ENV === "production" &&
     body("deliveryChannels").custom(async (channels) => {
       if (!channels || !channels?.length) throw "invalid channels";

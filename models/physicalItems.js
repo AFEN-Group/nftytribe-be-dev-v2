@@ -1,35 +1,23 @@
 const physicalItems = (sequelize, dataTypes) => {
   const physicalItems = sequelize.define("physicalItems", {
-    address: {
+    name: {
       type: dataTypes.STRING,
       allowNull: false,
     },
-    city: {
-      type: dataTypes.STRING,
+    description: {
+      type: dataTypes.TEXT,
     },
-    state: {
-      type: dataTypes.STRING,
-      allowNull: false,
-    },
-    country: {
-      type: dataTypes.STRING,
-      allowNull: false,
-    },
-    tokenId: {
+    unit_weight: {
       type: dataTypes.INTEGER,
+      default: 1,
     },
-    tokenAddress: {
-      type: dataTypes.STRING,
+    unit_amount: {
+      type: dataTypes.INTEGER,
+      default: 1,
     },
-    weight: {
-      type: dataTypes.DECIMAL(10, 2),
-    },
-    deliveryChannels: {
-      type: dataTypes.JSON,
-    },
-    images: {
-      type: dataTypes.JSON,
-      defaultValue: [],
+    quantity: {
+      type: dataTypes.INTEGER,
+      default: 1,
     },
   });
 
@@ -40,18 +28,20 @@ const physicalItems = (sequelize, dataTypes) => {
         allowNull: true,
       },
     });
-    physicalItems.hasMany(models.physicalItemBuyers, {
-      onDelete: "cascade",
-      foreignKey: {
-        allowNull: true,
-      },
-    });
+
+    // physicalItems.hasOne(models.physicalItemBuyers, {
+    //   // onDelete: "cascade",
+    //   foreignKey: {
+    //     allowNull: true,
+    //   },
+    // });
     physicalItems.hasMany(models.uploads, {
       onDelete: "cascade",
       foreignKey: {
         allowNull: true,
       },
     });
+    physicalItems.belongsTo(models.addresses);
   };
   return physicalItems;
 };
