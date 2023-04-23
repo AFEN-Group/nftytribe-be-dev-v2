@@ -68,6 +68,9 @@ const users = (sequelize, dataTypes) => {
       },
       onDelete: "cascade",
     });
+    users.hasOne(models.addresses, {
+      onDelete: "cascade",
+    });
     users.hasMany(models.collectionLikes, {
       onDelete: "cascade",
       foreignKey: {

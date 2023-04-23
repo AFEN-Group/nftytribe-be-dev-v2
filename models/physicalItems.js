@@ -19,6 +19,29 @@ const physicalItems = (sequelize, dataTypes) => {
       type: dataTypes.INTEGER,
       default: 1,
     },
+    address_code: {
+      type: dataTypes.INTEGER,
+      allowNull: false,
+    },
+    category_id: {
+      type: dataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    height: {
+      type: dataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    width: {
+      type: dataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    length: {
+      type: dataTypes.INTEGER,
+      allowNull: false,
+    },
   });
 
   physicalItems.associate = (models) => {
@@ -41,7 +64,6 @@ const physicalItems = (sequelize, dataTypes) => {
         allowNull: true,
       },
     });
-    physicalItems.belongsTo(models.addresses);
   };
   return physicalItems;
 };

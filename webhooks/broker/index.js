@@ -97,8 +97,6 @@ broker.route("/").post(
 
 const testData = require("./demoPhysicalProxy.json");
 const { redis } = require("@helpers/redis");
-const getPair = require("@helpers/pairs");
-const DeliveryMethods = require("@functions/deliveryMethods");
 
 broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed } = testData;
@@ -122,6 +120,15 @@ broker.route("/physical-item").post(async (req, res) => {
             model: db.physicalItems,
             required: true,
           },
+          {
+            model: db.users,
+            include: [
+              {
+                model: db.addresses,
+                required: true,
+              },
+            ],
+          },
         ],
       });
 
@@ -134,62 +141,42 @@ broker.route("/physical-item").post(async (req, res) => {
       const paidPrice =
         Number(price) / 10 ** Number(listing.moreInfo.erc20TokenDecimals);
 
-      const buyerDetailJson = await redis.get(
-        fromAddress + process.env.physical_item_buyer_marker
+      const cachedData = JSON.parse(
+        await redis.get(`${listing.id}-${fromAddress}-booking`)
       );
-
-      if (!buyerDetailJson) {
-        //a refund maybe
+      console.log(fromAddress);
+      if (!cachedData) {
+        //handle or log error and refund
         return;
       }
-      const buyerInfo = JSON.parse(buyerDetailJson);
-      if (buyerInfo.methodName === "topship") {
-        //CACHE THIS PAIR LATER
-        const { USDTNGN } = await getPair();
-        // shipping cost in usd from naira
-        const shippingCostUSD = buyerInfo.cost / 100 / Number(USDTNGN);
-        const erc20Token =
-          env === "production"
-            ? listing.dataValues.moreInfo.erc20TokenAddress
-            : "0xbA2aE424d960c26247Dd6c32edC70B295c744C43";
+      const shippingCostUSD = cachedData.totalUsd;
 
-        const priceData = await Moralis.EvmApi.token
-          .getTokenPrice({
-            address: erc20Token,
-            chain: env === "production" ? chainId : EvmChain.BSC,
-          })
-          .catch(console.error);
+      const erc20Token =
+        env === "production"
+          ? listing.dataValues.moreInfo.erc20TokenAddress
+          : "0xbA2aE424d960c26247Dd6c32edC70B295c744C43";
 
-        const { usdPrice } = priceData.toJSON();
-        const shippingCostUSDToChargedToken = shippingCostUSD / usdPrice;
+      const priceData = await Moralis.EvmApi.token
+        .getTokenPrice({
+          address: erc20Token,
+          chain: env === "production" ? chainId : EvmChain.BSC,
+        })
+        .catch(console.error);
 
-        //adding nft price to generated equivalent
-        const totalCharge = shippingCostUSDToChargedToken + listingPrice;
+      const { usdPrice } = priceData.toJSON();
+      const shippingCostUSDToChargedToken = shippingCostUSD / usdPrice;
 
-        // console.log(paidPrice, listingPrice, totalCharge);
-        if (paidPrice >= totalCharge) {
-          //positive -- process release of nft and shipping
+      //adding nft price to generated equivalent
+      const totalCharge = shippingCostUSDToChargedToken + listingPrice;
 
-          const book = await DeliveryMethods.topship.book(
-            listing.physicalItem,
-            buyerInfo,
-            listing.userId,
-            fromAddress
-          );
-          console.log(book);
-        } else {
-          //underpayment --refund user and possibly email user of failed purchase attempt
-          console.log("underpriced");
-          const book = await DeliveryMethods.topship
-            .book(listing.physicalItem, buyerInfo, listing.userId, fromAddress)
-            .catch((err) => console.log(Object.keys(err), err.response));
-          console.log(book);
-        }
+      // console.log(paidPrice, listingPrice, totalCharge);
+      if (paidPrice >= totalCharge) {
+        //positive -- process release of nft and shipping
+        console.log("proceed with booking ------");
+      } else {
+        //underpayment --refund user and possibly email user of failed purchase attempt
+        console.log("underpriced");
       }
-
-      //convert shipping cost to dollar
-      //convert listing price to dollar
-      //convert paid price to dollar
     }
   }
 
