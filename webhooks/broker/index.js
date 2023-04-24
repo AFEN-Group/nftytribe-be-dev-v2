@@ -97,6 +97,7 @@ broker.route("/").post(
 
 const testData = require("./demoPhysicalProxy.json");
 const { redis } = require("@helpers/redis");
+const { BubbleDelivery } = require("@helpers/bubble");
 
 broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed } = testData;
@@ -172,7 +173,13 @@ broker.route("/physical-item").post(async (req, res) => {
       // console.log(paidPrice, listingPrice, totalCharge);
       if (paidPrice >= totalCharge) {
         //positive -- process release of nft and shipping
-        console.log("proceed with booking ------");
+        await BubbleDelivery.book(cachedData.data).catch((err) => {
+          // log error and refund user possibly
+          console.log(err);
+        });
+        //email user of successful booking with necessary details
+        //then save necessary details
+        console.log("Booked! ------");
       } else {
         //underpayment --refund user and possibly email user of failed purchase attempt
         console.log("underpriced");

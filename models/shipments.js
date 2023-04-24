@@ -6,8 +6,9 @@ const { Sequelize, DataTypes } = require("sequelize");
  */
 const shipments = (sequelize, dataTypes) => {
   const shipments = sequelize.define("shipments", {
-    orderId: {
-      type: dataTypes.STRING,
+    order: {
+      type: dataTypes.JSON,
+      allowNull: false,
     },
   });
   shipments.associate = (models) => {
