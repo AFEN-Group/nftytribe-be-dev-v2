@@ -12,10 +12,10 @@ const shipments = (sequelize, dataTypes) => {
     },
   });
   shipments.associate = (models) => {
-    shipments.belongsTo(models.addresses, {
+    shipments.belongsTo(models.users, {
       as: "receiver",
     });
-    shipments.belongsTo(models.addresses, {
+    shipments.belongsTo(models.users, {
       as: "sender",
     });
     // shipments.belongsTo(models.users, { onDelete: "cascade" });
