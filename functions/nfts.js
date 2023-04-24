@@ -914,9 +914,7 @@ class Nfts {
         sellerId: listing.userId,
       });
 
-      await db.nfts.destroy({
-        where: { id: listing.id },
-      });
+      await listing.destroy();
       return newTransaction;
     }
   };

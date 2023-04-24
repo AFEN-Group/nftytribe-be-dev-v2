@@ -8,7 +8,7 @@ const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
 const physicalItemAbi = require("../../abi/physicalItemsBroker.json");
 const PIProxyAbi = require("../../abi/piProxy.json");
-const web3 = require("web3");
+// const web3 = require("web3");
 abiDecoder.addABI(brokerV2.brokerV2);
 abiDecoder.addABI(physicalItemAbi);
 abiDecoder.addABI(PIProxyAbi);
@@ -103,6 +103,7 @@ broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed } = testData;
   const { input, fromAddress } = txs[0];
   if (!confirmed && txs.length) {
+    const nfts = new Nfts();
     const { name, params } = abiDecoder.decodeMethod(input);
     if (name.toLowerCase() === "buy") {
       const nft = new Nfts();
@@ -190,6 +191,22 @@ broker.route("/physical-item").post(async (req, res) => {
             })
           ).id,
         });
+
+        const newSales = await nfts.buyNft(params, fromAddress);
+        console.log(newSales, "newSale");
+        // ..notifcations
+        const worker = new Worker("./workers/singleNotifications.js");
+        const notificationData = {
+          transactionId: newSales.id,
+          title: newSales.listingInfo.name,
+          tokenId: newSales.listingInfo.tokenId,
+          type: NotificationTypes.SOLD,
+          userId: newSales.sellerId,
+          // buyerId: newSales.buyerId,
+        };
+        worker.postMessage(notificationData);
+        // await listing.destroy();
+        //take down the listing
         //email user of successful booking with necessary details
         //then save necessary details
         console.log("Booked! ------");
