@@ -145,7 +145,7 @@ broker.route("/physical-item").post(async (req, res) => {
       const cachedData = JSON.parse(
         await redis.get(`${listing.id}-${fromAddress}-booking`)
       );
-      console.log(fromAddress);
+      // console.log(fromAddress);
       if (!cachedData) {
         //handle or log error and refund
         return;
@@ -173,9 +173,22 @@ broker.route("/physical-item").post(async (req, res) => {
       // console.log(paidPrice, listingPrice, totalCharge);
       if (paidPrice >= totalCharge) {
         //positive -- process release of nft and shipping
-        await BubbleDelivery.book(cachedData.data).catch((err) => {
-          // log error and refund user possibly
-          console.log(err);
+        const booked = await BubbleDelivery.book(cachedData.data).catch(
+          (err) => {
+            // log error and refund user possibly
+            console.log(err);
+          }
+        );
+        await db.shipments.create({
+          order: booked.data,
+          senderId: listing.userId,
+          receiverId: (
+            await db.users.findOne({
+              where: {
+                walletAddress: fromAddress,
+              },
+            })
+          ).id,
         });
         //email user of successful booking with necessary details
         //then save necessary details
