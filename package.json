@@ -37,7 +37,7 @@
   },
   "scripts": {
     "dev": "npx sequelize-cli db:migrate && NODE_ENV=development nodemon -r module-alias/register -r dotenv/config  server.js",
-    "start": "npx sequelize-cli db:migrate && NODE_ENV=production node -r module-alias/register -r dotenv/config  server.js",
+    "start": "NODE_ENV=production node -r module-alias/register -r dotenv/config  server.js",
     "start:production": "npm run set-env && npx sequelize-cli db:migrate && npm run start",
     "staging": " NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
     "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh",
