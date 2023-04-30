@@ -16,6 +16,6 @@ process.on("SIGTERM", () => {
   }, 10000);
 });
 
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync().then(() => {
   server.listen(port, console.log.bind(this, `listening on port ::: ${port}`));
 });
