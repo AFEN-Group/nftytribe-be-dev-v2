@@ -27,8 +27,9 @@ exports.verifyAddress = expressAsyncHandler(async (req, res) => {
   );
 
   //check if user has address
+  let add;
   if (user.address) {
-    await db.addresses.update(
+    add = await db.addresses.update(
       {
         address_code: verified.address_code,
       },
@@ -39,7 +40,7 @@ exports.verifyAddress = expressAsyncHandler(async (req, res) => {
       }
     );
   } else {
-    await db.addresses.create({
+    add = await db.addresses.create({
       userId: user.id,
       address_code: verified.address_code,
     });
@@ -189,7 +190,7 @@ exports.book = expressAsyncHandler(async (req, res) => {
   //pattern is listingId-walletAddress-booked
   //cached
   await redis.setex(
-    `${listing.id}-${user.walletAddress}-booking`,
+    `${listing.id}-${user.walletAddress.toLowerCase()}-booking`,
     60 * 60 * 12,
     JSON.stringify({ data, total, totalUsd })
   );

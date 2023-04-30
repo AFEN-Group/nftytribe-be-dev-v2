@@ -32,7 +32,10 @@ exports.linkPhysicalItems = async (key, listingId) => {
   const data = JSON.parse(await redis.getdel(key));
   if (data) {
     //store physical item to database
-    const item = await db.physicalItems.create({ ...data, nftId: listingId });
+    const item = await db.physicalItems.create({
+      ...data,
+      nftId: listingId,
+    });
     //update the listing to physical=true
     await db.nfts.update(
       {

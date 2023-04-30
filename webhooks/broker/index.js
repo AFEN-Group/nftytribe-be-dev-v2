@@ -8,7 +8,6 @@ const db = require("@models");
 const NotificationTypes = require("@types/notificationTypes");
 const physicalItemAbi = require("../../abi/physicalItemsBroker.json");
 const PIProxyAbi = require("../../abi/piProxy.json");
-// const web3 = require("web3");
 abiDecoder.addABI(brokerV2.brokerV2);
 abiDecoder.addABI(physicalItemAbi);
 abiDecoder.addABI(PIProxyAbi);
@@ -98,14 +97,17 @@ broker.route("/").post(
 const testData = require("./demoPhysicalProxy.json");
 const { redis } = require("@helpers/redis");
 const { BubbleDelivery } = require("@helpers/bubble");
+const initWeb3 = require("@helpers/web3");
 
 broker.route("/physical-item").post(async (req, res) => {
-  const { txs, chainId, confirmed } = testData;
-  const { input, fromAddress } = txs[0];
+  const { txs, chainId, confirmed, logs } = req.body;
+  const { input, fromAddress, toAddress } = txs[0];
   if (!confirmed && txs.length) {
+    console.log("passed--- confirmed");
     const nfts = new Nfts();
     const { name, params } = abiDecoder.decodeMethod(input);
     if (name.toLowerCase() === "buy") {
+      console.log("passed--- buy");
       const nft = new Nfts();
       //get arrange fields
       const { tokenId, erc721, price } = nft.getFields(params);
@@ -138,19 +140,22 @@ broker.route("/physical-item").post(async (req, res) => {
         //register an error, an attempt to purchase something that does not exist
         return;
       }
+      console.log("passed--- listing");
       const listingPrice = Number(listing.price);
 
       const paidPrice =
         Number(price) / 10 ** Number(listing.moreInfo.erc20TokenDecimals);
 
       const cachedData = JSON.parse(
-        await redis.get(`${listing.id}-${fromAddress}-booking`)
+        await redis.get(`${listing.id}-${fromAddress.toLowerCase()}-booking`)
       );
-      // console.log(fromAddress);
+
+      // console.log(fromAddress, listing.id);
       if (!cachedData) {
         //handle or log error and refund
         return;
       }
+      console.log("passed--- cached data");
       const shippingCostUSD = cachedData.totalUsd;
 
       const erc20Token =
@@ -171,7 +176,12 @@ broker.route("/physical-item").post(async (req, res) => {
       //adding nft price to generated equivalent
       const totalCharge = shippingCostUSDToChargedToken + listingPrice;
 
-      // console.log(paidPrice, listingPrice, totalCharge);
+      const privateKey = process.env.p_key;
+      const web3 = await initWeb3(chainId);
+      const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+      web3.eth.accounts.wallet.add(account);
+      const contract = new web3.eth.Contract(PIProxyAbi, toAddress);
+      let data;
       if (paidPrice >= totalCharge) {
         //positive -- process release of nft and shipping
         const booked = await BubbleDelivery.book(cachedData.data).catch(
@@ -193,7 +203,8 @@ broker.route("/physical-item").post(async (req, res) => {
         });
 
         const newSales = await nfts.buyNft(params, fromAddress);
-        console.log(newSales, "newSale");
+        data = contract.methods.processBid(logs[0].topic1, false).encodeABI();
+
         // ..notifcations
         const worker = new Worker("./workers/singleNotifications.js");
         const notificationData = {
@@ -205,18 +216,38 @@ broker.route("/physical-item").post(async (req, res) => {
           // buyerId: newSales.buyerId,
         };
         worker.postMessage(notificationData);
-        // await listing.destroy();
-        //take down the listing
-        //email user of successful booking with necessary details
-        //then save necessary details
         console.log("Booked! ------");
       } else {
         //underpayment --refund user and possibly email user of failed purchase attempt
-        console.log("underpriced");
+        data = contract.methods.processBid(logs[0].topic1, true).encodeABI();
+        // console.log("underpriced");
       }
+
+      //finish tx
+      const tx = {
+        from: account.address,
+        to: toAddress,
+        data,
+        gas: 100000,
+        gasPrice: web3.utils.toWei("50", "gwei"),
+      };
+
+      web3.eth
+        .sendTransaction(tx)
+        .on("transactionHash", (hash) => {
+          console.log(`Transaction hash: ${hash}`);
+        })
+        .on("receipt", (receipt) => {
+          console.log(`Transaction was mined in block ${receipt.blockNumber}`);
+          res.send(200);
+        })
+        .on("error", (error) => {
+          console.error(error);
+          res.send();
+        });
     }
   }
 
-  res.send();
+  // res.send();
 });
 module.exports = broker;
