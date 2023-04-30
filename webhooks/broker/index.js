@@ -94,7 +94,8 @@ broker.route("/").post(
   })
 );
 
-const testData = require("./demoPhysicalProxy.json");
+// const testData = require("./demoPhysicalProxy.json");
+
 const { redis } = require("@helpers/redis");
 const { BubbleDelivery } = require("@helpers/bubble");
 const initWeb3 = require("@helpers/web3");
@@ -240,16 +241,16 @@ broker.route("/physical-item").post(async (req, res) => {
         })
         .on("receipt", (receipt) => {
           console.log(`Transaction was mined in block ${receipt.blockNumber}`);
-          res.send(200);
+          // res.send(200);
         })
         .on("error", (error) => {
           console.error(error);
-          res.send();
+          // res.send();
           logger(JSON.stringify(err), "piProxy-listing", "error");
         });
     }
   }
 
-  // res.send();
+  res.send();
 });
 module.exports = broker;
