@@ -28,36 +28,6 @@ spec:
           # volumeMounts:
           #   - mountPath: /logs
           #     name: nftytribe
-          env:
-            - name: redis
-              value: redis-service
-
-            - name: db_username
-              valueFrom:
-                secretKeyRef:
-                  name: nftytribe-be
-                  key: db_username
-
-            - name: db_password
-              valueFrom:
-                secretKeyRef:
-                  name: nftytribe-be
-                  key: db_password
-
-            - name: db_host
-              valueFrom:
-                secretKeyRef:
-                  name: nftytribe-be
-                  key: db_host
-
-            - name: db_port
-              valueFrom:
-                secretKeyRef:
-                  name: nftytribe-be
-                  key: db_port
-
-            - name: database
-              valueFrom:
-                secretKeyRef:
-                  name: nftytribe-be
-                  key: database
+          envFrom:
+            - secretRef:
+                name: nfty-be
