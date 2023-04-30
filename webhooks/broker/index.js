@@ -98,6 +98,7 @@ const testData = require("./demoPhysicalProxy.json");
 const { redis } = require("@helpers/redis");
 const { BubbleDelivery } = require("@helpers/bubble");
 const initWeb3 = require("@helpers/web3");
+const { logger } = require("@helpers/logger");
 
 broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed, logs } = req.body;
@@ -187,7 +188,7 @@ broker.route("/physical-item").post(async (req, res) => {
         const booked = await BubbleDelivery.book(cachedData.data).catch(
           (err) => {
             // log error and refund user possibly
-            console.log(err);
+            logger(JSON.stringify(err), "piProxy-listing", "error");
           }
         );
         await db.shipments.create({
@@ -244,6 +245,7 @@ broker.route("/physical-item").post(async (req, res) => {
         .on("error", (error) => {
           console.error(error);
           res.send();
+          logger(JSON.stringify(err), "piProxy-listing", "error");
         });
     }
   }
