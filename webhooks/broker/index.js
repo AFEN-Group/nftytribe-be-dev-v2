@@ -21,7 +21,7 @@ broker.route("/").post(
     const { txs, chainId, confirmed } = req.body;
     // console.log(chainId);
     const [txsData] = txs;
-    if (txsData && !confirmed) {
+    if (txsData && confirmed) {
       const { fromAddress, input } = txsData;
       const data = abiDecoder.decodeMethod(input);
       const nfts = new Nfts();
@@ -105,7 +105,7 @@ broker.route("/physical-item").post(async (req, res) => {
   const { txs, chainId, confirmed, logs } = req.body;
   if (txs[0]) {
     const { input, fromAddress, toAddress } = txs[0];
-    if (!confirmed && txs.length) {
+    if (confirmed && txs.length) {
       console.log("passed--- confirmed");
       const nfts = new Nfts();
       const { name, params } = abiDecoder.decodeMethod(input);
