@@ -51,10 +51,7 @@ const getUser = asyncHandler(async (req, res) => {
 });
 
 const kycV1 = asyncHandler(async (req, res) => {
-  const data = await checkError(req, validationResult, {
-    locations: ["body"],
-    matchedData,
-  });
+  const data = await checkError(req);
   const { id: userId } = req.user;
 
   //checking if user has email updated
@@ -105,12 +102,20 @@ const kycV1 = asyncHandler(async (req, res) => {
       };
     }),
   ];
+  // const url =
+  //   process.env.NODE_ENV === "production"
+  //     ? "https://dev.api.v2.nftytribe.io"
+  //     : "https://test.nftytribe.io";
+  const template = await db.emailTemplates.getAndSetValues("kyc", {
+    email,
+    name: data.fullName,
+    ...data,
+    links: data.socialLinks,
+  });
   await mailer.sendEmail(
     {
       subject,
-      html: `
-      ${JSON.stringify({ ...data, email, userId })}
-    `,
+      html: template,
       to,
     },
     attachment
