@@ -44,3 +44,13 @@ Note: If you don't have a `.env` file yet, you can use the empty `env.fields` fi
 3. Run `yarn start:dev` or `npm run start:dev`
 
 4. To start the application casually, run `yarn dev` or `npm run dev`
+
+# Email template filling example
+
+Email templates value holders are represented with
+
+```
+   **fieldName**
+```
+
+this will enable the getAndSet template function fill up the necessary dat
