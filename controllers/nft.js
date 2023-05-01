@@ -2,6 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const { validationResult, matchedData } = require("express-validator");
 const checkError = require("@functions/checkError");
 const Nfts = require("@functions/nfts");
+const Moralis = require("../functions/Moralis.sdk");
 const { createPhysicalItems } = require("@functions/physicalItems");
 const {
   // linkPhysicalItems,
@@ -108,6 +109,26 @@ const fetchPhysicalItem = expressAsyncHandler(async (req, res) => {
   res.send(item);
 });
 
+const testT = ["0x55d398326f99059fF775485246999027B3197955"];
+const testChain = "0x38";
+const env = process.env.NODE_ENV;
+
+const getTokenPrices = expressAsyncHandler(async (req, res) => {
+  // addresses && chainId = req.body -- required fields in body
+  const chain = env === "production" ? req.body.chainId : testChain;
+  const data = await Promise.all(
+    (env === "production" ? req.body.addresses : testT).map(async (address) => {
+      const data = await Moralis.EvmApi.token.getTokenPrice({
+        address,
+        chain,
+      });
+      return data.toJSON();
+    })
+  );
+
+  res.send(data);
+});
+
 module.exports = {
   getNfts,
   getSingleNftListing,
@@ -124,4 +145,5 @@ module.exports = {
   newPhysicalItem,
   newNft,
   fetchPhysicalItem,
+  getTokenPrices,
 };
