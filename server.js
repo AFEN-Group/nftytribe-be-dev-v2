@@ -3,9 +3,9 @@ const db = require("@models");
 const port = process.env.app_port;
 
 //gracefully shutting down
-process.on("SIGTERM", () => {
+process.on("SIGTERM", async () => {
   console.log("Received SIGTERM, shutting down gracefully");
-  server.close(() => {
+  (await server()).close(() => {
     console.log("Closed out remaining connections");
     process.exit(0);
   });
@@ -16,6 +16,9 @@ process.on("SIGTERM", () => {
   }, 10000);
 });
 
-db.sequelize.sync().then(() => {
-  server.listen(port, console.log.bind(this, `listening on port ::: ${port}`));
+db.sequelize.sync().then(async () => {
+  (await server()).listen(
+    port,
+    console.log.bind(this, `listening on port ::: ${port}`)
+  );
 });
