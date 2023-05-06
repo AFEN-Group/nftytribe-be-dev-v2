@@ -8,9 +8,10 @@ const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
 const { startSocket } = require("./helpers/socket");
 // const logger = require("morgan");
-const t = require("@functions/physicalItems");
+
 const test = require("@routes/test");
-const db = require("@models");
+
+const init = require("./admin");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 100,
@@ -26,11 +27,12 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
+        defaultSrc: ["'self'", "https:"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         baseUri: ["'self'"],
         fontSrc: ["'self'", "https:", "data:"],
+        imgSrc: ["'self'", "https:"],
       },
     },
   })
@@ -40,37 +42,11 @@ app.disable("x-powered-by");
 app.use("/api", route);
 app.use("/hook", hooks);
 app.use("/test", test);
-
+app.use("/static", express.static("./assets"));
 //error handler
 
 const start = async () => {
-  const { default: AdminJS } = await import("adminjs");
-  const AdminJSSequelize = await import("@adminjs/sequelize");
-  const { default: AdminJSExpress } = await import("@adminjs/express");
-  AdminJS.registerAdapter(AdminJSSequelize);
-
-  const admin = new AdminJS({
-    rootPath: "/admin",
-    resources: [
-      db.users,
-      db.addresses,
-      db.transactions,
-      db.nfts,
-      db.chains,
-      db.categories,
-      db.bids,
-      db.emailTemplates,
-      db.networks,
-      db.collections,
-    ],
-    // databases: [db],
-    branding: {
-      companyName: "Afen",
-    },
-  });
-  const adminRouter = AdminJSExpress.buildRouter(admin);
-
-  app.use(admin.options.rootPath, adminRouter);
+  await init(app);
 
   app.use(errorHandler);
   const server = http.createServer(app);
