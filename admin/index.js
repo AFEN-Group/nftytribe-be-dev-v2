@@ -36,6 +36,18 @@ const init = async (app) => {
       db.admins,
     ],
     // databases: [db],
+    locale: {
+      translations: {
+        en: {
+          components: {
+            Login: {
+              welcomeHeader: "Welcome",
+              welcomeMessage: "Proceed with your email and Password",
+            },
+          },
+        },
+      },
+    },
     branding: {
       companyName: "Nftytribe",
       softwareBrothers: false,
@@ -46,11 +58,6 @@ const init = async (app) => {
         colors: {
           primary100: "#F3BB1C",
         },
-      },
-    },
-    pages: {
-      login: {
-        component: build.bundle("../jsx-components/login/Login.jsx"),
       },
     },
   });
