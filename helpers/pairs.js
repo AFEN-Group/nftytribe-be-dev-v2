@@ -5,7 +5,7 @@ const apiSecret = process.env.binance_api_secret_key;
 
 const getPair = async () => {
   const { data } = await axios({
-    url: "https://7xy.se7entales.org/ngn",
+    url: "http://64.227.144.246:4000/ngn",
   });
   return data;
 };
