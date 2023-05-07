@@ -64,7 +64,7 @@ const init = async (app) => {
   const store = new MySQLStore({
     host: process.env.db_host,
     password: process.env.db_password,
-    database: process.env.db_name,
+    database: process.env.database ?? process.env.db_name,
     user: process.env.db_username,
     port: process.env.db_port,
   });
