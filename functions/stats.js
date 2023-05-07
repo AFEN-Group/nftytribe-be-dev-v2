@@ -2,12 +2,13 @@ const { Op } = require("sequelize");
 const db = require("../models");
 const { Sequelize } = require("../models");
 const moment = require("moment");
+
 class Stats {
   getCollectionStats = async (data = {}) => {
     console.log(data);
     const { startDate, endDate, limit, page, chain } = data;
     const offset = (page - 1) * limit;
-    //get collection with highest buy based on date
+
     const options = {
       createdAt: {
         [Op.and]: {
@@ -19,6 +20,7 @@ class Stats {
         chainId: chain,
       }),
     };
+
     const include = [
       {
         model: db.collections,
@@ -30,17 +32,13 @@ class Stats {
       where: options,
       subQuery: false,
       attributes: [
-        // [
-        //   db.Sequelize.fn("DISTINCT", db.Sequelize.col("collectionId")),
-        //   "collectionId",
-        // ],
         [
           db.Sequelize.fn(
             "SUM",
             db.Sequelize.fn(
               "JSON_EXTRACT",
               db.Sequelize.col("listingInfo"),
-              db.Sequelize.literal(`"$.nativePrice.value"`)
+              "$.nativePrice.value"
             )
           ),
           "nativeVol",
@@ -51,7 +49,7 @@ class Stats {
             db.sequelize.fn(
               "JSON_EXTRACT",
               db.Sequelize.col("listingInfo"),
-              db.Sequelize.literal("'$.nativePrice.value'")
+              "$.nativePrice.value"
             )
           ),
           "floorPrice",
@@ -59,24 +57,25 @@ class Stats {
         [
           Sequelize.literal(
             `(
-                select (difference * 100 / original) from (
-                    select ( latest - original) difference, original
-                    from (
-                        select 
-                            (select json_extract(listingInfo, "$.nativePrice.value") from transactions where createdAt <= '${moment(
+                SELECT (difference * 100 / original) FROM (
+                    SELECT ( latest - original) difference, original
+                    FROM (
+                        SELECT 
+                            (SELECT JSON_EXTRACT(listingInfo, '$.nativePrice.value') FROM transactions WHERE createdAt <= '${moment(
                               startDate
                             ).format(
                               "YYYY-MM-DD"
-                            )}' or createdAt like '${moment(startDate).format(
+                            )}' OR createdAt LIKE '${moment(startDate).format(
               "YYYY-MM-DD%"
-            )}' order by id desc limit 1 ) original,
-                            (select json_extract(listingInfo, "$.nativePrice.value") from transactions where createdAt <= '${moment(
+            )}' ORDER BY id DESC LIMIT 1) original,
+                            (SELECT JSON_EXTRACT(listingInfo, '$.nativePrice.value') FROM transactions WHERE createdAt <= '${moment(
                               endDate
                             ).format(
                               "YYYY-MM-DD"
-                            )}' or createdAt like '${moment(endDate).format(
+                            )}' OR createdAt LIKE '${moment(endDate).format(
               "YYYY-MM-DD%"
-            )}' order by id desc limit 1) latest) priceChange
+            )}' ORDER BY id DESC LIMIT 1) latest
+                    ) priceChange
                 ) changeOverTime
             )`
           ),
@@ -85,7 +84,7 @@ class Stats {
         [
           Sequelize.literal(
             `(
-                select count(collectionId)  
+                SELECT COUNT(collectionId)
             )`
           ),
           "salesCount",
@@ -105,5 +104,3 @@ class Stats {
 }
 
 module.exports = Stats;
-
-// console.log(moment().add(0, "days"));
