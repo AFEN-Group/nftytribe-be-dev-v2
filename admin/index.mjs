@@ -30,7 +30,10 @@ const init = async (app, db, MySQLStore) => {
     destinationDir: "../.adminjs",
   });
   const admin = new AdminJS({
-    rootPath: "/admin",
+    rootPath:
+      "/" + process.env.NODE_ENV === "production"
+        ? process.env.admin_root
+        : "admin",
     resources: [
       db.users,
       db.addresses,
