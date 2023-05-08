@@ -29,11 +29,9 @@ const init = async (app, db, MySQLStore) => {
     customComponentsInitializationFilePath: "./components/Dashboard.jsx",
     destinationDir: "../.adminjs",
   });
+
   const admin = new AdminJS({
-    rootPath:
-      "/" + process.env.NODE_ENV === "production"
-        ? process.env.admin_root
-        : "admin",
+    rootPath: "/admin",
     resources: [
       db.users,
       db.addresses,
