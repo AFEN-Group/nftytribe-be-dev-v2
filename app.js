@@ -7,11 +7,14 @@ const cors = require("cors");
 const errorHandler = require("./middlewares/errorhandler.middleware");
 const hooks = require("./webhooks");
 const { startSocket } = require("./helpers/socket");
+
 // const logger = require("morgan");
 
 const test = require("@routes/test");
 
-const init = require("./admin");
+// const init = require("./admin");
+const db = require("@models");
+const session = require("express-session");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 100,
@@ -46,7 +49,9 @@ app.use("/static", express.static("./assets"));
 //error handler
 
 const start = async () => {
-  await init(app);
+  const MySQLStore = require("express-mysql-session")(session);
+  const { default: init } = await import("./admin/index.mjs");
+  await init(app, db, MySQLStore);
 
   app.use(errorHandler);
   const server = http.createServer(app);

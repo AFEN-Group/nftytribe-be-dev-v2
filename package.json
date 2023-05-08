@@ -4,6 +4,8 @@
   "main": "server.js",
   "license": "MIT",
   "dependencies": {
+    "@adminjs/bundler": "^3.0.0",
+    "@adminjs/design-system": "^4.0.1",
     "@adminjs/express": "^6.0.0",
     "@adminjs/sequelize": "^4.0.0",
     "@mailchimp/mailchimp_transactional": "^1.0.48",
@@ -34,6 +36,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^2.3.3",
     "node-binance-api": "^0.13.1",
+    "node-sass": "^8.0.0",
     "randomstring": "^1.2.2",
     "rate-limiter-flexible": "^2.3.11",
     "sequelize": "^6.24.0",
@@ -41,6 +44,7 @@
     "sharp": "^0.31.1",
     "socket.io": "^4.5.4",
     "socket.io-adapter": "^2.4.0",
+    "styled-components": "^6.0.0-rc.1",
     "tslib": "^2.5.0",
     "web3": "^1.8.1",
     "winston": "^3.8.2"

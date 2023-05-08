@@ -1,11 +1,13 @@
-const db = require("@models");
+// const db = require("@models");
 
-const init = async (app) => {
-  const { default: AdminJS } = await import("adminjs");
-  const AdminJSSequelize = await import("@adminjs/sequelize");
-  const { default: AdminJSExpress, build } = await import("@adminjs/express");
-  const session = require("express-session");
-  const MySQLStore = require("express-mysql-session")(session);
+import { AdminJS, ComponentLoader } from "adminjs";
+import { bundle } from "@adminjs/bundler";
+import AdminJSExpress from "@adminjs/express";
+import AdminJSSequelize from "@adminjs/sequelize";
+
+const init = async (app, db, MySQLStore) => {
+  //init component loader
+  const componentLoader = new ComponentLoader();
 
   const DEFAULT_ADMIN = {
     email: process.env.admin_email,
@@ -20,6 +22,13 @@ const init = async (app) => {
 
   AdminJS.registerAdapter(AdminJSSequelize);
 
+  const components = {
+    Dashboard: componentLoader.add("Dashboard", "./components/Dashboard"),
+  };
+  await bundle({
+    customComponentsInitializationFilePath: "./components/Dashboard.jsx",
+    destinationDir: "../.adminjs",
+  });
   const admin = new AdminJS({
     rootPath: "/admin",
     resources: [
@@ -34,6 +43,7 @@ const init = async (app) => {
       db.networks,
       db.collections,
       db.admins,
+      db.physicalItems,
     ],
     // databases: [db],
     locale: {
@@ -60,6 +70,13 @@ const init = async (app) => {
         },
       },
     },
+
+    dashboard: {
+      handler: async () => {},
+      component: components.Dashboard,
+      componentLoader,
+    },
+    componentLoader,
   });
   const store = new MySQLStore({
     host: process.env.db_host,
@@ -68,7 +85,6 @@ const init = async (app) => {
     user: process.env.db_username,
     port: process.env.db_port,
   });
-
   const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
     admin,
     {
@@ -87,4 +103,4 @@ const init = async (app) => {
   app.use(admin.options.rootPath, adminRouter);
 };
 
-module.exports = init;
+export default init;

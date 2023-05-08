@@ -1,3 +1,4 @@
+const Mailer = require("@functions/mailer");
 const { Sequelize, DataTypes } = require("sequelize");
 /**
  *
@@ -6,7 +7,7 @@ const { Sequelize, DataTypes } = require("sequelize");
  * @param {import("@types/physicalItems").DB} db
  */
 
-const users = (sequelize, dataTypes) => {
+const users = (sequelize, dataTypes, db) => {
   const users = sequelize.define("users", {
     email: {
       type: dataTypes.STRING,
@@ -125,6 +126,25 @@ const users = (sequelize, dataTypes) => {
       through: models.userNotifications,
     });
   };
+  users.beforeUpdate((user, options) => {
+    const prev = user.previous();
+    if (!prev.verified) {
+      db.emailTemplates
+        .getAndSetValues("verified", { name: user.username })
+        .then(async (result) => {
+          const html = result;
+          const mailer = new Mailer("noreply", "NftyTribe");
+          await mailer.sendEmail({
+            subject: "Account Verified",
+            html,
+            to: [user.email],
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
   return users;
 };
 
