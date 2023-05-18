@@ -188,25 +188,22 @@ class Collections {
             "favoriteCount",
           ],
           [
-            Sequelize.literal(`(
-              select sum(listingInfo->>"$.nativePrice.value") 
-              from 
-                transactions 
-              where 
-                nftInfo->>"$.address" = collections.contractAddress
-            )`),
+            Sequelize.literal(`COALESCE((
+              SELECT SUM(listingInfo->>'$.nativePrice.value')
+              FROM transactions
+              WHERE nftInfo->>'$.address' = collections.contractAddress
+            ), 0)`),
             "volume",
           ],
           [
-            Sequelize.literal(`(
-              select min(listingInfo->>"$.nativePrice.value") 
-              from 
-                transactions 
-              where 
-                nftInfo->>"$.address" = collections.contractAddress
-            )`),
+            Sequelize.literal(`COALESCE((
+              SELECT MIN(listingInfo->>'$.nativePrice.value')
+              FROM transactions
+              WHERE nftInfo->>'$.address' = collections.contractAddress
+            ), 0)`),
             "floorPrice",
           ],
+
           [
             Sequelize.literal(`(
               select 
@@ -218,17 +215,17 @@ class Collections {
                   ) * 100)
               from  (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions 
                 where 
                   DATE(transactions.createdAt) = CURDATE()
                 and 
-                  nftInfo->>"$.address" = collections.contractAddress
+                  nftInfo->>'$.address' = collections.contractAddress
               ) currentVolume,
               (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions 
                 where 
@@ -236,7 +233,7 @@ class Collections {
                     .subtract(1, "day")
                     .format("YYYY-MM-DD")}'
                 and 
-                  nftInfo->>"$.address" = collections.contractAddress
+                  nftInfo->>'$.address' = collections.contractAddress
               ) lastVolume
             )`),
             "24hrs",
@@ -252,7 +249,7 @@ class Collections {
                  ) * 100)
               from (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions
                 where 
@@ -264,11 +261,11 @@ class Collections {
                   CURDATE()
                 )
                 and
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
               ) currentVolume,
               (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions
                 where 
@@ -280,7 +277,7 @@ class Collections {
                   '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
                 )
                 and
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
               ) lastVolume
             )`),
             "7days",
@@ -292,7 +289,7 @@ class Collections {
               from 
                 nfts 
               where 
-                moreInfo->>"$.contractAddress" = collections.contractAddress
+                moreInfo->>'$.contractAddress' = collections.contractAddress
             )`),
             "totalNfts",
           ],
@@ -303,7 +300,7 @@ class Collections {
             from
               nfts
             where 
-              moreInfo->>"$.contractAddress" = collections.contractAddress
+              moreInfo->>'$.contractAddress' = collections.contractAddress
           )`),
             "totalOwners",
           ],
@@ -315,7 +312,7 @@ class Collections {
                (select id from collectionLikes where userId = ${userId} and collectionId = collections.id)
               `
               ),
-              "boolean"
+              "DECIMAL"
             ),
             "isLiked",
           ],
@@ -326,7 +323,7 @@ class Collections {
                (select id from collectionFavorites where userId = ${userId} and collectionId = collections.id)
               `
               ),
-              "boolean"
+              "DECIMAL"
             ),
             "isFavorite",
           ],
@@ -378,37 +375,33 @@ class Collections {
         include: [
           [
             db.Sequelize.literal(
-              `
-             (select count(id) from collectionLikes where collectionId = collections.id)
-            `
+              `(select count(id) from collectionLikes where collectionId = collections.id)`
             ),
             "likeCount",
           ],
           [
             db.Sequelize.literal(
-              `
-             (select count(id) from collectionFavorites where collectionId = collections.id)
-            `
+              `(select count(id) from collectionFavorites where collectionId = collections.id)`
             ),
             "favoriteCount",
           ],
           [
             Sequelize.literal(`(
-              select IFNULL(sum(listingInfo->>"$.nativePrice.value"), 0)
+              select IFNULL(sum(listingInfo->>'$.nativePrice.value'), 0)
               from 
                 transactions 
               where 
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
             )`),
             "volume",
           ],
           [
             Sequelize.literal(`(
-              select IFNULL(min(listingInfo->>"$.nativePrice.value"), 0)
+              select IFNULL(min(listingInfo->>'$.nativePrice.value'), 0)
               from 
                 transactions 
               where 
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
             )`),
             "floorPrice",
           ],
@@ -423,17 +416,17 @@ class Collections {
                   ) * 100)
               from  (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions 
                 where 
                   DATE(transactions.createdAt) = CURDATE()
                 and 
-                  nftInfo->>"$.address" = collections.contractAddress
+                  nftInfo->>'$.address' = collections.contractAddress
               ) currentVolume,
               (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions 
                 where 
@@ -441,7 +434,7 @@ class Collections {
                     .subtract(1, "day")
                     .format("YYYY-MM-DD")}'
                 and 
-                  nftInfo->>"$.address" = collections.contractAddress
+                  nftInfo->>'$.address' = collections.contractAddress
               ) lastVolume
             )`),
             "24hrs",
@@ -453,11 +446,11 @@ class Collections {
                  case 
                   when lastVolume.value = 0 then 1
                   else lastVolume.value
-                  end
+                 end
                  ) * 100)
               from (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions
                 where 
@@ -469,11 +462,11 @@ class Collections {
                   CURDATE()
                 )
                 and
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
               ) currentVolume,
               (
                 select 
-                  IFNULL(SUM(listingInfo->>"$.nativePrice.value"), 0) value
+                  IFNULL(SUM(listingInfo->>'$.nativePrice.value'), 0) value
                 from 
                   transactions
                 where 
@@ -485,7 +478,7 @@ class Collections {
                   '${moment().subtract(1, "week").format("YYYY-MM-DD")}'
                 )
                 and
-                nftInfo->>"$.address" = collections.contractAddress
+                nftInfo->>'$.address' = collections.contractAddress
               ) lastVolume
             )`),
             "7days",
@@ -497,7 +490,7 @@ class Collections {
               from 
                 nfts 
               where 
-                moreInfo->>"$.contractAddress" = collections.contractAddress
+                moreInfo->>'$.contractAddress' = collections.contractAddress
             )`),
             "totalNfts",
           ],
@@ -508,16 +501,14 @@ class Collections {
             from
               nfts
             where 
-              moreInfo->>"$.contractAddress" = collections.contractAddress
+              moreInfo->>'$.contractAddress' = collections.contractAddress
           )`),
             "totalOwners",
           ],
           userId && [
             db.Sequelize.cast(
               db.Sequelize.literal(
-                `
-               (select id from collectionLikes where userId = ${userId} and collectionId = collections.id)
-              `
+                `(select id from collectionLikes where userId = ${userId} and collectionId = collections.id)`
               ),
               "boolean"
             ),
@@ -526,9 +517,7 @@ class Collections {
           userId && [
             db.Sequelize.cast(
               db.Sequelize.literal(
-                `
-               (select id from collectionFavorites where userId = ${userId} and collectionId = collections.id)
-              `
+                `(select id from collectionFavorites where userId = ${userId} and collectionId = collections.id)`
               ),
               "boolean"
             ),
