@@ -44,6 +44,7 @@ const init = async (app, db, MySQLStore) => {
       db.collections,
       db.admins,
       db.physicalItems,
+      db.supportedTokens,
     ],
     // databases: [db],
     locale: {
