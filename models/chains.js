@@ -10,6 +10,14 @@ const chains = (sequelize, dataTypes) => {
       type: dataTypes.STRING,
       unique: "chain",
     },
+    rpc: {
+      allowNull: true,
+      type: dataTypes.STRING,
+    },
+    image: {
+      allowNull: true,
+      type: dataTypes.STRING,
+    },
   });
   chains.associate = (models) => {
     chains.hasMany(models.collections, {

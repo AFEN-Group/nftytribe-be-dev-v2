@@ -2,7 +2,7 @@ const db = require("@models");
 const Web3 = require("web3");
 
 const initWeb3 = async (chain) => {
-  const { rpc } = await db.networks.findOne({
+  const { rpc } = await db.chains.findOne({
     where: {
       chain,
     },

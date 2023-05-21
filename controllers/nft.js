@@ -8,6 +8,7 @@ const {
   // linkPhysicalItems,
   getPhysicalItem,
 } = require("../functions/physicalItems");
+const db = require("@models");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -109,21 +110,32 @@ const fetchPhysicalItem = expressAsyncHandler(async (req, res) => {
   res.send(item);
 });
 
-const testT = ["0x55d398326f99059fF775485246999027B3197955"];
+const testT = "0x55d398326f99059fF775485246999027B3197955";
 const testChain = "0x38";
 const env = process.env.NODE_ENV;
 
 const getTokenPrices = expressAsyncHandler(async (req, res) => {
   // addresses && chainId = req.body -- required fields in body
   const chain = env === "production" ? req.body.chainId : testChain;
-  const data = await Promise.all(
-    (env === "production" ? req.body.addresses : testT).map(async (address) => {
-      const data = await Moralis.EvmApi.token.getTokenPrice({
-        address,
+  const token = await db.supportedTokens.findAll({
+    include: {
+      model: db.chains,
+      where: {
         chain,
-      });
-      return data.toJSON();
-    })
+      },
+      required: true,
+    },
+  });
+  const data = await Promise.all(
+    (env === "production" ? token : [{ token: testT }]).map(
+      async ({ token }) => {
+        const data = await Moralis.EvmApi.token.getTokenPrice({
+          address: token,
+          chain,
+        });
+        return data.toJSON();
+      }
+    )
   );
 
   res.send(data);

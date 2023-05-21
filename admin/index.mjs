@@ -41,7 +41,6 @@ const init = async (app, db, MySQLStore) => {
       db.categories,
       db.bids,
       db.emailTemplates,
-      db.networks,
       db.collections,
       db.admins,
       db.physicalItems,
