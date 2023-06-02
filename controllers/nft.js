@@ -9,6 +9,8 @@ const {
   getPhysicalItem,
 } = require("../functions/physicalItems");
 const db = require("@models");
+const { redis } = require("@helpers/redis");
+const { logger } = require("@helpers/logger");
 
 const getNfts = expressAsyncHandler(async (req, res) => {
   await checkError(req, validationResult);
@@ -117,6 +119,8 @@ const env = process.env.NODE_ENV;
 const getTokenPrices = expressAsyncHandler(async (req, res) => {
   // addresses && chainId = req.body -- required fields in body
   const chain = env === "production" ? req.body.chainId : testChain;
+  const cachedTokens = await redis.get("supported-token-" + chain);
+
   const token = await db.supportedTokens.findAll({
     include: {
       model: db.chains,
@@ -126,19 +130,29 @@ const getTokenPrices = expressAsyncHandler(async (req, res) => {
       required: true,
     },
   });
-  const data = await Promise.all(
-    (env === "production" ? token : [{ token: testT }]).map(
-      async ({ token }) => {
-        const data = await Moralis.EvmApi.token.getTokenPrice({
-          address: token,
-          chain,
-        });
-        return data.toJSON();
-      }
-    )
-  );
-
-  res.send(data);
+  try {
+    const data = await Promise.all(
+      (env === "production" ? token : [{ token: testT }]).map(
+        async ({ token }) => {
+          const data = await Moralis.EvmApi.token.getTokenPrice({
+            address: token,
+            chain,
+          });
+          return data.toJSON();
+        }
+      )
+    );
+    //cache data
+    await redis.set("supported-token-" + chain, JSON.stringify(data));
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+    logger(err, "supportedTokenError", "error");
+    if (cachedTokens) {
+      res.send(JSON.parse(cachedTokens));
+      console.log("sent cache");
+    } else throw err;
+  }
 });
 
 module.exports = {
