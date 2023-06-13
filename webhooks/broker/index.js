@@ -185,6 +185,7 @@ broker.route("/physical-item").post(async (req, res) => {
         web3.eth.accounts.wallet.add(account);
         const contract = new web3.eth.Contract(PIProxyAbi, toAddress);
         let data;
+        console.log(paidPrice, totalCharge, "==== paid and totalcharge");
         if (paidPrice >= totalCharge) {
           //positive -- process release of nft and shipping
           const booked = await BubbleDelivery.book(cachedData.data).catch(
@@ -231,10 +232,11 @@ broker.route("/physical-item").post(async (req, res) => {
           from: account.address,
           to: toAddress,
           data,
-          gas: 100000,
-          gasPrice: web3.utils.toWei("50", "gwei"),
-        };
 
+          gasPrice: await web3.eth.getGasPrice(),
+        };
+        const gas = await web3.eth.estimateGas(tx);
+        tx.gas = gas;
         web3.eth
           .sendTransaction(tx)
           .on("transactionHash", (hash) => {
@@ -249,7 +251,7 @@ broker.route("/physical-item").post(async (req, res) => {
           .on("error", (error) => {
             console.error(error);
             // res.send();
-            logger(JSON.stringify(err), "piProxy-listing", "error");
+            logger(JSON.stringify(error), "piProxy-listing", "error");
           });
       }
     }
