@@ -5,6 +5,7 @@ metadata:
   name: nftytribe-v2-be-networks
   annotations:
     cert-manager.io/cluster-issuer: cert-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 101m
     # traefik.ingress.kubernetes.io/proxy-body-size: 5m
 spec:
   ingressClassName: nginx
