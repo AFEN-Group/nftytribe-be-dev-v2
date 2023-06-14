@@ -28,7 +28,7 @@ const nfts = (sequelize, dataTypes) => {
         defaultValue: false,
       },
       description: {
-        type: dataTypes.STRING,
+        type: dataTypes.TEXT,
         allowNull: true,
       },
       url: {
