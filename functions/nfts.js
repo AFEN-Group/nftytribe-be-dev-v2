@@ -121,7 +121,10 @@ class Nfts {
       // console.log(url);
       // building data
       const values = {
-        name: nftMetadata.name,
+        name:
+          nftMetadata.metadata?.name ??
+          nftMetadata.metadata?.title ??
+          nftMetadata.name,
         tokenId: data.tokenId,
         description: nftMetadata.metadata?.description,
         categoryId: Number(data.category) || undefined,
