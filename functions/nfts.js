@@ -101,6 +101,10 @@ class Nfts {
         await this.getNftMetaData(data.tokenId, data.erc721, chain),
         await this.getTokenData(data.erc20Token, chain),
       ]);
+
+      console.log(nftMetadata, "nftMetadata");
+      console.log(tokenData, "tokenMetadata");
+
       /**
        * @type {string}
        */

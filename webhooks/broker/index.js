@@ -191,6 +191,7 @@ broker.route("/physical-item").post(async (req, res) => {
           const booked = await BubbleDelivery.book(cachedData.data).catch(
             (err) => {
               // log error and refund user possibly
+              // change everything happening here, in fact transactions should be reversed
               logger(JSON.stringify(err), "piProxy-listing", "error");
             }
           );
@@ -232,7 +233,6 @@ broker.route("/physical-item").post(async (req, res) => {
           from: account.address,
           to: toAddress,
           data,
-
           gasPrice: await web3.eth.getGasPrice(),
         };
         const gas = await web3.eth.estimateGas(tx);
