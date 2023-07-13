@@ -137,7 +137,9 @@ class Users {
       };
     await redis.del(this.userId + "-email-verification");
     const updated = await this.updateUser({ email: email.email });
-
+    await db.emailLists.create({
+      email: email.email,
+    });
     return updated;
   };
 }
