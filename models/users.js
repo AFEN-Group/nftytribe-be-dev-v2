@@ -122,9 +122,10 @@ const users = (sequelize, dataTypes, db) => {
     // users.hasMany(models.physicalItemBuyers, {
     //   onDelete: "cascade",
     // });
-    users.belongsToMany(models.notifications, {
-      through: models.userNotifications,
-    });
+    // users.belongsToMany(models.notifications, {
+    //   through: models.userNotifications,
+    // });
+    users.hasMany(models.notifications);
   };
   users.beforeUpdate((user, options) => {
     const prev = user.previous();
@@ -145,6 +146,34 @@ const users = (sequelize, dataTypes, db) => {
         });
     }
   });
+  users.beforeBulkUpdate(async (user, options) => {
+    if (user.where?.id) {
+      const result = await users.findOne({
+        where: {
+          id: user.where.id,
+        },
+      });
+      const event = await db.notificationEvents.findOne({
+        where: {
+          name: "AccountUpdate",
+        },
+      });
+
+      const notification = await db.notifications.create(
+        {
+          userId: result.id,
+          notificationEventId: event.id,
+          parameters: {
+            username: result.username,
+          },
+        },
+        {
+          include: { model: db.notificationEvents },
+        }
+      );
+    }
+  });
+
   return users;
 };
 

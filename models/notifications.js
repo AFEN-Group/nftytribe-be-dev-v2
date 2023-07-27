@@ -11,18 +11,18 @@ const { Socket } = require("socket.io");
  */
 const notifications = (sequelize, dataTypes, db) => {
   const notifications = sequelize.define("notifications", {
-    type: {
-      type: dataTypes.STRING(50),
-      allowNull: false,
-    },
-    text: {
+    message: {
       type: dataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     isRead: {
       type: dataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    parameters: {
+      allowNull: false,
+      type: dataTypes.JSON,
     },
   });
 
@@ -30,9 +30,8 @@ const notifications = (sequelize, dataTypes, db) => {
     notifications.belongsToMany(model.users, {
       through: model.userNotifications,
     });
-    notifications.belongsTo(model.collections);
-    notifications.belongsTo(model.nfts);
-    notifications.belongsTo(model.transactions);
+    notifications.belongsTo(model.users);
+    notifications.belongsTo(model.notificationEvents);
   };
 
   //all single
@@ -252,6 +251,45 @@ const notifications = (sequelize, dataTypes, db) => {
     );
   };
 
+  notifications.beforeCreate(async (notification, options) => {
+    // /**
+    //  * @type {import("sequelize").CreateOptions}
+    //  */
+    // const opt = options;
+
+    const { notificationEventId, parameters } = notification;
+
+    const event = await db.notificationEvents.findOne({
+      where: {
+        id: notificationEventId,
+      },
+    });
+    const { description } = event;
+    notification.message = description;
+
+    // validate that the required parameters are available
+    const keys = description.match(/(?<=\{)(.*?)(?=\})/g);
+
+    for (let key of keys) {
+      if (!parameters[key]) {
+        throw { message: `key ${key} not found in parameter!` };
+      } else {
+        notification.message = notification.message.replace(
+          `{${key}}`,
+          parameters[key]
+        );
+      }
+    }
+    // return notification;
+    // all passed
+  });
+
+  notifications.afterCreate(async (notification) => {
+    socketEmitter.to(notification.userId.toString()).emit("notification", {
+      ...notification.dataValues,
+      notificationEvent: (await notification.getNotificationEvent()).dataValues,
+    });
+  });
   return notifications;
 };
 

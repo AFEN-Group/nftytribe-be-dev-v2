@@ -169,7 +169,7 @@ class Nfts {
         await linkPhysicalItems(physicalId, newListing.id);
       }
 
-      return newListing;
+      return { nft: newListing, user };
     } else {
       //do nothing
     }
@@ -218,18 +218,18 @@ class Nfts {
         walletAddress,
       },
     });
-    return (
-      user &&
-      (await db.nfts.destroy({
-        where: {
-          // userId: user.id,
-          tokenId,
-          moreInfo: {
-            contractAddress,
-          },
+    const nft = await db.nfts.findOne({
+      where: {
+        // userId: user.id,
+        tokenId,
+        moreInfo: {
+          contractAddress,
         },
-      }))
-    );
+      },
+    });
+    user && (await nft.destroy());
+
+    return { user, nft };
   };
 
   getListings = async (inputs = {}) => {
@@ -735,6 +735,9 @@ class Nfts {
           contractAddress: data.erc721,
         },
       },
+      include: {
+        model: db.users,
+      },
     });
     const bidder = await db.users.findOne({
       where: {
@@ -748,7 +751,7 @@ class Nfts {
         userId: bidder.id,
         amount: data.amount / 10 ** listing.moreInfo.erc20TokenDecimals,
       });
-      return { bid, listing };
+      return { bid, listing, bidder };
     }
   };
 
@@ -922,7 +925,7 @@ class Nfts {
       });
 
       await listing.destroy();
-      return newTransaction;
+      return { transaction: newTransaction, buyer };
     }
   };
 

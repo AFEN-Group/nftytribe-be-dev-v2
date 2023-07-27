@@ -30,61 +30,151 @@ broker.route("/").post(
         //handle putting sale off
         const [tokenId, address] = data.params;
 
-        const putOffSale = await nfts.putOffSale(
+        const result = await nfts.putOffSale(
           address.value,
           fromAddress,
           tokenId.value
         );
+
+        //notification
+        const event = await db.notificationEvents.findOne({
+          where: {
+            name: "PutOffSale",
+          },
+        });
+        if (event) {
+          const notification = await db.notifications.create(
+            {
+              userId: result.user.id,
+              notificationEventId: event.id,
+              parameters: {
+                nft_name: result.nft.name,
+                username: result.user.username,
+              },
+            },
+            {
+              include: {
+                model: db.notificationEvents,
+              },
+            }
+          );
+
+          //emit through socket
+        }
       }
 
       if (data.name.toLowerCase() === "putonsale") {
-        const newListing = await nfts.putOnSale(
-          data.params,
-          fromAddress,
-          chainId
+        const result = await nfts.putOnSale(data.params, fromAddress, chainId);
+        const event = await db.notificationEvents.findOne({
+          where: {
+            name: "PutOnSale",
+          },
+        });
+        const notification = await db.notifications.create(
+          {
+            parameters: {
+              username: result.user.username,
+              nft_name: result.nft.name,
+              listingId: result.nft.id,
+            },
+            notificationEventId: event.id,
+            userId: result.user.id,
+          },
+          {
+            include: {
+              model: db.notificationEvents,
+            },
+          }
         );
 
-        const multiNotificationWorker = new Worker(
-          "./workers/multiNotifications.js"
-        );
-
-        newListing.collectionId &&
-          multiNotificationWorker.postMessage({
-            type: NotificationTypes.NEW_LISTING_COLLECTION,
-            nftId: newListing.id,
-            listingId: newListing.id,
-            collectionId: newListing.collectionId,
-            name: "favorite",
-          });
+        //emit notification
       }
 
       if (data.name.toLowerCase() === "bid") {
-        const newBid = await nfts.newBid(data.params, fromAddress);
-        // notifications
-        const worker = new Worker("./workers/singleNotifications.js");
-        worker.postMessage({
-          nftId: newBid.listing.id,
-          title: newBid.listing.name,
-          tokenId: newBid.listing.tokenId,
-          type: NotificationTypes.BID_PLACED,
-          userId: newBid.listing.userId,
+        const result = await nfts.newBid(data.params, fromAddress);
+        // create notification
+        const event = await db.notificationEvents.findOne({
+          where: {
+            name: "NewBid",
+          },
         });
-      }
-      if (data.name.toLowerCase() === "buy") {
-        const newSales = await nfts.buyNft(data.params, fromAddress);
 
-        console.log(newSales, "newSale");
-        // ..notifcations
-        const worker = new Worker("./workers/singleNotifications.js");
-        const notificationData = {
-          transactionId: newSales.id,
-          title: newSales.listingInfo.name,
-          tokenId: newSales.listingInfo.tokenId,
-          type: NotificationTypes.SOLD,
-          userId: newSales.sellerId,
-          // buyerId: newSales.buyerId,
-        };
-        worker.postMessage(notificationData);
+        const notification = await db.notifications.create(
+          {
+            parameters: {
+              listingId: result.listing.id,
+              username: result.listing.user.username,
+              nft_name: result.listing.name,
+            },
+            userId: result.listing.userId,
+            notificationEventId: event.id,
+          },
+          {
+            include: {
+              model: db.notificationEvents,
+            },
+          }
+        );
+
+        //emit notification
+      }
+
+      if (data.name.toLowerCase() === "buy") {
+        const result = await nfts.buyNft(data.params, fromAddress);
+        const event = await db.notificationEvents.findOne({
+          where: {
+            name: "NFTSold",
+          },
+        });
+        const event2 = await db.notificationEvents.findOne({
+          where: {
+            name: "SuccessfulPurchase",
+          },
+        });
+        const seller = await db.users.findOne({
+          where: {
+            id: result.transaction.sellerId,
+          },
+        });
+        const notification = await db.notifications.create(
+          {
+            parameters: {
+              transactionId: result.transaction.id,
+              username: seller.username,
+              nft_name: result.transaction.listingInfo.name,
+              price: result.transaction.listingInfo.price,
+              currency: result.transaction.erc20Info.symbol,
+            },
+            userId: result.transaction.sellerId,
+            notificationEventId: event.id,
+          },
+          {
+            include: {
+              model: db.notificationEvents,
+            },
+          }
+        );
+        //emit to seller
+
+        const notification2 = await db.notifications.create(
+          {
+            parameters: {
+              transactionId: result.transaction.id,
+              username: result.buyer.username,
+              nft_name: result.transaction.listingInfo.name,
+              price: result.transaction.listingInfo.price,
+              currency: result.transaction.erc20Info.symbol,
+            },
+            userId: result.buyer.id,
+            notificationEventId: event2.id,
+          },
+          {
+            include: {
+              model: db.notificationEvents,
+            },
+          }
+        );
+        // emit notification to buyer
       }
     } else if (txsData && confirmed) {
       //changed confirmed to true
