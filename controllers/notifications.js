@@ -19,6 +19,9 @@ exports.getNotification = expressAsyncHandler(async (req, res) => {
     await user.getNotifications({
       limit,
       offset,
+      include: {
+        model: db.notificationEvents,
+      },
     }),
   ]);
   const data = {
