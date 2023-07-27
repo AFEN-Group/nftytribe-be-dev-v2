@@ -275,16 +275,16 @@ broker.route("/physical-item").post(async (req, res) => {
         web3.eth.accounts.wallet.add(account);
         const contract = new web3.eth.Contract(PIProxyAbi, toAddress);
         let data;
+        let booked;
         console.log(paidPrice, totalCharge, "==== paid and totalcharge");
         if (paidPrice >= totalCharge) {
           //positive -- process release of nft and shipping
-          const booked = await BubbleDelivery.book(cachedData.data).catch(
-            (err) => {
-              // log error and refund user possibly
-              // change everything happening here, in fact transactions should be reversed
-              logger(JSON.stringify(err), "piProxy-listing", "error");
-            }
-          );
+
+          booked = await BubbleDelivery.book(cachedData.data).catch((err) => {
+            // log error and refund user possibly
+            // change everything happening here, in fact transactions should be reversed
+            logger(JSON.stringify(err), "piProxy-listing", "error");
+          });
           await db.shipments.create({
             order: booked.data,
             senderId: listing.userId,
@@ -297,20 +297,7 @@ broker.route("/physical-item").post(async (req, res) => {
             ).id,
           });
 
-          const newSales = await nfts.buyNft(params, fromAddress);
           data = contract.methods.processBid(logs[0].topic1, false).encodeABI();
-
-          // ..notifcations
-          const worker = new Worker("./workers/singleNotifications.js");
-          const notificationData = {
-            transactionId: newSales.id,
-            title: newSales.listingInfo.name,
-            tokenId: newSales.listingInfo.tokenId,
-            type: NotificationTypes.SOLD,
-            userId: newSales.sellerId,
-            // buyerId: newSales.buyerId,
-          };
-          worker.postMessage(notificationData);
           console.log("Booked! ------");
         } else {
           //underpayment --refund user and possibly email user of failed purchase attempt
@@ -332,11 +319,54 @@ broker.route("/physical-item").post(async (req, res) => {
           .on("transactionHash", (hash) => {
             console.log(`Transaction hash: ${hash}`);
           })
-          .on("receipt", (receipt) => {
+          .on("receipt", async (receipt) => {
             console.log(
               `Transaction was mined in block ${receipt.blockNumber}`
             );
             // res.send(200);
+            if (booked) {
+              const result = await nfts.buyNft(params, fromAddress);
+
+              const event = await db.notificationEvents.findOne({
+                where: {
+                  name: "NFTSold",
+                },
+              });
+              const event2 = await db.notificationEvents.findOne({
+                where: {
+                  name: "SuccessfulPurchase",
+                },
+              });
+              const seller = await db.users.findOne({
+                where: {
+                  id: result.transaction.sellerId,
+                },
+              });
+              const notification = await db.notifications.create({
+                parameters: {
+                  transactionId: result.transaction.id,
+                  username: seller.username,
+                  nft_name: result.transaction.listingInfo.name,
+                  price: result.transaction.listingInfo.price,
+                  currency: result.transaction.erc20Info.symbol,
+                },
+                userId: result.transaction.sellerId,
+                notificationEventId: event.id,
+              });
+              //emit to seller
+
+              const notification2 = await db.notifications.create({
+                parameters: {
+                  transactionId: result.transaction.id,
+                  username: result.buyer.username,
+                  nft_name: result.transaction.listingInfo.name,
+                  price: result.transaction.listingInfo.price,
+                  currency: result.transaction.erc20Info.symbol,
+                },
+                userId: result.buyer.id,
+                notificationEventId: event2.id,
+              });
+            }
           })
           .on("error", (error) => {
             console.error(error);
