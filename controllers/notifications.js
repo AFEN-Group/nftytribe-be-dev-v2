@@ -22,6 +22,7 @@ exports.getNotification = expressAsyncHandler(async (req, res) => {
       include: {
         model: db.notificationEvents,
       },
+      order: [["createdAt", "desc"]],
     }),
   ]);
   const data = {
@@ -43,10 +44,8 @@ exports.markAll = expressAsyncHandler(async (req, res) => {
     { isRead: true },
     {
       where: {
-        id: {
-          [Op.in]: db.Sequelize.literal(`(
-          SELECT notificationId FROM userNotifications WHERE userId = ${id})`),
-        },
+        userId: id,
+        isRead: false,
       },
     }
   );
