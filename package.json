@@ -51,10 +51,10 @@
     "winston": "^3.8.2"
   },
   "scripts": {
-    "dev": "npx sequelize-cli db:migrate &&  nodemon -r module-alias/register -r dotenv/config  server.js",
+    "dev": "nodemon -r module-alias/register -r dotenv/config  server.js",
     "start": "NODE_ENV=production node -r module-alias/register -r dotenv/config  server.js",
     "start:production": "npm run set-env && npx sequelize-cli db:migrate && npm run start",
-    "staging": " NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
+    "staging": "npx sequelize-cli db:seed:all &&  NODE_ENV=staging node -r module-alias/register -r dotenv/config server.js",
     "update-db": "chmod +x ./scripts/db/update_db.sh && ./scripts/db/update_db.sh",
     "set-env": "node -r dotenv/config ./scripts/db/set_env.js",
     "start:dev": "npm run set-env && npm run dev",
