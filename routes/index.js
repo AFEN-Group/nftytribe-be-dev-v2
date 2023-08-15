@@ -10,6 +10,7 @@ const uploads = require("./uploads");
 const user = require("./user");
 const shipment = require("./shipment");
 const announcements = require("./announcements");
+const search = require("./search");
 
 const route = require("express").Router();
 
@@ -23,5 +24,6 @@ route.use("/uploads", uploads);
 route.use("/shipment", shipment);
 route.use("/notifications", notification);
 route.use("/announcements", announcements);
+route.use("/search", search);
 
 module.exports = route;

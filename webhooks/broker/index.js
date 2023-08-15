@@ -98,23 +98,30 @@ broker.route("/").post(
             name: "NewBid",
           },
         });
-
-        const notification = await db.notifications.create(
-          {
-            parameters: {
-              listingId: result.listing.id,
-              username: result.listing.user.username,
-              nft_name: result.listing.name,
-            },
-            userId: result.listing.userId,
-            notificationEventId: event.id,
+        const event2 = await db.notificationEvents.findOne({
+          where: {
+            name: "BidConfirmed",
           },
-          {
-            include: {
-              model: db.notificationEvents,
-            },
-          }
-        );
+        });
+
+        await db.notifications.create({
+          parameters: {
+            listingId: result.listing.id,
+            username: result.listing.user.username,
+            nft_name: result.listing.name,
+          },
+          userId: result.listing.userId,
+          notificationEventId: event.id,
+        });
+        await db.notifications.create({
+          parameters: {
+            listingId: result.listing.id,
+            username: result.bidder.username,
+            nft_name: result.listing.name,
+          },
+          userId: result.bidder.id,
+          notificationEventId: event2.id,
+        });
 
         //emit notification
       }
